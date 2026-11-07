@@ -176,6 +176,21 @@ act_subgroup_count_outcomes <- c(
   "rescue_days_itt"
 )
 
+# Subgroup variables for the mixed-model interactions, and the repeated
+# outcomes also fitted by child or adult (AQLQ and PACQLQ each apply to one
+# group only)
+mixed_subgroup_variables <- c(
+  "prefer_language",
+  "participant_sex",
+  "self_reported_adherence_binary",
+  "act_binary"
+)
+child_adult_mixed_outcomes <- c(
+  "act_score",
+  "afs_score",
+  "self_reported_adherence"
+)
+
 ## ---- output-folders
 dir.create("figures", showWarnings = FALSE)
 dir.create("tables", showWarnings = FALSE)
