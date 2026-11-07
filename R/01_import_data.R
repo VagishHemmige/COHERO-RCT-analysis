@@ -1,7 +1,7 @@
 # Purpose: read the four study files and tidy their column names.
 # Needs: setup.R (file paths). Produces: raw_asthma_data,
 #   baseline_sex, clean_asthma_data (REDCap export joined to
-#   sex), raw_notifications, raw_medications, RawFollowupdates.
+#   sex), raw_notifications, raw_medications, raw_followup_dates.
 # Ported from the ImportData chunk of MR_SJ_asthma_pilot_2023-9-15.Rmd
 #   (reading steps only; cleaning is in 02_build_visit_data.R).
 
