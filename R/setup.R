@@ -53,7 +53,7 @@ timepoint_review_file <- file.path(
 glitch_date <- as.Date("2018-5-16")
 
 # Items averaged into each scale score
-AQLQ_variables <- c(
+aqlq_items <- c(
   "short_of_breath_2weeks",
   "avoid_dust_2weeks",
   "frustrated_2weeks",
@@ -71,7 +71,7 @@ AQLQ_variables <- c(
   "limited_work_tasks_2weeks"
 )
 
-PACQLQ_variables <- c(
+pacqlq_items <- c(
   "caregiver_helplessness_1week",
   "family_plans_change_1week",
   "caregiver_frustration_1week",
@@ -87,7 +87,7 @@ PACQLQ_variables <- c(
   "caregiver_worry_child_normalcy_1week"
 )
 
-AFS_variables <- c(
+afs_items <- c(
   "limitation_structured_physical_activities",
   "limitation_sports",
   "limitation_strenuous_activities",
@@ -115,44 +115,44 @@ adherence_cutoff <- 35 # self-reported adherence score >= 35 is "Adherent"
 act_cutoff <- 12 # ACT score >= 12 is "Controlled"
 
 # Inhaler names used to relabel controller vs rescue medication
-ControlMedicationVector <- c(
+controller_medication_names <- c(
   "Advair", "Breo", "Dulera", "Flovent", "QVAR", "Symbicort"
 )
-RescueMedicationVector <- c("Combivent", "ProAir", "Ventolin", "Proventil")
+rescue_medication_names <- c("Combivent", "ProAir", "Ventolin", "Proventil")
 
 # Upper bound of the study ID range used to build the day grid; see #15
 n_subject_ids <- 81
 
 # 12-month health care use outcomes
-HospitalCountOutcomes <- c(
+hospital_count_outcomes <- c(
   "ed_visit_number_times_12months",
   "hospitalization_number_times_12months",
   "urgent_care_number_times_12months"
 )
-HospitalBinaryOutcomes <- c(
+hospital_binary_outcomes <- c(
   "ed_visit_12months",
   "hospitalization_asthma_12months",
   "urgent_care_12months"
 )
 
 # Count outcomes modelled with negative binomial regression
-PoissonOutcomes <- c(
+count_outcomes <- c(
   "ed_visit_number_times_12months",
   "hospitalization_number_times_12months",
   "urgent_care_number_times_12months",
-  "Number_Rescue_puffs_ITT",
-  "Number_Rescue_days_ITT"
+  "rescue_puffs_itt",
+  "rescue_days_itt"
 )
 
 # Repeated-measures outcomes and subgroup variables for the mixed models
-OutcomeList <- c(
+repeated_outcomes <- c(
   "act_score",
-  "AQLQ_score",
-  "PACQLQ_score",
-  "AFS_score",
+  "aqlq_score",
+  "pacqlq_score",
+  "afs_score",
   "self_reported_adherence"
 )
-InteractionVariableList <- c(
+subgroup_variables <- c(
   "prefer_language",
   "child_adult",
   "participant_sex",

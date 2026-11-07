@@ -1,27 +1,27 @@
 # Purpose: read the four study files and tidy their column names.
-# Needs: setup.R (file paths). Produces: RawAsthmaData,
-#   EMASTHMA_DATA_Baseline_gender, CleanAsthmaData (REDCap export joined to
-#   sex), RawNotifications, RawMedications, RawFollowupdates.
+# Needs: setup.R (file paths). Produces: raw_asthma_data,
+#   baseline_sex, clean_asthma_data (REDCap export joined to
+#   sex), raw_notifications, raw_medications, RawFollowupdates.
 # Ported from the ImportData chunk of MR_SJ_asthma_pilot_2023-9-15.Rmd
 #   (reading steps only; cleaning is in 02_visits.R).
 
 ## ---- import-redcap
 # Raw data export from REDCap
-RawAsthmaData <- read_excel(redcap_export_file)
+raw_asthma_data <- read_excel(redcap_export_file)
 
 # Sex is in a separate file
-EMASTHMA_DATA_Baseline_gender <- read_excel(baseline_sex_file) %>%
+baseline_sex <- read_excel(baseline_sex_file) %>%
   select(study_id_screening, participant_sex)
 
 # Merge sex into the REDCap export
-CleanAsthmaData <- left_join(
-  RawAsthmaData,
-  EMASTHMA_DATA_Baseline_gender,
+clean_asthma_data <- left_join(
+  raw_asthma_data,
+  baseline_sex,
   by = "study_id_screening"
 )
 
 ## ---- import-notifications
-RawNotifications <- read_excel(
+raw_notifications <- read_excel(
   push_data_file,
   sheet = "Notifications",
   col_types = c(
@@ -31,12 +31,12 @@ RawNotifications <- read_excel(
 )
 
 # Remove spaces from names
-names(RawNotifications) <- names(RawNotifications) %>%
+names(raw_notifications) <- names(raw_notifications) %>%
   str_replace_all(fixed(" "), "")
 
 ## ---- import-medications
 # suppressWarnings avoids one warning per missing cell
-RawMedications <- read_excel(
+raw_medications <- read_excel(
   push_data_file,
   sheet = "Medication Usage",
   col_types = c(
@@ -48,19 +48,19 @@ RawMedications <- read_excel(
   suppressWarnings()
 
 # Remove spaces from names
-names(RawMedications) <- names(RawMedications) %>%
+names(raw_medications) <- names(raw_medications) %>%
   str_replace_all(fixed(" "), "")
 
 ## ---- import-followup-dates
 # suppressWarnings avoids one warning per missing cell
-RawFollowupdates <- read_excel(
+raw_followup_dates <- read_excel(
   timepoint_review_file,
   col_types = c("numeric", "date", "date", "date", "date", "date", "date")
 ) %>%
   suppressWarnings()
 
 # Remove spaces and other troublesome characters from names
-names(RawFollowupdates) <- names(RawFollowupdates) %>%
+names(raw_followup_dates) <- names(raw_followup_dates) %>%
   str_replace_all(fixed(" "), "") %>%
   str_replace_all(fixed("#"), "") %>%
   str_replace_all(fixed("-"), "")
