@@ -160,6 +160,22 @@ subgroup_variables <- c(
   "act_binary"
 )
 
+# Subgroup variables for the count-model interactions, and the count outcomes
+# fitted with the baseline asthma control subgroup (hospitalizations are left
+# out, as in the original analysis)
+count_subgroup_variables <- c(
+  "prefer_language",
+  "participant_sex",
+  "child_adult",
+  "self_reported_adherence_binary"
+)
+act_subgroup_count_outcomes <- c(
+  "ed_visit_number_times_12months",
+  "urgent_care_number_times_12months",
+  "rescue_puffs_itt",
+  "rescue_days_itt"
+)
+
 ## ---- output-folders
 dir.create("figures", showWarnings = FALSE)
 dir.create("tables", showWarnings = FALSE)
