@@ -191,6 +191,12 @@ child_adult_mixed_outcomes <- c(
   "self_reported_adherence"
 )
 
+# Population names used in plot titles
+population_labels <- c(
+  itt = "ITT analysis",
+  pp = "per-protocol analysis"
+)
+
 ## ---- output-folders
 dir.create("figures", showWarnings = FALSE)
 dir.create("tables", showWarnings = FALSE)
