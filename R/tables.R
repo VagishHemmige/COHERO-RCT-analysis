@@ -1,6 +1,6 @@
 # Purpose: build Table 1 and the count-outcome summary.
-# Needs: setup.R (count_outcomes); 03_medication.R (clean_asthma_data_itt,
-#   rescue_medication_merged).
+# Needs: setup.R (count_outcomes); 03_derive_medication_outcomes.R
+#   (clean_asthma_data_itt, rescue_medication_merged).
 # Produces: table_1, count_outcome_summary. Nothing is written to disk yet;
 #   exporting tables is deferred (see #8).
 # Ported from the table1 and CountAndBinaryOutcomes chunks of

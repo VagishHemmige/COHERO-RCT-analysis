@@ -2,8 +2,8 @@
 #   controller proportion of days covered (PDC), and build the
 #   participant-level data for the count models.
 # Needs: setup.R (controller_medication_names, rescue_medication_names,
-#   glitch_date, n_subject_ids, hospital_count_outcomes); 01_import.R
-#   (raw_medications); 02_visits.R (clean_asthma_data_itt,
+#   glitch_date, n_subject_ids, hospital_count_outcomes); 01_import_data.R
+#   (raw_medications); 02_build_visit_data.R (clean_asthma_data_itt,
 #   clean_asthma_data_pp, study_dates).
 # Produces: medication_data_clean, total_rescue_medication_uses,
 #   control_medication, controller_pdc, controller_pdc_quarter,
@@ -13,7 +13,7 @@
 #   clean_asthma_data_pp.
 # Ported from the medication_data_processing and medicationquarteranalysis
 #   chunks of MR_SJ_asthma_pilot_2023-9-15.Rmd. The chunk's data checks are
-#   in R/exploratory/medication_checks.R.
+#   in R/exploratory/check_medication.R.
 
 ## ---- clean-medication-records
 # Records with no study ID are not participants and are excluded from all

@@ -2,8 +2,8 @@
 #   with subgroup interactions, in the ITT and per-protocol populations.
 # Needs: setup.R (repeated_outcomes, mixed_subgroup_variables,
 #   child_adult_mixed_outcomes); functions.R (create_me_table());
-#   03_medication.R (clean_asthma_data_itt, clean_asthma_data_pp, with
-#   interval controller PDC added).
+#   03_derive_medication_outcomes.R (clean_asthma_data_itt,
+#   clean_asthma_data_pp, with interval controller PDC added).
 # Produces: mixed_model_tables, a named list of flextables indexed by
 #   population ("itt", "pp"), then outcome, then "overall" or the subgroup
 #   variable.

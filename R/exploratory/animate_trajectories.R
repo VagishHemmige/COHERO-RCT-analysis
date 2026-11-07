@@ -1,9 +1,10 @@
 # Purpose: animated views of ACT and controller use. Exploratory: not sourced
 #   by main.R. Run by an authorized person only: several animations step
-#   through participants one at a time and show each study ID, so their
-#   output is participant-level and not for release.
-# Needs: setup.R; 02_visits.R (clean_asthma_data_itt, clean_asthma_data_pp);
-#   03_medication.R (control_medication).
+#   through participants one at a time and show each study ID, so their output
+#   is participant-level and not for release.
+# Needs: setup.R; 02_build_visit_data.R (clean_asthma_data_itt,
+#   clean_asthma_data_pp); 03_derive_medication_outcomes.R
+#   (control_medication).
 # Produces: animation objects; animate() renders them when run.
 # Ported from the initialgraphs and medication chunks of
 #   MR_SJ_asthma_pilot_2023-9-15.Rmd.

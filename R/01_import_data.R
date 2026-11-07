@@ -3,7 +3,7 @@
 #   baseline_sex, clean_asthma_data (REDCap export joined to
 #   sex), raw_notifications, raw_medications, RawFollowupdates.
 # Ported from the ImportData chunk of MR_SJ_asthma_pilot_2023-9-15.Rmd
-#   (reading steps only; cleaning is in 02_visits.R).
+#   (reading steps only; cleaning is in 02_build_visit_data.R).
 
 ## ---- import-redcap
 # Raw data export from REDCap

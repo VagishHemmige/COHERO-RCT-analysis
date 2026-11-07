@@ -2,9 +2,9 @@
 #   controller use, and the mixed-model plots for every outcome and subgroup.
 # Needs: setup.R (count_outcomes, repeated_outcomes, mixed_subgroup_variables,
 #   child_adult_mixed_outcomes, population_labels); functions.R
-#   (create_me_plot()); 03_medication.R (clean_asthma_data_itt,
+#   (create_me_plot()); 03_derive_medication_outcomes.R (clean_asthma_data_itt,
 #   clean_asthma_data_pp, rescue_medication_merged,
-#   controller_medication_merged); 05_mixed_models.R (mixed_model_data).
+#   controller_medication_merged); 05_fit_mixed_models.R (mixed_model_data).
 # Produces: act_plots, count_outcome_plots, medication_plots (named lists of
 #   ggplot objects); mixed_model_plots (named list indexed by population,
 #   outcome, then "overall" or the subgroup variable). Nothing is written to
@@ -12,7 +12,7 @@
 # Ported from the initialgraphs, CountAndBinaryOutcomes, medication and
 #   mixed-model plot chunks of MR_SJ_asthma_pilot_2023-9-15.Rmd. In the RMD
 #   each plot was printed into the document; here they are kept in named
-#   lists. The animations are in R/exploratory/animations.R.
+#   lists. The animations are in R/exploratory/animate_trajectories.R.
 
 ## ---- act-plots
 act_plots <- list()

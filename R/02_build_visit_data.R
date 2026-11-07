@@ -1,7 +1,7 @@
 # Purpose: build the visit-level analysis data for the ITT and per-protocol
 #   populations, with recodes and scale scores.
 # Needs: setup.R (item lists, missing_999_variables, glitch_date,
-#   adherence_cutoff, act_cutoff); 01_import.R (clean_asthma_data).
+#   adherence_cutoff, act_cutoff); 01_import_data.R (clean_asthma_data).
 # Produces: clean_asthma_data_itt (all visits), clean_asthma_data_pp (visits
 #   on or before glitch_date), study_dates (one row per participant with
 #   consent and follow-up visit dates).

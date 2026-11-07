@@ -1,11 +1,12 @@
-# Purpose: data checks on the app medication records. Exploratory: not
-#   sourced by main.R. Run by an authorized person only; the printed tables
-#   come from restricted data and are not cleared for release.
-# Needs: setup.R; 01_import.R (raw_medications); 03_medication.R
-#   (medication_data_clean). Produces: printed check tables only.
+# Purpose: data checks on the app medication records. Exploratory: not sourced
+#   by main.R. Run by an authorized person only; the printed tables come from
+#   restricted data and are not cleared for release.
+# Needs: setup.R; 01_import_data.R (raw_medications);
+#   03_derive_medication_outcomes.R (medication_data_clean). Produces: printed
+#   check tables only.
 # Ported from the medication_data_processing chunk of
-#   MR_SJ_asthma_pilot_2023-9-15.Rmd. A check on one named participant in
-#   the original is left out, because it ties a study ID to a data fact.
+#   MR_SJ_asthma_pilot_2023-9-15.Rmd. A check on one named participant in the
+#   original is left out, because it ties a study ID to a data fact.
 
 ## ---- check-missing-ids
 # Records with no study ID, by app user

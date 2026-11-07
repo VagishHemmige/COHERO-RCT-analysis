@@ -2,18 +2,18 @@
 #   health care use and rescue inhaler use), overall and with subgroup
 #   interactions, and compare controller PDC between arms.
 # Needs: setup.R (count_outcomes, count_subgroup_variables,
-#   act_subgroup_count_outcomes); 03_medication.R (rescue_medication_merged,
-#   controller_medication_merged).
+#   act_subgroup_count_outcomes); 03_derive_medication_outcomes.R
+#   (rescue_medication_merged, controller_medication_merged).
 # Produces: count_model_table (one stacked gtsummary table),
 #   count_interaction_tables (named list: outcome, then subgroup variable),
 #   rescue_puffs_model_alt_table, rescue_days_model_alt_table (see issue #1),
 #   controller_pdc_comparison.
 # Ported from the CountAndBinaryOutcomes, CountAndBinaryOutcomes2 and
 #   medication chunks of MR_SJ_asthma_pilot_2023-9-15.Rmd. In the RMD the
-#   interaction tables were printed; here they are kept in a named list.
-#   The outcome summary and plots go to tables.R and figures.R; the
+#   interaction tables were printed; here they are kept in a named list. The
+#   outcome summary and plots go to tables.R and figures.R; the
 #   hospitalization-by-ACT model that was left out is in
-#   R/exploratory/count_model_checks.R.
+#   R/exploratory/check_count_models.R.
 
 ## ---- count-models
 # Negative binomial regression of each count on arm, with log follow-up time

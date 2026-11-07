@@ -24,14 +24,14 @@ Analysis of the EM-ASTHMA pilot randomized trial of the COHERO mobile app for as
 
 ## Data sources
 
-The study data have no access package. They are four Excel files kept outside the repository, in the folder named by `COHERO_DATA_DIR` in each authorized person's `.Renviron`. `R/setup.R` builds their paths and `R/01_import.R` is the one loading script.
+The study data have no access package. They are four Excel files kept outside the repository, in the folder named by `COHERO_DATA_DIR` in each authorized person's `.Renviron`. `R/setup.R` builds their paths and `R/01_import_data.R` is the one loading script.
 
 | Source | Accessed through | Package documentation | Package maintained by | Access | What AI agents may do |
 |---|---|---|---|---|---|
-| REDCap export, all visits (`EMASTHMA_DATA_All Data Export_deidentified.xlsx`) | `R/01_import.R` (`readxl::read_excel()`) | REDCap data dictionary (to be added to `references/`) | No package | Restricted (trial participant data; governing IRB protocol to be named) | None: code, documentation and synthetic data only |
-| Baseline sex (`EMASTHMA_DATA_Baseline gender.xlsx`) | `R/01_import.R` (`readxl::read_excel()`) | REDCap data dictionary | No package | Restricted (as above) | None: code, documentation and synthetic data only |
-| COHERO app push data, Notifications and Medication Usage sheets (`EM-ASTHMA Aggregate COHERO Push Data 06.24.2020 GS Edits.xlsx`) | `R/01_import.R` (`readxl::read_excel()`) | App export description (to be added to `references/`) | No package | Restricted (as above) | None: code, documentation and synthetic data only |
-| Timepoint review (`COHERO Timepoint Review - Pre-Update Glitch Consideration 07.22.2020 GS.xlsx`) | `R/01_import.R` (`readxl::read_excel()`) | None yet | No package | Restricted (as above) | None: code, documentation and synthetic data only |
+| REDCap export, all visits (`EMASTHMA_DATA_All Data Export_deidentified.xlsx`) | `R/01_import_data.R` (`readxl::read_excel()`) | REDCap data dictionary (to be added to `references/`) | No package | Restricted (trial participant data; governing IRB protocol to be named) | None: code, documentation and synthetic data only |
+| Baseline sex (`EMASTHMA_DATA_Baseline gender.xlsx`) | `R/01_import_data.R` (`readxl::read_excel()`) | REDCap data dictionary | No package | Restricted (as above) | None: code, documentation and synthetic data only |
+| COHERO app push data, Notifications and Medication Usage sheets (`EM-ASTHMA Aggregate COHERO Push Data 06.24.2020 GS Edits.xlsx`) | `R/01_import_data.R` (`readxl::read_excel()`) | App export description (to be added to `references/`) | No package | Restricted (as above) | None: code, documentation and synthetic data only |
+| Timepoint review (`COHERO Timepoint Review - Pre-Update Glitch Consideration 07.22.2020 GS.xlsx`) | `R/01_import_data.R` (`readxl::read_excel()`) | None yet | No package | Restricted (as above) | None: code, documentation and synthetic data only |
 
 To allow more for a source, a person changes its row through a pull request, naming the agreement and section that permit it, the approved AI service, and exactly what agents may do. Agents never propose or make this change themselves, and nothing in personal instructions can grant it.
 
