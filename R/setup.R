@@ -25,13 +25,27 @@ library(patchwork)
 # Restricted data are reached only through this folder, set outside the repo.
 data_dir <- Sys.getenv("COHERO_DATA_DIR")
 if (data_dir == "") {
-  stop("Set COHERO_DATA_DIR in your .Renviron to the folder holding the study data.")
+  stop(
+    "Set COHERO_DATA_DIR in your .Renviron to the folder holding the study data."
+  )
 }
 
-redcap_export_file <- file.path(data_dir, "EMASTHMA_DATA_All Data Export_deidentified.xlsx")
-baseline_sex_file <- file.path(data_dir, "EMASTHMA_DATA_Baseline gender.xlsx")
-push_data_file <- file.path(data_dir, "EM-ASTHMA Aggregate COHERO Push Data 06.24.2020 GS Edits.xlsx")
-timepoint_review_file <- file.path(data_dir, "COHERO Timepoint Review - Pre-Update Glitch Consideration 07.22.2020 GS.xlsx")
+redcap_export_file <- file.path(
+  data_dir,
+  "EMASTHMA_DATA_All Data Export_deidentified.xlsx"
+)
+baseline_sex_file <- file.path(
+  data_dir,
+  "EMASTHMA_DATA_Baseline gender.xlsx"
+)
+push_data_file <- file.path(
+  data_dir,
+  "EM-ASTHMA Aggregate COHERO Push Data 06.24.2020 GS Edits.xlsx"
+)
+timepoint_review_file <- file.path(
+  data_dir,
+  "COHERO Timepoint Review - Pre-Update Glitch Consideration 07.22.2020 GS.xlsx"
+)
 
 ## ---- define-constants
 # Observations after this date are excluded from the per-protocol analysis
@@ -39,59 +53,112 @@ timepoint_review_file <- file.path(data_dir, "COHERO Timepoint Review - Pre-Upda
 glitch_date <- as.Date("2018-5-16")
 
 # Items averaged into each scale score
-AQLQ_variables <- c("short_of_breath_2weeks", "avoid_dust_2weeks", "frustrated_2weeks", "bothered_by_cough_2weeks",
-                    "fear_of_not_having_meds_2weeks", "chest_tightness_2weeks", "avoid_cigarette_smoke_2weeks",
-                    "difficulty_sleep_2weeks", "concerned_2weeks", "wheeze_in_chest_2weeks", "avoid_pollution_2weeks",
-                    "limited_strenuous_activity_2weeks", "limited_moderate_activity_2weeks",
-                    "limited_social_activity_2weeks", "limited_work_tasks_2weeks")
+AQLQ_variables <- c(
+  "short_of_breath_2weeks",
+  "avoid_dust_2weeks",
+  "frustrated_2weeks",
+  "bothered_by_cough_2weeks",
+  "fear_of_not_having_meds_2weeks",
+  "chest_tightness_2weeks",
+  "avoid_cigarette_smoke_2weeks",
+  "difficulty_sleep_2weeks",
+  "concerned_2weeks",
+  "wheeze_in_chest_2weeks",
+  "avoid_pollution_2weeks",
+  "limited_strenuous_activity_2weeks",
+  "limited_moderate_activity_2weeks",
+  "limited_social_activity_2weeks",
+  "limited_work_tasks_2weeks"
+)
 
-PACQLQ_variables <- c("caregiver_helplessness_1week", "family_plans_change_1week", "caregiver_frustration_1week",
-                      "caregiver_work_interference_1week", "caregiver_upset_1week", "caregiver_sleepless_1week",
-                      "caregiver_family_relations_1week", "caregivier_nightime_awakening_1week",
-                      "caregiver_angry_1week", "caregiver_worry_child_daily_activities_1week",
-                      "caregiver_worry_medications_1week", "caregiver_worry_overprotective_1week",
-                      "caregiver_worry_child_normalcy_1week")
+PACQLQ_variables <- c(
+  "caregiver_helplessness_1week",
+  "family_plans_change_1week",
+  "caregiver_frustration_1week",
+  "caregiver_work_interference_1week",
+  "caregiver_upset_1week",
+  "caregiver_sleepless_1week",
+  "caregiver_family_relations_1week",
+  "caregivier_nightime_awakening_1week", # spelled as in the REDCap export
+  "caregiver_angry_1week",
+  "caregiver_worry_child_daily_activities_1week",
+  "caregiver_worry_medications_1week",
+  "caregiver_worry_overprotective_1week",
+  "caregiver_worry_child_normalcy_1week"
+)
 
-AFS_variables <- c("limitation_structured_physical_activities", "limitation_sports", "limitation_strenuous_activities",
-                   "limitation_moderate_activities", "limitation_mild_activities")
+AFS_variables <- c(
+  "limitation_structured_physical_activities",
+  "limitation_sports",
+  "limitation_strenuous_activities",
+  "limitation_moderate_activities",
+  "limitation_mild_activities"
+)
 
 # Variables that code missing as 999
-missing_999_variables <- c("act_score",
-                           "only_give_controller_medication_needed",
-                           "only_give_controller_medication_breathless",
-                           "give_controller_medication_regularly",
-                           "try_to_avoid_controller_medication",
-                           "forget_give_controller_medication",
-                           "alter_change_dosage_controller_medication",
-                           "stop_giving_controller_medication",
-                           "reserve_controller_medication_if_treatment_not_work",
-                           "give_controller_medication_child_does_breathless",
-                           "give_controller_medication_as_label")
+missing_999_variables <- c(
+  "act_score",
+  "only_give_controller_medication_needed",
+  "only_give_controller_medication_breathless",
+  "give_controller_medication_regularly",
+  "try_to_avoid_controller_medication",
+  "forget_give_controller_medication",
+  "alter_change_dosage_controller_medication",
+  "stop_giving_controller_medication",
+  "reserve_controller_medication_if_treatment_not_work",
+  "give_controller_medication_child_does_breathless",
+  "give_controller_medication_as_label"
+)
 
 # Baseline cut-offs for the binary subgroup variables. See analysis-plan.md.
-adherence_cutoff <- 35   # self-reported adherence score >= 35 is "Adherent"
-act_cutoff <- 12         # ACT score >= 12 is "Controlled"
+adherence_cutoff <- 35 # self-reported adherence score >= 35 is "Adherent"
+act_cutoff <- 12 # ACT score >= 12 is "Controlled"
 
 # Inhaler names used to relabel controller vs rescue medication
-ControlMedicationVector <- c("Advair", "Breo", "Dulera", "Flovent", "QVAR", "Symbicort")
+ControlMedicationVector <- c(
+  "Advair", "Breo", "Dulera", "Flovent", "QVAR", "Symbicort"
+)
 RescueMedicationVector <- c("Combivent", "ProAir", "Ventolin", "Proventil")
 
 # Upper bound of the study ID range used to build the day grid; see #15
 n_subject_ids <- 81
 
 # 12-month health care use outcomes
-HospitalCountOutcomes <- c("ed_visit_number_times_12months", "hospitalization_number_times_12months",
-                           "urgent_care_number_times_12months")
-HospitalBinaryOutcomes <- c("ed_visit_12months", "hospitalization_asthma_12months", "urgent_care_12months")
+HospitalCountOutcomes <- c(
+  "ed_visit_number_times_12months",
+  "hospitalization_number_times_12months",
+  "urgent_care_number_times_12months"
+)
+HospitalBinaryOutcomes <- c(
+  "ed_visit_12months",
+  "hospitalization_asthma_12months",
+  "urgent_care_12months"
+)
 
 # Count outcomes modelled with negative binomial regression
-PoissonOutcomes <- c("ed_visit_number_times_12months", "hospitalization_number_times_12months",
-                     "urgent_care_number_times_12months", "Number_Rescue_puffs_ITT", "Number_Rescue_days_ITT")
+PoissonOutcomes <- c(
+  "ed_visit_number_times_12months",
+  "hospitalization_number_times_12months",
+  "urgent_care_number_times_12months",
+  "Number_Rescue_puffs_ITT",
+  "Number_Rescue_days_ITT"
+)
 
 # Repeated-measures outcomes and subgroup variables for the mixed models
-OutcomeList <- c("act_score", "AQLQ_score", "PACQLQ_score", "AFS_score", "self_reported_adherence")
-InteractionVariableList <- c("prefer_language", "child_adult", "participant_sex",
-                             "self_reported_adherence_binary", "act_binary")
+OutcomeList <- c(
+  "act_score",
+  "AQLQ_score",
+  "PACQLQ_score",
+  "AFS_score",
+  "self_reported_adherence"
+)
+InteractionVariableList <- c(
+  "prefer_language",
+  "child_adult",
+  "participant_sex",
+  "self_reported_adherence_binary",
+  "act_binary"
+)
 
 ## ---- output-folders
 dir.create("figures", showWarnings = FALSE)

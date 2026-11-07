@@ -14,13 +14,21 @@ EMASTHMA_DATA_Baseline_gender <- read_excel(baseline_sex_file) %>%
   select(study_id_screening, participant_sex)
 
 # Merge sex into the REDCap export
-CleanAsthmaData <- left_join(RawAsthmaData, EMASTHMA_DATA_Baseline_gender, by = "study_id_screening")
+CleanAsthmaData <- left_join(
+  RawAsthmaData,
+  EMASTHMA_DATA_Baseline_gender,
+  by = "study_id_screening"
+)
 
 ## ---- import-notifications
-RawNotifications <- read_excel(push_data_file,
-                               sheet = "Notifications",
-                               col_types = c("numeric", "numeric", "text", "date", "skip",
-                                             "numeric", "text", "date", "skip", "skip"))
+RawNotifications <- read_excel(
+  push_data_file,
+  sheet = "Notifications",
+  col_types = c(
+    "numeric", "numeric", "text", "date", "skip",
+    "numeric", "text", "date", "skip", "skip"
+  )
+)
 
 # Remove spaces from names
 names(RawNotifications) <- names(RawNotifications) %>%
@@ -28,11 +36,15 @@ names(RawNotifications) <- names(RawNotifications) %>%
 
 ## ---- import-medications
 # suppressWarnings avoids one warning per missing cell
-RawMedications <- read_excel(push_data_file,
-                             sheet = "Medication Usage",
-                             col_types = c("numeric", "date", "numeric", "numeric", "numeric", "text", "date", "numeric", "text",
-                                           "text", "text", "text", "text", "text", "text", "numeric", "numeric", "date", "date",
-                                           "date", "date", "date")) %>%
+RawMedications <- read_excel(
+  push_data_file,
+  sheet = "Medication Usage",
+  col_types = c(
+    "numeric", "date", "numeric", "numeric", "numeric", "text", "date",
+    "numeric", "text", "text", "text", "text", "text", "text", "text",
+    "numeric", "numeric", "date", "date", "date", "date", "date"
+  )
+) %>%
   suppressWarnings()
 
 # Remove spaces from names
@@ -41,8 +53,10 @@ names(RawMedications) <- names(RawMedications) %>%
 
 ## ---- import-followup-dates
 # suppressWarnings avoids one warning per missing cell
-RawFollowupdates <- read_excel(timepoint_review_file,
-                               col_types = c("numeric", "date", "date", "date", "date", "date", "date")) %>%
+RawFollowupdates <- read_excel(
+  timepoint_review_file,
+  col_types = c("numeric", "date", "date", "date", "date", "date", "date")
+) %>%
   suppressWarnings()
 
 # Remove spaces and other troublesome characters from names
