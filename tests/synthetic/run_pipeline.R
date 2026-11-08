@@ -106,6 +106,24 @@ panels_match_levels <- tryCatch({
   ))
 }, error = function(e) FALSE)
 
+## ---- check-figures
+# Visual snapshots and export formats (test_figures.R). FALSE, not an error,
+# when the code under test predates the figure style, so a comparison run on
+# older code still saves its snapshot.
+# testthat skips snapshot tests unless NOT_CRAN is set; a skipped test
+# counts as a failure here, so a missing comparison never passes silently
+Sys.setenv(NOT_CRAN = "true")
+figure_results <- tryCatch(
+  as.data.frame(testthat::test_file(
+    file.path(harness_dir, "test_figures.R"),
+    reporter = "summary", stop_on_failure = FALSE
+  )),
+  error = function(e) NULL
+)
+figures_pass <- !is.null(figure_results) &&
+  all(figure_results$failed == 0) && !any(figure_results$error) &&
+  !any(figure_results$skipped)
+
 ## ---- check-recovery
 # Refit two models directly and check that the 95% confidence interval
 # covers the effect built into the synthetic data
@@ -154,6 +172,7 @@ expected <- list(
   "table 1" = inherits(table_1, "flextable"),
   "subgroup panels draw their own level's participants" =
     panels_match_levels,
+  "figures match their snapshots and save in every format" = figures_pass,
   "every mixed-model cell has 2 or more observations" =
     length(thin_cells) == 0,
   "no singular mixed-model fits" = singular_fits == 0,

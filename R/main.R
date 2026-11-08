@@ -6,6 +6,7 @@
 
 source("R/setup.R")
 source("R/functions.R")
+source("R/plot_style.R")
 source("R/01_import_data.R")
 source("R/02_build_visit_data.R")
 source("R/03_derive_medication_outcomes.R")

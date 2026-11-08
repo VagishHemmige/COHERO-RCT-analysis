@@ -65,6 +65,9 @@ website:
               - href: quarto/functions.qmd
                 text: Functions
                 icon: laptop
+              - href: quarto/plot_style.qmd
+                text: Plot style
+                icon: laptop
 
           # One numbered page per definitive script, in the order main.R
           # sources them.

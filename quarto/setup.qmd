@@ -49,6 +49,15 @@ These named objects collect the visit cutoff, questionnaire item lists, medicati
 #| eval: false
 ```
 
+## Figure labels
+
+`figure_labels` gives each variable a readable name for figures, so a reader sees "ACT score" rather than `act_score`. `arm_labels` names the arms in place of their codes, 0 and 1. The figure style on [Plot style](plot_style.qmd) uses both. The labels give names and units only: each instrument's range and direction will be added once its scoring source is confirmed in the analysis plan.
+
+```{r}
+#| label: figure-labels
+#| eval: false
+```
+
 ## Output folders
 
 These calls create local `tables` and `figures` directories if needed. Creating a folder does not export a table or plot: the current table and figure scripts keep their objects in memory. For help with scripts, projects and finding function help, see the corresponding chapters of [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].

@@ -35,9 +35,10 @@ jobs:
         with:
           use-public-rspm: true
 
-      # The packages R/setup.R attaches, plus writexl for the synthetic files
-      # and broom.helpers, which gtsummary's tbl_regression() needs but only
-      # suggests. Quarto is not installed: this job renders nothing.
+      # The packages R/setup.R attaches, plus writexl for the synthetic files,
+      # broom.helpers, which gtsummary's tbl_regression() needs but only
+      # suggests, and ragg, svglite, testthat and vdiffr for the figure tests.
+      # Quarto is not installed: this job renders nothing.
       - name: Install the R packages the analysis uses
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -58,6 +59,10 @@ jobs:
             any::gtsummary
             any::broom.helpers
             any::patchwork
+            any::ragg
+            any::svglite
+            any::testthat
+            any::vdiffr
 
       - name: Run the analysis on synthetic data
         env:
