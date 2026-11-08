@@ -6,7 +6,8 @@
 # never fails the run. The runner has no study data: everything it reads is
 # built by tests/synthetic/build_synthetic_data.R. The log shows check
 # results, counts of warnings and messages, and estimates on synthetic data
-# only; no outputs are uploaded.
+# only. The only upload is a changed figure snapshot (synthetic data), when a
+# figure no longer matches its recorded image.
 
 on:
   workflow_dispatch:
@@ -68,6 +69,17 @@ jobs:
         env:
           COHERO_SNAPSHOT: ${{ runner.temp }}/proposed.rds
         run: Rscript tests/synthetic/run_pipeline.R
+
+      # When a figure no longer matches its snapshot, keep the new image so it
+      # can be reviewed and, if right, committed in place of the old one.
+      # Images are drawn from synthetic data only.
+      - name: Upload changed figure snapshots for review
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: changed-figure-snapshots
+          path: tests/synthetic/_snaps/**/*.new.svg
+          if-no-files-found: ignore
 
       # Pull requests only: main's R/ with this branch's harness and data
       - name: Check out main for comparison
