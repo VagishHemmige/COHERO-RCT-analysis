@@ -85,15 +85,13 @@ rescue_puffs_model_alt_table <- glm.nb(
   rescue_puffs_itt ~ studyarm + log(offset(followup_time_itt)),
   data = rescue_medication_merged
 ) %>%
-  tidy(., conf.int = TRUE, exp = TRUE) %>%
-  flextable()
+  tbl_regression(exp = TRUE)
 
 rescue_days_model_alt_table <- glm.nb(
   rescue_days_itt ~ studyarm + log(offset(followup_time_itt)),
   data = rescue_medication_merged
 ) %>%
-  tidy(., conf.int = TRUE, exp = TRUE) %>%
-  flextable()
+  tbl_regression(exp = TRUE)
 
 ## ---- controller-pdc-comparison
 # Controller PDC for the year by arm, with gtsummary's default test

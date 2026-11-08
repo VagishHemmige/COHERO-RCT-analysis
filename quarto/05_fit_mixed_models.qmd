@@ -36,7 +36,7 @@ knitr::read_chunk("../R/05_fit_mixed_models.R")
 
 ## Mixed models overall
 
-For each population and outcome, this fits the model once with `fit_mixed_model()`, then makes its coefficient table with `tabulate_model_terms()` and its estimates with `estimate_effects()`. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, `mixed_model_tables[["itt"]][["act_score"]][["overall"]]` selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.
+For each population and outcome, this fits the model once with `fit_mixed_model()`, then makes its table of model terms with `tabulate_model_terms()`, its estimates with `estimate_effects()`, and a table of those estimates with `tabulate_effects()`. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, `mixed_model_tables[["itt"]][["act_score"]][["overall"]]` selects the overall intention-to-treat ACT table after an authorized run. Those are tables of model terms. The intervention effect at each visit is in `mixed_model_effect_tables`, indexed the same way.
 
 The model and what its coefficients mean are explained in [Longitudinal data and mixed models](methods_longitudinal.qmd).
 

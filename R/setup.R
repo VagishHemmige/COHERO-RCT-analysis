@@ -199,9 +199,10 @@ population_labels <- c(
 )
 
 ## ---- figure-labels
-# Readable names for variables in figures, used by label_figure() (in
-# plot_style.R). Names and units only: the instruments' score ranges and
-# directions wait for the scoring sources to be confirmed (analysis-plan.md).
+# Readable names for variables in figures and tables, used by label_figure()
+# (in plot_style.R) and tabulate_model_terms(). Names and units only: the
+# instruments' score ranges and directions wait for the scoring sources to
+# be confirmed (analysis-plan.md).
 figure_labels <- c(
   act_score = "ACT score",
   aqlq_score = "AQLQ score",
@@ -209,7 +210,7 @@ figure_labels <- c(
   afs_score = "Activity limitation (AFS) score",
   self_reported_adherence = "Self-reported adherence score",
   ed_visit_number_times_12months = "Emergency department visits, 12 months",
-  hospitalization_number_times_12months = "Hospitalisations, 12 months",
+  hospitalization_number_times_12months = "Hospitalizations, 12 months",
   urgent_care_number_times_12months = "Urgent care visits, 12 months",
   rescue_puffs_itt = "Rescue inhaler puffs",
   rescue_days_itt = "Days with rescue inhaler use",
@@ -225,6 +226,7 @@ figure_labels <- c(
   self_reported_adherence_binary = "Baseline self-reported adherence",
   act_binary = "Baseline asthma control",
   studyarm = "Study arm",
+  time_factor = "Months since baseline",
   time_linear = "Months since baseline",
   time_plot = "Months since baseline"
 )

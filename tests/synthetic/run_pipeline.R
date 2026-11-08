@@ -124,6 +124,63 @@ figures_pass <- !is.null(figure_results) &&
   all(figure_results$failed == 0) && !any(figure_results$error) &&
   !any(figure_results$skipped)
 
+## ---- check-tables
+# Every number in the mixed-model tables matches its source (issue #8): the
+# model-term tables match broom.mixed::tidy() of each fit, and the effects
+# tables match estimate_effects(). Compared as sorted sets of values, so the
+# check does not depend on how the table lays them out. FALSE, not an error,
+# when the code under test predates these tables.
+table_values <- function(table_body, prefix) {
+  table_body %>%
+    select(starts_with(prefix)) %>%
+    unlist(use.names = FALSE) %>%
+    as.numeric() %>%
+    na.omit() %>%
+    sort()
+}
+same_values <- function(table_body, source, prefix) {
+  isTRUE(all.equal(
+    table_values(table_body, prefix), sort(na.omit(source)),
+    tolerance = 1e-8
+  ))
+}
+model_terms_match <- tryCatch(all(unlist(lapply(
+  names(mixed_model_fits), function(population) {
+    lapply(names(mixed_model_fits[[population]]), function(outcome) {
+      lapply(names(mixed_model_fits[[population]][[outcome]]), function(analysis) {
+        fit <- mixed_model_fits[[population]][[outcome]][[analysis]]
+        terms <- broom.mixed::tidy(fit, effects = "fixed", conf.int = TRUE) %>%
+          filter(term != "(Intercept)")
+        # Reference levels carry a placeholder estimate, not a model term
+        body <- mixed_model_tables[[population]][[outcome]][[analysis]]$table_body %>%
+          filter(is.na(reference_row) | !reference_row)
+        all(vapply(
+          c("estimate", "conf.low", "conf.high", "p.value"),
+          function(column) same_values(body, terms[[column]], column),
+          logical(1)
+        ))
+      })
+    })
+  }
+))), error = function(e) FALSE)
+
+effect_tables_match <- tryCatch(all(unlist(lapply(
+  names(mixed_model_estimates), function(population) {
+    lapply(names(mixed_model_estimates[[population]]), function(outcome) {
+      lapply(names(mixed_model_estimates[[population]][[outcome]]), function(analysis) {
+        estimates <- mixed_model_estimates[[population]][[outcome]][[analysis]]
+        effects <- bind_rows(estimates$within_levels, estimates$between_levels)
+        body <- mixed_model_effect_tables[[population]][[outcome]][[analysis]]$table_body
+        all(vapply(
+          c("estimate", "conf.low", "conf.high", "p.value"),
+          function(column) same_values(body, effects[[column]], column),
+          logical(1)
+        ))
+      })
+    })
+  }
+))), error = function(e) FALSE)
+
 ## ---- check-recovery
 # Refit two models directly and check that the 95% confidence interval
 # covers the effect built into the synthetic data
@@ -167,6 +224,17 @@ expected <- list(
   "mixed model tables: 2 populations" = length(mixed_model_tables) == 2,
   "mixed model tables: 56 in all" =
     sum(lengths(unlist(mixed_model_tables, recursive = FALSE))) == 56,
+  "mixed model effect tables: 56 in all" = tryCatch(
+    sum(lengths(unlist(mixed_model_effect_tables, recursive = FALSE))) == 56,
+    error = function(e) FALSE
+  ),
+  "model-term tables match the fitted models" = model_terms_match,
+  "effect tables match the estimates" = effect_tables_match,
+  "every table saved as a Word file" = tryCatch(
+    length(list.files("tables", pattern = "\\.docx$")) ==
+      6 + sum(lengths(count_interaction_tables)) + 2 * 56,
+    error = function(e) FALSE
+  ),
   "mixed model plots: 56 in all" =
     sum(lengths(unlist(mixed_model_plots, recursive = FALSE))) == 56,
   "table 1" = inherits(table_1, "flextable"),

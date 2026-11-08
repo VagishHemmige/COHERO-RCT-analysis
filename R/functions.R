@@ -30,14 +30,93 @@ fit_mixed_model <- function(data, outcome, modifier = NULL,
 }
 
 ## ---- tabulate-model-terms
-# The fitted model's coefficients as a flextable: the baseline exposure
-# difference, the time-by-exposure interaction terms and, with a modifier,
-# the three-way terms
-tabulate_model_terms <- function(fit, caption) {
-  fit %>%
-    tidy(conf.int = TRUE) %>%
-    flextable() %>%
-    set_caption(caption)
+# The fitted model's fixed-effect terms as a gtsummary table: the baseline
+# exposure difference, the time-by-exposure interaction terms and, with a
+# modifier, the three-way terms (issue #8). Estimates, 95% confidence
+# intervals and p values are the model's own, from broom.mixed::tidy(), with
+# Satterthwaite degrees of freedom. labels: readable names for the model's
+# variables, looked up by name.
+tabulate_model_terms <- function(fit, caption, labels = NULL) {
+  model_variables <- all.vars(formula(fit, fixed.only = TRUE))[-1]
+  variable_labels <- as.list(labels[intersect(names(labels), model_variables)])
+
+  tbl_regression(fit, label = variable_labels) %>%
+    modify_fmt_fun(p.value ~ format_p_value) %>%
+    modify_caption(caption)
+}
+
+## ---- tabulate-effects
+# The exposure effect at each time from estimate_effects(), as a gtsummary
+# table (issue #8): at the first (baseline) time the difference between
+# exposure groups, and at each later time the difference between them in
+# change from baseline. These are the effects the trajectory figures show.
+# With a modifier, one column group per level, then one per difference
+# between a level and the first level. time_label names the time unit in the
+# row labels. p values are formatted as on the figures.
+tabulate_effects <- function(estimates, caption, time = "time_factor",
+                             modifier = NULL, time_label = "Month") {
+  effect_table <- function(effects) {
+    effects %>%
+      transmute(
+        variable = time,
+        row_type = "level",
+        label = paste(time_label, .data[[time]]),
+        estimate, conf.low, conf.high, p.value
+      ) %>%
+      as_gtsummary() %>%
+      modify_column_hide(c(variable, row_type)) %>%
+      modify_header(
+        label = "**Visit**", estimate = "**Difference**",
+        conf.low = "**95% CI**", p.value = "**p-value**"
+      ) %>%
+      modify_fmt_fun(
+        c(estimate, conf.low, conf.high) ~ label_style_number(digits = 2),
+        p.value ~ format_p_value
+      ) %>%
+      modify_column_merge(
+        pattern = "{conf.low}, {conf.high}", rows = !is.na(conf.low)
+      )
+  }
+  footnote <- paste(
+    "First visit: the difference between groups.",
+    "Later visits: the difference between groups in change from baseline.",
+    "Not adjusted for multiple comparisons."
+  )
+
+  if (is.null(modifier)) {
+    effects_table <- effect_table(estimates$within_levels)
+  } else {
+    within <- estimates$within_levels
+    levels_shown <- if (is.factor(within[[modifier]])) {
+      levels(droplevels(within[[modifier]]))
+    } else {
+      unique(as.character(within[[modifier]]))
+    }
+    comparisons <- unique(as.character(estimates$between_levels$comparison))
+
+    within_tables <- lapply(levels_shown, function(level) {
+      effect_table(within %>% filter(as.character(.data[[modifier]]) == level))
+    })
+    between_tables <- lapply(comparisons, function(level_comparison) {
+      effect_table(
+        estimates$between_levels %>%
+          filter(as.character(comparison) == level_comparison)
+      )
+    })
+    effects_table <- tbl_merge(
+      c(within_tables, between_tables),
+      tab_spanner = c(
+        paste0("**", levels_shown, "**"),
+        paste0("**Difference between levels: ", comparisons, "**")
+      )
+    )
+  }
+
+  effects_table %>%
+    modify_footnote_header(
+      footnote, columns = starts_with("estimate"), replace = TRUE
+    ) %>%
+    modify_caption(caption)
 }
 
 ## ---- estimate-effects
