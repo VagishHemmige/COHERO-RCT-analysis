@@ -27,12 +27,18 @@ knitr::read_chunk("../R/01_import_data.R")
 
 ## Import REDCap
 
+The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A `left_join()` matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; repeated matches in the sex file could instead multiply rows unintentionally. An authorized analyst should check that the sex file has one row per identifier and that the join preserves the visit count.
+
+The illustrated joins in [R for Data Science](https://r4ds.hadley.nz/joins.html) explain keys and unmatched rows [@r4ds2]. The output here, `clean_asthma_data`, becomes the input to [Build visit data](02_build_visit_data.qmd).
+
 ```{r}
 #| label: import-redcap
 #| eval: false
 ```
 
 ## Import notifications
+
+This reads the Notifications sheet into `raw_notifications`. `col_types` states how successive spreadsheet columns should be interpreted: numeric, text or date; `skip` omits a column. Removing spaces standardizes the column names used in R. These notification records are imported but are not an outcome in the model scripts shown on this site.
 
 ```{r}
 #| label: import-notifications
@@ -41,12 +47,16 @@ knitr::read_chunk("../R/01_import_data.R")
 
 ## Import medications
 
+This reads individual app medication records into `raw_medications`; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. [Derive medication outcomes](03_derive_medication_outcomes.qmd) will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. readxl's [column-type guide](https://readxl.tidyverse.org/articles/cell-and-column-types.html) explains what happens when spreadsheet cells and requested types disagree [@readxltypes].
+
 ```{r}
 #| label: import-medications
 #| eval: false
 ```
 
 ## Import followup dates
+
+This loads the separate timepoint-review spreadsheet as `raw_followup_dates` and simplifies its column names. Loading a file does not mean later scripts use it: the `study_dates` object used for medication windows is built from the baseline REDCap rows in the [next script](02_build_visit_data.qmd#study-dates). Keeping track of which object supplies a date is essential when checking follow-up windows.
 
 ```{r}
 #| label: import-followup-dates

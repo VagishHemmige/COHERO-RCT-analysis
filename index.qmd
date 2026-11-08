@@ -5,12 +5,47 @@ format: html
 
 ## What this analysis does
 
-This site shows the code for the analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. The analysis looks at asthma control, quality of life, activity limitation, controller adherence, app-recorded inhaler use and 12-month health care use, in intention-to-treat and per-protocol populations. It uses the trial's REDCap export and the data recorded by the COHERO app, which are not part of this site or its repository.
+This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.
+
+There are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.
+
+The detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.
 
 ## How to read this site
 
-The **Methods** pages explain, in general terms, the techniques the code uses: mixed models for repeated measures, interactions, what a p-value for interaction means, and how to get the effect within each subgroup and visit with emmeans. They end with how this code does each of these. Each page under **Code** shows one script, in the order `R/main.R` runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md), a retrospective record written after the results were seen.
+If you have some R and introductory statistics experience, start with [Longitudinal data and mixed models](quarto/methods_longitudinal.qmd). Then read [Interactions](quarto/methods_interactions.qmd) and [What a p-value for interaction means](quarto/methods_interaction_p_values.qmd). You can skip the optional algebra in [Effects behind an interaction](quarto/methods_stratified_effects.qmd) on a first pass.
+
+The **Code** pages follow the order of `R/main.R`. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.
+
+## Follow the rows
+
+| Stage | What a row represents | Why it matters |
+|---|---|---|
+| Imported visit data | A participant at a recorded visit | Several rows can belong to the same person |
+| App medication records | A recorded medication event | Many records must be summarized before comparing participants |
+| Participant-day grid | A candidate day for a participant | Days without records affect the adherence denominator |
+| Count-model data | A participant with counts and follow-up time | Time at risk matters when comparing counts |
+| Mixed-model data | A participant at a visit | The model accounts for repeated measurements within a person |
+
+The grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.
+
+## Terms used throughout
+
+| Term | Meaning here |
+|---|---|
+| Arm | The assigned intervention or control group |
+| Baseline | The starting assessment |
+| Intention to treat (ITT) | Comparing participants by assigned arm, using available observations |
+| Per protocol (PP) | This project's restriction to observations on or before the app-glitch cutoff; not a general definition of adherence |
+| Subgroup | A participant characteristic used to ask whether the arm effect differs between groups |
+| ACT / AQLQ / PACQLQ / AFS | Code labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification |
+| PDC | Proportion of days covered; here calculated from recorded controller use, as explained on the medication page |
+| Confidence interval | An interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions |
+
+For R syntax, [R for Data Science](https://r4ds.hadley.nz/) is a free reference with worked examples [@r4ds2]. You only need the linked topic when it helps with the section you are reading.
 
 ## Status
 
-In progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository's [Issues](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues). Pages on the clinical background and the study design will be added later.
+The project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in [Issues](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues).
+
+The [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md) records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.

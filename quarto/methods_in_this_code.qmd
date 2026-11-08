@@ -5,6 +5,8 @@ format: html
 
 This page maps the ideas on the other methods pages to the analysis code, as it stands now, and notes what is planned to change.
 
+Think of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.
+
 ## Mixed-model tables: `create_me_table()`
 
 [`create_me_table()`](functions.qmd#create-me-table) fits `outcome ~ time_factor * studyarm + (1 | study_id_screening)`, or the three-way version with a subgroup, and returns the model's coefficients as a table. [5. Fit mixed models](05_fit_mixed_models.qmd) calls it 56 times: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations.
@@ -21,13 +23,19 @@ So the tables show the raw coefficients described on [Longitudinal data and mixe
 | Model B | One coefficient per visit-by-arm cell (`me_factor - 1`) | Each cell's mean and confidence interval, the points and bars on the plot |
 | Model C, subgroups only | The arm effect nested within each level | The p-values printed in each level's panel: the baseline arm difference and the change-from-baseline arm differences within that level |
 
-All three are the **same model**: they fit identically and differ only in which combinations of the fitted values they report. Model C is the "refit with a different coding" approach from [Effects behind an interaction](methods_stratified_effects.qmd), so the subgroup plots already show the arm effect within each level, which the tables don't.
+These codings are intended to represent the same mean structure and random intercept. Equivalent estimates require the same analysis rows and an equivalent model specification. In the current subgroup code, a missing subgroup can become the text "NA" in a pasted cell label for model B, while A and C omit missing subgroup values. Equivalence therefore needs checking rather than assuming.
+
+Model C uses nested terms to expose subgroup-specific arm comparisons; it does not literally relevel a factor. The panels show mean trajectories and p-values for within-subgroup contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
+
+To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.
 
 ## Count models
 
-[4. Fit count models](04_fit_count_models.qmd) fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn't shown directly.
+[4. Fit count models](04_fit_count_models.qmd) fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn't shown directly. The separate alternative rescue fits retain an offset-syntax defect documented on the [count-model page](04_fit_count_models.qmd#rescue-models-alternative).
 
 ## What is planned to change
+
+These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.
 
 - [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10): fit each model once and pass it to both the table and the plot, taking cell means and contrasts with emmeans instead of refitting in other codings.
 - [#8](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8): move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.

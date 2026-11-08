@@ -9,6 +9,8 @@ This page explains what the coefficients of a model with an interaction mean, fo
 
 A subgroup analysis asks whether the intervention's effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an **arm × subgroup interaction** to the model. The interaction lets the arm effect take a different value in each subgroup level.
 
+An overall effect averages across the participants being compared. A subgroup analysis asks an additional question: does that effect differ by a characteristic such as preferred language? This does not mean language itself was randomized. The subgroup main effect should not be read as a causal effect of speaking one language rather than another.
+
 ## Reading the coefficients: count models
 
 For a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):
@@ -21,7 +23,7 @@ glm.nb(
 )
 ```
 
-On the log scale, and after exponentiating:
+The model fits coefficients on a log scale. Applying `exp()` converts them to ratios. English is the **reference level**, the category used as the starting comparison; it is not a statement that English speakers are the typical or preferred population. After exponentiating:
 
 | Exponentiated coefficient | Meaning |
 |---|---|
@@ -31,6 +33,18 @@ On the log scale, and after exponentiating:
 
 So a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if `studyarm1` is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn't an effect in anyone; it's how much the effect changes between levels.
 
+### Keep three quantities separate
+
+For the invented example above:
+
+| Quantity | Value | Interpretation |
+|---|---:|---|
+| Intervention/control IRR in English speakers | 0.80 | Intervention rate is 20% lower |
+| Intervention/control IRR in Spanish speakers | 1.00 | Equal modeled rates |
+| Ratio of those IRRs | 1.25 | The arm comparison differs between subgroups |
+
+The last value is a comparison **of comparisons**. It does not mean Spanish speakers have 25% more events.
+
 ## Reading the coefficients: linear mixed models
 
 The same logic holds on an additive scale. In `outcome ~ time_factor * studyarm * subgroup + (1 | id)`:
@@ -39,8 +53,12 @@ The same logic holds on an additive scale. In `outcome ~ time_factor * studyarm 
 - each term is a **difference**: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see [Longitudinal data and mixed models](methods_longitudinal.qmd));
 - with six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.
 
+In ordinary language, the three-way interaction asks: “Does the difference in improvement between the two arms also differ between subgroups?” Work out the arm comparison within each subgroup before comparing those comparisons.
+
 That's why tables of raw coefficients from these models are hard to read. [What a p-value for interaction means](methods_interaction_p_values.qmd) explains what these terms' p-values test, and [Effects behind an interaction](methods_stratified_effects.qmd) shows how to get the effects themselves.
 
 ## Scale matters
 
 An interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both [@knol2012presenting].
+
+For a brief clinical-statistics explanation, read [Altman and Bland on comparing two estimates](https://doi.org/10.1136/bmj.326.7382.219) [@altman2003interaction]. For reporting guidance, [Knol and VanderWeele](https://doi.org/10.1093/ije/dyr218) explain why subgroup-specific effects belong alongside the interaction measure [@knol2012presenting].
