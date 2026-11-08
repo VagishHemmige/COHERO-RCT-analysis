@@ -1,9 +1,24 @@
 # Purpose: run the whole analysis on synthetic data and check that it
-#   finishes and produces every expected object. Used by
+#   finishes, produces every expected object, gives every model enough data
+#   and recovers the effects built into the data. Used by
 #   .github/workflows/test-pipeline.yml; can also be run locally.
 # Run from the project root: Rscript tests/synthetic/run_pipeline.R
-# Produces: a pass or fail, a count of warnings by message, and nothing
-#   written outside a temporary folder. Prints no data values.
+#   The synthetic data and the snapshot code are read from this script's own
+#   folder, so the same harness can run another copy of R/ (the workflow runs
+#   it on main's code too, from main's project root).
+# Set COHERO_SNAPSHOT to a file path to save every output there, for
+#   tests/synthetic/compare_snapshots.R.
+# Produces: a pass or fail, counts of warnings and messages, and nothing
+#   written outside a temporary folder (and the snapshot, if asked for).
+#   Prints no data values, only check results and estimates on synthetic data.
+
+## ---- harness-folder
+script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
+harness_dir <- if (length(script_arg) == 1) {
+  dirname(normalizePath(sub("^--file=", "", script_arg)))
+} else {
+  "tests/synthetic"
+}
 
 ## ---- synthetic-data-folder
 synthetic_dir <- file.path(tempdir(), "cohero-synthetic-data")
@@ -11,28 +26,93 @@ Sys.setenv(COHERO_DATA_DIR = synthetic_dir)
 
 ## ---- build-synthetic-data
 source("R/setup.R")
-source("tests/synthetic/build_synthetic_data.R")
+source(file.path(harness_dir, "build_synthetic_data.R"))
 cat("Synthetic files written:", length(list.files(synthetic_dir)), "\n")
 
 ## ---- run-pipeline
-# Run main.R, collecting warnings by message rather than printing them as
-# they happen
+# Run main.R, collecting warnings and messages rather than printing them as
+# they happen. Model-fitting problems (singular fits, dropped columns) are
+# reported by lme4 as messages.
 collected_warnings <- character()
+collected_messages <- character()
 withCallingHandlers(
   source("R/main.R"),
   warning = function(w) {
     collected_warnings <<- c(collected_warnings, conditionMessage(w))
     invokeRestart("muffleWarning")
+  },
+  message = function(m) {
+    collected_messages <<- c(collected_messages, conditionMessage(m))
+    invokeRestart("muffleMessage")
   }
 )
 cat("main.R finished.\n")
 
+## ---- check-cells
+# Every visit x arm x level cell each mixed model uses has at least two
+# observations of the outcome, in both populations
+mixed_analyses <- c(
+  lapply(repeated_outcomes, function(o) list(o, NULL)),
+  unlist(lapply(repeated_outcomes, function(o) {
+    lapply(mixed_subgroup_variables, function(s) list(o, s))
+  }), recursive = FALSE),
+  lapply(child_adult_mixed_outcomes, function(o) list(o, "child_adult"))
+)
+thin_cells <- character()
+for (population in names(mixed_model_data)) {
+  for (analysis in mixed_analyses) {
+    outcome <- analysis[[1]]
+    subgroup <- analysis[[2]]
+    cells <- mixed_model_data[[population]] %>%
+      filter(!is.na(.data[[outcome]])) %>%
+      count(time_factor, studyarm, across(all_of(as.character(subgroup))))
+    expected_cells <- length(unique(mixed_model_data[[population]]$time_factor)) *
+      2 * if (is.null(subgroup)) 1 else 2
+    if (nrow(cells) < expected_cells || any(cells$n < 2)) {
+      thin_cells <- c(thin_cells, paste(
+        population, outcome, if (is.null(subgroup)) "overall" else subgroup
+      ))
+    }
+  }
+}
+
+## ---- check-recovery
+# Refit two models directly and check that the 95% confidence interval
+# covers the effect built into the synthetic data
+act_fit <- lmer(
+  act_score ~ time_factor * studyarm + (1 | study_id_screening),
+  data = clean_asthma_data_itt
+)
+act_term <- "time_factor12:studyarm1"
+act_ci <- fixef(act_fit)[[act_term]] +
+  c(-1, 1) * qnorm(0.975) * sqrt(diag(vcov(act_fit)))[[act_term]]
+
+ed_fit <- glm.nb(
+  ed_visit_number_times_12months ~ studyarm + offset(log(followup_time_itt)),
+  data = rescue_medication_merged
+)
+ed_ci <- exp(
+  coef(ed_fit)[["studyarm1"]] +
+    c(-1, 1) * qnorm(0.975) * sqrt(diag(vcov(ed_fit)))[["studyarm1"]]
+)
+
+covers <- function(ci, truth) ci[1] <= truth && truth <= ci[2]
+
 ## ---- check-outputs
-# Every object the scripts' headers say they produce, with the expected sizes
+singular_fits <- sum(grepl("boundary \\(singular\\)", collected_messages))
+rank_deficient_fits <- sum(grepl("rank deficient", collected_messages))
+
+# Every object the scripts' headers say they produce, with the expected
+# sizes, and the checks that make the synthetic data fit for comparing
+# estimates
 expected <- list(
   "per-protocol visits exist" = nrow(clean_asthma_data_pp) > 0,
   "per-protocol drops some visits" =
     nrow(clean_asthma_data_pp) < nrow(clean_asthma_data_itt),
+  "per-protocol rescue counts not all zero" =
+    any(rescue_medication_merged$rescue_puffs_pp > 0),
+  "per-protocol controller PDC not all missing" =
+    any(!is.na(controller_medication_merged$controller_pdc_pp)),
   "count model table" = inherits(count_model_table, "gtsummary"),
   "count interaction tables: 5 outcomes" =
     length(count_interaction_tables) == 5,
@@ -41,18 +121,15 @@ expected <- list(
     sum(lengths(unlist(mixed_model_tables, recursive = FALSE))) == 56,
   "mixed model plots: 56 in all" =
     sum(lengths(unlist(mixed_model_plots, recursive = FALSE))) == 56,
-  "table 1" = inherits(table_1, "flextable")
-)
-
-# Reported but not failing: suspected defects in the original code, to be
-# confirmed here and fixed in their own pull requests. If PuffDate is read as
-# a date-time, PuffDate <= glitch_date compares a date-time with a Date,
-# which R may compare as raw numbers; whether current R does is unconfirmed.
-watch <- list(
-  "per-protocol rescue counts not all zero" =
-    any(rescue_medication_merged$rescue_puffs_pp > 0),
-  "per-protocol controller PDC not all missing" =
-    any(!is.na(controller_medication_merged$controller_pdc_pp))
+  "table 1" = inherits(table_1, "flextable"),
+  "every mixed-model cell has 2 or more observations" =
+    length(thin_cells) == 0,
+  "no singular mixed-model fits" = singular_fits == 0,
+  "no rank-deficient mixed-model fits" = rank_deficient_fits == 0,
+  "ACT 12-month difference: 95% CI covers the true 2" =
+    covers(act_ci, synthetic_truth$act_difference),
+  "ED visits rate ratio: 95% CI covers the true 0.7" =
+    covers(ed_ci, synthetic_truth$health_care_rate_ratio)
 )
 
 ## ---- report
@@ -60,18 +137,32 @@ cat("\nChecks:\n")
 for (check in names(expected)) {
   cat(if (isTRUE(expected[[check]])) "  PASS " else "  FAIL ", check, "\n")
 }
-
-cat("\nWatched (suspected defects; these do not fail the run):\n")
-for (check in names(watch)) {
-  cat(if (isTRUE(watch[[check]])) "  OK    " else "  WATCH ", check, "\n")
+if (length(thin_cells) > 0) {
+  cat("\nAnalyses with an empty or thin cell:\n")
+  cat(paste0("  ", thin_cells, "\n"), sep = "")
 }
+cat(sprintf(
+  "\nRecovered on synthetic data: ACT difference %.2f (%.2f to %.2f); ED rate ratio %.2f (%.2f to %.2f)\n",
+  fixef(act_fit)[[act_term]], act_ci[1], act_ci[2],
+  exp(coef(ed_fit)[["studyarm1"]]), ed_ci[1], ed_ci[2]
+))
 
-cat("\nWarnings by message (", length(collected_warnings), " in all):\n",
-    sep = "")
-warning_counts <- sort(table(collected_warnings), decreasing = TRUE)
-for (message in names(warning_counts)) {
-  cat("  ", warning_counts[[message]], " x ", substr(message, 1, 150), "\n",
-      sep = "")
+tally <- function(x, label) {
+  cat("\n", label, " by message (", length(x), " in all):\n", sep = "")
+  counts <- sort(table(substr(trimws(x), 1, 150)), decreasing = TRUE)
+  for (text in names(counts)) {
+    cat("  ", counts[[text]], " x ", text, "\n", sep = "")
+  }
+}
+tally(collected_warnings, "Warnings")
+tally(collected_messages, "Messages")
+
+## ---- snapshot
+snapshot_file <- Sys.getenv("COHERO_SNAPSHOT")
+if (snapshot_file != "") {
+  source(file.path(harness_dir, "snapshot.R"))
+  saveRDS(snapshot_outputs(), snapshot_file)
+  cat("\nSnapshot saved.\n")
 }
 
 if (!all(vapply(expected, isTRUE, logical(1)))) {

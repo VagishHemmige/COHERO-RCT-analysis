@@ -1,9 +1,12 @@
 # Runs the whole analysis on synthetic data on every pull request and push
-# to main, or by hand from the Actions tab, and fails if main.R errors or an
-# expected output is missing. The runner has no study data: everything it
-# reads is built by tests/synthetic/build_synthetic_data.R. The log shows
-# only pass or fail per check and a count of warnings by message; no outputs
-# are uploaded.
+# to main, or by hand from the Actions tab, and fails if main.R errors, an
+# expected output is missing, a model has too little data, or a known effect
+# is not recovered. On a pull request it also runs main's code with the same
+# harness and synthetic data, and reports which outputs differ; that report
+# never fails the run. The runner has no study data: everything it reads is
+# built by tests/synthetic/build_synthetic_data.R. The log shows check
+# results, counts of warnings and messages, and estimates on synthetic data
+# only; no outputs are uploaded.
 
 on:
   workflow_dispatch:
@@ -55,4 +58,28 @@ jobs:
             any::patchwork
 
       - name: Run the analysis on synthetic data
+        env:
+          COHERO_SNAPSHOT: ${{ runner.temp }}/proposed.rds
         run: Rscript tests/synthetic/run_pipeline.R
+
+      # Pull requests only: main's R/ with this branch's harness and data
+      - name: Check out main for comparison
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.base_ref }}
+          path: base
+
+      - name: Run main's code on the same synthetic data
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        working-directory: base
+        env:
+          COHERO_SNAPSHOT: ${{ runner.temp }}/base.rds
+        run: Rscript ../tests/synthetic/run_pipeline.R
+
+      - name: Report which outputs differ from main
+        if: github.event_name == 'pull_request'
+        run: >
+          Rscript tests/synthetic/compare_snapshots.R
+          "${{ runner.temp }}/base.rds" "${{ runner.temp }}/proposed.rds"
