@@ -76,6 +76,36 @@ for (population in names(mixed_model_data)) {
   }
 }
 
+## ---- check-panel-levels
+# Each subgroup panel draws its own level's participants, whatever the row
+# order (issue #30): rows reversed, so a level-2 participant comes first
+# (FALSE, not an error, when the code under test predates these functions,
+# so a comparison run on older code still saves its snapshot)
+panels_match_levels <- tryCatch({
+  reversed_data <- clean_asthma_data_itt %>% arrange(desc(study_id_screening))
+  reversed_fit <- fit_mixed_model(
+    reversed_data, "act_score", modifier = "participant_sex"
+  )
+  reversed_plot <- plot_effect_trajectories(
+    reversed_data, estimate_effects(reversed_fit, modifier = "participant_sex"),
+    "act_score", "participant_sex"
+  )
+  baseline_levels <- reversed_data %>%
+    filter(time_factor == "0") %>%
+    select(study_id_screening, participant_sex)
+  all(vapply(
+    seq_along(levels(reversed_data$participant_sex)),
+    function(k) {
+      drawn <- unique(reversed_plot[[k]]$layers[[1]]$data$study_id_screening)
+      drawn_levels <- baseline_levels %>%
+        filter(study_id_screening %in% drawn) %>%
+        pull(participant_sex)
+      all(drawn_levels == levels(reversed_data$participant_sex)[k])
+    },
+    logical(1)
+  ))
+}, error = function(e) FALSE)
+
 ## ---- check-recovery
 # Refit two models directly and check that the 95% confidence interval
 # covers the effect built into the synthetic data
@@ -122,6 +152,8 @@ expected <- list(
   "mixed model plots: 56 in all" =
     sum(lengths(unlist(mixed_model_plots, recursive = FALSE))) == 56,
   "table 1" = inherits(table_1, "flextable"),
+  "subgroup panels draw their own level's participants" =
+    panels_match_levels,
   "every mixed-model cell has 2 or more observations" =
     length(thin_cells) == 0,
   "no singular mixed-model fits" = singular_fits == 0,

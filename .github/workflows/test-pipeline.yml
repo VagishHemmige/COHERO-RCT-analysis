@@ -52,6 +52,7 @@ jobs:
             any::broom.mixed
             any::lme4
             any::lmerTest
+            any::emmeans
             any::gganimate
             any::flextable
             any::gtsummary

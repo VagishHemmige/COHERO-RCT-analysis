@@ -67,7 +67,7 @@ fit_spanish_ref <- glm.nb(
 # exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers
 ```
 
-This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. The plotting function uses a related idea: model C rewrites the formula to expose subgroup-specific terms directly, rather than literally calling `relevel()` (see [How this code does it](methods_in_this_code.qmd)).
+This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)).
 
 
 ::: {.callout-note collapse="true" title="Optional: where the interval comes from"}
