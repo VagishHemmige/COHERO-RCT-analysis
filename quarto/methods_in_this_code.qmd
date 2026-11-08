@@ -25,7 +25,7 @@ Think of the workflow in three steps: prepare the observations, fit the model, t
 
 Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)). Using one fit also means the means, the p-values and the table come from the same analysis rows.
 
-[`plot_effect_trajectories()`](functions.qmd#plot-effect-trajectories) draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
+[`compose_trajectory_figure()`](functions.qmd#the-whole-figure) draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with `show_effect_panel = TRUE` it also shows each contrast's estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
 
 To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.
 
