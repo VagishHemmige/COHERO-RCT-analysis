@@ -336,12 +336,9 @@ plot_p_values <- function(effects, visits, title = NULL, dagger = TRUE,
 
 ## ---- plot-numbers-table
 # Number of participants with the outcome recorded, per arm and visit: one
-# row per arm, named in text, aligned to the visits above. With min_cell, a
-# count below it is shown as "<min_cell" (a small-cell rule; the threshold is
-# a disclosure decision, #11). Returns a ggplot.
+# row per arm, named in text, aligned to the visits above. Returns a ggplot.
 plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
-                               show_row_labels = TRUE, title = "Observed, n",
-                               min_cell = NULL) {
+                               show_row_labels = TRUE, title = "Observed, n") {
   visits <- sort(unique(data$time_linear))
   counts <- rows_for_level(data, modifier, level) %>%
     filter(!is.na(.data[[outcome]])) %>%
@@ -349,12 +346,6 @@ plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
     mutate(arm = factor(
       arm_labels[as.character(studyarm)], levels = rev(arm_labels)
     ))
-  if (!is.null(min_cell)) {
-    counts <- counts %>%
-      mutate(n_obs = ifelse(
-        n_obs < min_cell, paste0("<", min_cell), as.character(n_obs)
-      ))
-  }
 
   ggplot(counts, aes(
     x = time_linear, y = arm, label = n_obs, colour = studyarm
@@ -384,8 +375,9 @@ plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
 # modifier), rows for the means, the effects and the numbers table, built as
 # one grid so the visits line up from top to bottom. The four options are
 # chosen per figure (#35); the defaults reproduce the earlier figure's
-# content. jitter_x, jitter_y and min_cell change only what is displayed
-# (#11); all default to no change. Returns a patchwork object: change every
+# content. jitter_x and jitter_y change only what is displayed (#11); both
+# default to no change. A data set with cells small enough to need
+# suppressing should not be shown in this figure at all. Returns a patchwork object: change every
 # panel with `&`, or one panel by indexing it.
 compose_trajectory_figure <- function(data, estimates, outcome,
                                       modifier = NULL, title = NULL,
@@ -394,8 +386,7 @@ compose_trajectory_figure <- function(data, estimates, outcome,
                                       show_baseline_p = TRUE,
                                       show_effect_panel = FALSE,
                                       offset = 0.18, jitter_x = 0,
-                                      jitter_y = 0, seed = 20261108,
-                                      min_cell = NULL) {
+                                      jitter_y = 0, seed = 20261108) {
   visits <- sort(unique(data$time_linear))
   if (is.null(modifier)) {
     levels_shown <- list(NULL)
@@ -407,10 +398,12 @@ compose_trajectory_figure <- function(data, estimates, outcome,
   }
   n_levels <- length(levels_shown)
 
-  # One y range for every means panel
+  # One y range for every means panel, widened by any vertical jitter so
+  # every displaced value stays on the axis
   means_limits <- range(
     estimates$means$conf.low, estimates$means$conf.high,
-    if (show_trajectories) data[[outcome]],
+    if (show_trajectories) data[[outcome]] + jitter_y,
+    if (show_trajectories) data[[outcome]] - jitter_y,
     na.rm = TRUE
   )
 
@@ -524,8 +517,7 @@ compose_trajectory_figure <- function(data, estimates, outcome,
     lapply(seq_len(n_levels), function(i) {
       plot_numbers_table(
         data, outcome, modifier, levels_shown[[i]],
-        show_row_labels = i == 1, title = if (i == 1) "Observed, n" else NULL,
-        min_cell = min_cell
+        show_row_labels = i == 1, title = if (i == 1) "Observed, n" else NULL
       )
     }),
     spacers(extra)
@@ -540,9 +532,6 @@ compose_trajectory_figure <- function(data, estimates, outcome,
     },
     if (show_trajectories && jitter_y > 0) {
       "Individual values are randomly displaced; means use the exact values."
-    },
-    if (!is.null(min_cell)) {
-      paste0("Counts below ", min_cell, " are shown as <", min_cell, ".")
     },
     "Points and bars: model-estimated means (95% CI).",
     if (show_effect_panel) {

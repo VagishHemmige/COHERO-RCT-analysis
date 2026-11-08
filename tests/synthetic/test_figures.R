@@ -51,8 +51,8 @@ testthat::test_that("the trajectory figure's options change it as recorded", {
 })
 
 ## ---- display-options
-# Jitter and small-cell suppression change only what is drawn (#11)
-testthat::test_that("jitter and small-cell options change only the display", {
+# Jitter changes only what is drawn (#11)
+testthat::test_that("jitter changes only the display", {
   data <- mixed_model_data[["itt"]]
   estimates <- mixed_model_estimates[["itt"]][["act_score"]][["overall"]]
   draw <- function(...) {
@@ -78,14 +78,12 @@ testthat::test_that("jitter and small-cell options change only the display", {
     diff(range(s)) < 1e-9
   })))
 
-  # Counts below the threshold are shown as "<threshold"
-  table <- compose_trajectory_figure(
-    data, estimates, "act_score", min_cell = 38
-  )[[5]]
-  labels <- as.character(ggplot2::ggplot_build(table)$data[[1]]$label)
-  testthat::expect_true("<38" %in% labels)
-  testthat::expect_false(any(suppressWarnings(as.numeric(labels)) < 38,
-                             na.rm = TRUE))
+  # The y-axis widens so every displaced value stays on it
+  limits <- ggplot2::ggplot_build(
+    compose_trajectory_figure(data, estimates, "act_score", jitter_y = 1)[[1]]
+  )$layout$panel_params[[1]]$y.range
+  testthat::expect_true(all(jittered[[1]]$y >= limits[1] &
+                              jittered[[1]]$y <= limits[2]))
 })
 
 ## ---- figure-export
