@@ -403,9 +403,8 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#by-hand-from-the-coefficients" id="toc-by-hand-from-the-coefficients" class="nav-link active" data-scroll-target="#by-hand-from-the-coefficients">By hand from the coefficients</a></li>
+  <li><a href="#with-emmeans" id="toc-with-emmeans" class="nav-link active" data-scroll-target="#with-emmeans">With emmeans</a></li>
   <li><a href="#by-refitting-with-a-different-reference-level" id="toc-by-refitting-with-a-different-reference-level" class="nav-link" data-scroll-target="#by-refitting-with-a-different-reference-level">By refitting with a different reference level</a></li>
-  <li><a href="#with-emmeans" id="toc-with-emmeans" class="nav-link" data-scroll-target="#with-emmeans">With emmeans</a></li>
   <li><a href="#check-that-the-methods-agree" id="toc-check-that-the-methods-agree" class="nav-link" data-scroll-target="#check-that-the-methods-agree">Check that the methods agree</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/edit/main/quarto/methods_stratified_effects.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -438,9 +437,76 @@ window.Quarto = {
 </header>
 
 
-<p>A model with an interaction holds the arm effect for every subgroup level and every visit, but its coefficients show only some of them directly (see <a href="../quarto/methods_interactions.html">Interactions</a>). This page shows two ways to get all of them, with confidence intervals, from a model already fitted. Both give the same answer. The code is shown, not run, and uses illustrative object names.</p>
-<section id="by-hand-from-the-coefficients" class="level2">
-<h2 class="anchored" data-anchor-id="by-hand-from-the-coefficients">By hand from the coefficients</h2>
+<p>The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model’s printed coefficient table may not answer that directly. A <strong>contrast</strong> is a requested comparison of model estimates, such as intervention minus control within a subgroup.</p>
+<p>In the <a href="../quarto/methods_interactions.html">invented interaction example</a>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</p>
+<p>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</p>
+<section id="with-emmeans" class="level2">
+<h2 class="anchored" data-anchor-id="with-emmeans">With emmeans</h2>
+<p>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. For the count model:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit, <span class="sc">~</span> studyarm <span class="sc">|</span> prefer_language, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>This gives one row per language: the intervention-vs-control IRR (a <code>ratio</code> column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.</p>
+<p>For the mixed model, the arm difference at each visit within each subgroup level:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">|</span> time_factor <span class="sc">*</span> prefer_language) <span class="sc">%&gt;%</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model’s interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">*</span> time_factor <span class="sc">|</span> prefer_language) <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"revpairwise"</span>, <span class="st">"trt.vs.ctrl"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</p>
+<p>Read <code>~ studyarm | prefer_language</code> as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an <code>lmer()</code> formula. <code>revpairwise</code> reverses the usual pairwise direction so the stated factor order gives intervention versus control. <code>confint()</code> explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.</p>
+<p>For a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score’s units. An interval for a mean or contrast is not the range of scores expected for individual participants.</p>
+<p>Start with the package’s <a href="https://rvlenth.github.io/emmeans/articles/AQuickStart.html">quick-start guide</a>. The <a href="https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html">interval and summary reference</a> explains <code>confint()</code>, scales and inference options <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.</p>
+</section>
+<section id="by-refitting-with-a-different-reference-level" class="level2">
+<h2 class="anchored" data-anchor-id="by-refitting-with-a-different-reference-level">By refitting with a different reference level</h2>
+<p>The coefficient for <code>studyarm1</code> is the arm effect in the reference level, so making the other level the reference gives its effect directly:</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>participants_spanish_ref <span class="ot">&lt;-</span> participants <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">relevel</span>(prefer_language, <span class="at">ref =</span> <span class="st">"Spanish"</span>))</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fit_spanish_ref <span class="ot">&lt;-</span> <span class="fu">glm.nb</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants_spanish_ref</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>This is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. The plotting function uses a related idea: model C rewrites the formula to expose subgroup-specific terms directly, rather than literally calling <code>relevel()</code> (see <a href="../quarto/methods_in_this_code.html">How this code does it</a>).</p>
+<div class="callout callout-style-default callout-note callout-titled" title="Optional: where the interval comes from">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Optional: where the interval comes from
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<section id="by-hand-from-the-coefficients" class="level3 callout-body-container callout-body">
+<h3 class="anchored" data-anchor-id="by-hand-from-the-coefficients">By hand from the coefficients</h3>
 <p>The arm effect in a non-reference level is a <strong>sum of coefficients</strong>, so its variance is a sum of variances and covariances. For the count model <code>rescue_puffs_itt ~ studyarm * prefer_language + offset(...)</code>:</p>
 <p><span class="math display">\[
 \log \text{IRR}_{\text{Spanish}} = \beta_{\text{arm}} + \beta_{\text{arm} \times \text{Spanish}}
@@ -451,71 +517,26 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">vcov</span>(fit)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"studyarm1"</span>, <span class="st">"studyarm1:prefer_languageSpanish"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>log_irr <span class="ot">&lt;-</span> <span class="fu">sum</span>(b[terms])</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(v[terms, terms]))     <span class="co"># the sum of the 2 x 2 block</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr)                          <span class="co"># IRR in Spanish speakers</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">vcov</span>(fit)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"studyarm1"</span>, <span class="st">"studyarm1:prefer_languageSpanish"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>log_irr <span class="ot">&lt;-</span> <span class="fu">sum</span>(b[terms])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(v[terms, terms]))     <span class="co"># the sum of the 2 x 2 block</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr)                          <span class="co"># IRR in Spanish speakers</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <p>The same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.</p>
+<p>Here <code>coef()</code> extracts coefficient estimates and <code>vcov()</code> extracts their variance–covariance matrix. The covariance matters because terms from the same model are estimated together. The square root of the combined variance gives a standard error. The displayed hand calculation uses a normal approximation; it is not a universal replacement for the degrees-of-freedom or interval method used by a mixed-model package.</p>
 </section>
-<section id="by-refitting-with-a-different-reference-level" class="level2">
-<h2 class="anchored" data-anchor-id="by-refitting-with-a-different-reference-level">By refitting with a different reference level</h2>
-<p>The coefficient for <code>studyarm1</code> is the arm effect in the reference level, so making the other level the reference gives its effect directly:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>participants_spanish_ref <span class="ot">&lt;-</span> participants <span class="sc">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">relevel</span>(prefer_language, <span class="at">ref =</span> <span class="st">"Spanish"</span>))</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>fit_spanish_ref <span class="ot">&lt;-</span> <span class="fu">glm.nb</span>(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants_spanish_ref</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
-<p>This is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. Recoding the reference level this way is also what the plotting function’s “model C” does (see <a href="../quarto/methods_in_this_code.html">How this code does it</a>).</p>
-</section>
-<section id="with-emmeans" class="level2">
-<h2 class="anchored" data-anchor-id="with-emmeans">With emmeans</h2>
-<p>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. For the count model:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit, <span class="sc">~</span> studyarm <span class="sc">|</span> prefer_language, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
-<p>This gives one row per language: the intervention-vs-control IRR (a <code>ratio</code> column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.</p>
-<p>For the mixed model, the arm difference at each visit within each subgroup level:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">|</span> time_factor <span class="sc">*</span> prefer_language) <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
-<p>These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model’s interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">*</span> time_factor <span class="sc">|</span> prefer_language) <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"revpairwise"</span>, <span class="st">"trt.vs.ctrl"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
-<p>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</p>
 </section>
 <section id="check-that-the-methods-agree" class="level2">
 <h2 class="anchored" data-anchor-id="check-that-the-methods-agree">Check that the methods agree</h2>
-<p>On synthetic data, the hand calculation, the refit with a new reference level and emmeans should give the same estimate and, for the count models, the same confidence interval. Showing that is a good test that the right terms were combined. These calls are checked against emmeans’ help pages for the installed version before they’re used in the analysis.</p>
+<p>Equivalent contrasts from the same fitted model should agree when they use the same rows, coding, scale, degrees of freedom and interval method. Refitting can obscure those requirements, especially if missing predictors change the rows used. On synthetic data, compare the estimates and intervals explicitly before adopting a new reporting route. That validation is tracked in <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9">#9</a>.</p>
 
 
 <!-- -->
@@ -996,88 +1017,110 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>A model with an interaction holds the arm effect for every subgroup level and every visit, but its coefficients show only some of them directly (see <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>). This page shows two ways to get all of them, with confidence intervals, from a model already fitted. Both give the same answer. The code is shown, not run, and uses illustrative object names.</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model's printed coefficient table may not answer that directly. A **contrast** is a requested comparison of model estimates, such as intervention minus control within a subgroup.</span>
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">## By hand from the coefficients</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>In the <span class="co">[</span><span class="ot">invented interaction example</span><span class="co">](methods_interactions.qmd)</span>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The arm effect in a non-reference level is a **sum of coefficients**, so its variance is a sum of variances and covariances. For the count model <span class="in">`rescue_puffs_itt ~ studyarm * prefer_language + offset(...)`</span>:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>\log \text{IRR}_{\text{Spanish}} = \beta_{\text{arm}} + \beta_{\text{arm} \times \text{Spanish}}</span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## With emmeans</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>. For the count model:</span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>\text{Var} = \text{Var}(\beta_{\text{arm}}) + \text{Var}(\beta_{\text{arm} \times \text{Spanish}}) + 2\,\text{Cov}(\beta_{\text{arm}}, \beta_{\text{arm} \times \text{Spanish}})</span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">vcov</span>(fit)</span>
-<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"studyarm1"</span>, <span class="st">"studyarm1:prefer_languageSpanish"</span>)</span>
-<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>log_irr <span class="ot">&lt;-</span> <span class="fu">sum</span>(b[terms])</span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(v[terms, terms]))     <span class="co"># the sum of the 2 x 2 block</span></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit, <span class="sc">~</span> studyarm <span class="sc">|</span> prefer_language, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>This gives one row per language: the intervention-vs-control IRR (a <span class="in">`ratio`</span> column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>For the mixed model, the arm difference at each visit within each subgroup level:</span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr)                          <span class="co"># IRR in Spanish speakers</span></span>
-<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se)</span>
-<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>The same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.</span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## By refitting with a different reference level</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>The coefficient for <span class="in">`studyarm1`</span> is the arm effect in the reference level, so making the other level the reference gives its effect directly:</span>
-<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>participants_spanish_ref <span class="ot">&lt;-</span> participants <span class="sc">%&gt;%</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">relevel</span>(prefer_language, <span class="at">ref =</span> <span class="st">"Spanish"</span>))</span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>fit_spanish_ref <span class="ot">&lt;-</span> <span class="fu">glm.nb</span>(</span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
-<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants_spanish_ref</span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. Recoding the reference level this way is also what the plotting function's "model C" does (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd)</span>).</span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## With emmeans</span></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>. For the count model:</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit, <span class="sc">~</span> studyarm <span class="sc">|</span> prefer_language, <span class="at">type =</span> <span class="st">"response"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>)</span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">|</span> time_factor <span class="sc">*</span> prefer_language) <span class="sc">%&gt;%</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model's interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">*</span> time_factor <span class="sc">|</span> prefer_language) <span class="sc">%&gt;%</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"revpairwise"</span>, <span class="st">"trt.vs.ctrl"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>Read <span class="in">`~ studyarm | prefer_language`</span> as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an <span class="in">`lmer()`</span> formula. <span class="in">`revpairwise`</span> reverses the usual pairwise direction so the stated factor order gives intervention versus control. <span class="in">`confint()`</span> explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>For a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score's units. An interval for a mean or contrast is not the range of scores expected for individual participants.</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>Start with the package's <span class="co">[</span><span class="ot">quick-start guide</span><span class="co">](https://rvlenth.github.io/emmeans/articles/AQuickStart.html)</span>. The <span class="co">[</span><span class="ot">interval and summary reference</span><span class="co">](https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html)</span> explains <span class="in">`confint()`</span>, scales and inference options <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>. These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## By refitting with a different reference level</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>The coefficient for <span class="in">`studyarm1`</span> is the arm effect in the reference level, so making the other level the reference gives its effect directly:</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a>participants_spanish_ref <span class="ot">&lt;-</span> participants <span class="sc">%&gt;%</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">relevel</span>(prefer_language, <span class="at">ref =</span> <span class="st">"Spanish"</span>))</span>
 <span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>This gives one row per language: the intervention-vs-control IRR (a <span class="in">`ratio`</span> column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.</span>
-<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>For the mixed model, the arm difference at each visit within each subgroup level:</span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">|</span> time_factor <span class="sc">*</span> prefer_language) <span class="sc">%&gt;%</span></span>
-<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="st">"revpairwise"</span>)</span>
-<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>fit_spanish_ref <span class="ot">&lt;-</span> <span class="fu">glm.nb</span>(</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants_spanish_ref</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. The plotting function uses a related idea: model C rewrites the formula to expose subgroup-specific terms directly, rather than literally calling <span class="in">`relevel()`</span> (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd)</span>).</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="Optional: where the interval comes from"}</span>
 <span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model's interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a><span class="fu">### By hand from the coefficients</span></span>
 <span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="fu">emmeans</span>(fit_lmer, <span class="sc">~</span> studyarm <span class="sc">*</span> time_factor <span class="sc">|</span> prefer_language) <span class="sc">%&gt;%</span></span>
-<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(<span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"revpairwise"</span>, <span class="st">"trt.vs.ctrl"</span>))</span>
-<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>The arm effect in a non-reference level is a **sum of coefficients**, so its variance is a sum of variances and covariances. For the count model <span class="in">`rescue_puffs_itt ~ studyarm * prefer_language + offset(...)`</span>:</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>\log \text{IRR}_{\text{Spanish}} = \beta_{\text{arm}} + \beta_{\text{arm} \times \text{Spanish}}</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>\text{Var} = \text{Var}(\beta_{\text{arm}}) + \text{Var}(\beta_{\text{arm} \times \text{Spanish}}) + 2\,\text{Cov}(\beta_{\text{arm}}, \beta_{\text{arm} \times \text{Spanish}})</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check that the methods agree</span></span>
-<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>On synthetic data, the hand calculation, the refit with a new reference level and emmeans should give the same estimate and, for the count models, the same confidence interval. Showing that is a good test that the right terms were combined. These calls are checked against emmeans' help pages for the installed version before they're used in the analysis.</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">coef</span>(fit)</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> <span class="fu">vcov</span>(fit)</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>terms <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"studyarm1"</span>, <span class="st">"studyarm1:prefer_languageSpanish"</span>)</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>log_irr <span class="ot">&lt;-</span> <span class="fu">sum</span>(b[terms])</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">sum</span>(v[terms, terms]))     <span class="co"># the sum of the 2 x 2 block</span></span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr)                          <span class="co"># IRR in Spanish speakers</span></span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a><span class="fu">exp</span>(log_irr <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se)</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>The same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>Here <span class="in">`coef()`</span> extracts coefficient estimates and <span class="in">`vcov()`</span> extracts their variance–covariance matrix. The covariance matters because terms from the same model are estimated together. The square root of the combined variance gives a standard error. The displayed hand calculation uses a normal approximation; it is not a universal replacement for the degrees-of-freedom or interval method used by a mixed-model package.</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check that the methods agree</span></span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a>Equivalent contrasts from the same fitted model should agree when they use the same rows, coding, scale, degrees of freedom and interval method. Refitting can obscure those requirements, especially if missing predictors change the rows used. On synthetic data, compare the estimates and intervals explicitly before adopting a new reporting route. That validation is tracked in <span class="co">[</span><span class="ot">#9</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9)</span>.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

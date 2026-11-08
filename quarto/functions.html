@@ -62,7 +62,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -112,17 +131,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
-  background-image: none;
-}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -132,6 +140,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -412,6 +431,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </div>
 <section id="create-me-table" class="level2">
 <h2 class="anchored" data-anchor-id="create-me-table">Create ME table</h2>
+<p>“ME” means mixed effects. A function is a reusable recipe: this one accepts a visit dataset, the outcome column’s name and an optional subgroup name. With <code>interaction_variable = NULL</code>, it fits visit × arm; supplying a subgroup adds the three-way interaction. <code>tidy()</code> turns model output into a table-shaped object, and <code>flextable()</code> formats it. The returned object is a table, not the fitted model itself. You can use the helper without understanding every formatting line; begin with its arguments and model formula.</p>
 <p>What the model’s coefficients mean is explained in <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a> and <a href="../quarto/methods_interactions.html">Interactions</a>; <a href="../quarto/methods_in_this_code.html#mixed-model-tables-create_me_table">How this code does it</a> describes what this table shows and doesn’t.</p>
 <div class="cell">
 <details class="code-fold">
@@ -423,37 +443,40 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">interaction_variable =</span> <span class="cn">NULL</span>) {</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Primary analysis without interactions if interaction_variable is NULL</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(interaction_variable)) {</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lmer</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">get</span>(outcome_of_interest) <span class="sc">~</span> time_factor <span class="sc">*</span> studyarm <span class="sc">+</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        (<span class="dv">1</span> <span class="sc">|</span> study_id_screening),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">data =</span> trial_data</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>(., <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">set_caption</span>(<span class="fu">paste0</span>(outcome_of_interest, <span class="st">" vs. time"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>()</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    lmer_formula <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>      outcome_of_interest, <span class="st">"~time_factor*studyarm*"</span>, interaction_variable,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">"+(1|study_id_screening)"</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.formula</span>()</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lmer</span>(lmer_formula, <span class="at">data =</span> trial_data) <span class="sc">%&gt;%</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>(., <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">set_caption</span>(<span class="fu">paste0</span>(</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        outcome_of_interest, <span class="st">" vs. time * "</span>, interaction_variable</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>      )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>()</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    lmer_formula <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>      outcome_of_interest,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">" ~ time_factor * studyarm + (1 | study_id_screening)"</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.formula</span>()</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lmer</span>(lmer_formula, <span class="at">data =</span> trial_data) <span class="sc">%&gt;%</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>(., <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>      <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>      <span class="fu">set_caption</span>(<span class="fu">paste0</span>(outcome_of_interest, <span class="st">" vs. time"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>()</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    lmer_formula <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>      outcome_of_interest, <span class="st">"~time_factor*studyarm*"</span>, interaction_variable,</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>      <span class="st">"+(1|study_id_screening)"</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.formula</span>()</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lmer</span>(lmer_formula, <span class="at">data =</span> trial_data) <span class="sc">%&gt;%</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">tidy</span>(., <span class="at">conf.int =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">flextable</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">set_caption</span>(<span class="fu">paste0</span>(</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        outcome_of_interest, <span class="st">" vs. time * "</span>, interaction_variable</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>      )) <span class="sc">%&gt;%</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">return</span>()</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="create-me-plot" class="level2">
 <h2 class="anchored" data-anchor-id="create-me-plot">Create ME plot</h2>
-<p>Inside, the function refits the same model in three codings (models A, B and C) to read off cell means and contrasts; <a href="../quarto/methods_in_this_code.html#mixed-model-plots-create_me_plot">How this code does it</a> explains each one, and <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a> the method behind model C.</p>
+<p>This helper accepts the same analysis inputs plus a title. It returns a plot object combining individual trajectories, estimated means, confidence intervals and p-value annotations. The long function mainly prepares those layers and arranges subgroup panels. Read it in that order: model fits, extracted estimates, observed counts, drawing layers. The two subgroup panels assume a two-level factor. For general guidance on writing and reading reusable recipes, see the Functions chapter in <a href="https://r4ds.hadley.nz/">R for Data Science</a> <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
+<p>Inside, the function fits alternative codings (models A, B and C) intended to expose cell means and contrasts; equivalence requires the same analysis rows and model specification. <a href="../quarto/methods_in_this_code.html#mixed-model-plots-create_me_plot">How this code does it</a> explains each one, and <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a> the method behind model C.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -530,7 +553,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Number observed in each arm at each visit</span></span>
 <span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    mixed_model_predictions <span class="ot">&lt;-</span> trial_data <span class="sc">%&gt;%</span></span>
-<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">get</span>(outcome_of_interest))) <span class="sc">%&gt;%</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(.data[[outcome_of_interest]])) <span class="sc">%&gt;%</span></span>
 <span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(time_linear, studyarm) <span class="sc">%&gt;%</span></span>
 <span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarize</span>(<span class="at">n_obs =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(</span>
@@ -544,7 +567,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(</span>
 <span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        trial_data,</span>
 <span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -552,7 +575,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>(</span>
 <span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        trial_data,</span>
 <span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -568,7 +591,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> estimate, <span class="at">color =</span> studyarm,</span>
 <span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>          <span class="at">group =</span> studyarm</span>
 <span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">2</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="dv">2</span></span>
 <span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(</span>
 <span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>        mixed_model_predictions,</span>
@@ -576,7 +599,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
 <span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm</span>
 <span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="fl">1.5</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
 <span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(</span>
@@ -617,7 +640,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>    data_for_function <span class="ot">&lt;-</span> trial_data <span class="sc">%&gt;%</span></span>
 <span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">interaction_variable_numeric =</span> <span class="fu">factor</span>(</span>
-<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>(<span class="fu">get</span>(interaction_variable))</span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="fu">as.numeric</span>(.data[[interaction_variable]])</span>
 <span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>      )) <span class="sc">%&gt;%</span></span>
 <span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">me_factor_interaction_variable =</span> <span class="fu">paste</span>(</span>
 <span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>        <span class="st">"time"</span>, time_linear, <span class="st">"studyarm"</span>, studyarm, interaction_variable,</span>
@@ -770,7 +793,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Number observed in each arm and level at each visit</span></span>
 <span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>    predictions_interaction <span class="ot">&lt;-</span> data_for_function <span class="sc">%&gt;%</span></span>
-<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="fu">get</span>(outcome_of_interest))) <span class="sc">%&gt;%</span></span>
+<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(.data[[outcome_of_interest]])) <span class="sc">%&gt;%</span></span>
 <span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(time_linear, studyarm, interaction_variable_numeric) <span class="sc">%&gt;%</span></span>
 <span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarize</span>(<span class="at">n_obs =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">interaction_variable =</span> interaction_variable_numeric) <span class="sc">%&gt;%</span></span>
@@ -801,7 +824,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(</span>
 <span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a>        data_nested_interaction<span class="sc">$</span>data[[<span class="dv">1</span>]],</span>
 <span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -809,7 +832,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>(</span>
 <span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a>        data_nested_interaction<span class="sc">$</span>data[[<span class="dv">1</span>]],</span>
 <span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -827,7 +850,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-368"><a href="#cb2-368" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted_2, <span class="at">y =</span> estimate, <span class="at">color =</span> studyarm,</span>
 <span id="cb2-369"><a href="#cb2-369" aria-hidden="true" tabindex="-1"></a>          <span class="at">group =</span> gid</span>
 <span id="cb2-370"><a href="#cb2-370" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-371"><a href="#cb2-371" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">2</span></span>
+<span id="cb2-371"><a href="#cb2-371" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="dv">2</span></span>
 <span id="cb2-372"><a href="#cb2-372" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-373"><a href="#cb2-373" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb2-374"><a href="#cb2-374" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(</span>
@@ -858,7 +881,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-399"><a href="#cb2-399" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted_2, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
 <span id="cb2-400"><a href="#cb2-400" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm</span>
 <span id="cb2-401"><a href="#cb2-401" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-402"><a href="#cb2-402" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="fl">1.5</span></span>
+<span id="cb2-402"><a href="#cb2-402" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
 <span id="cb2-403"><a href="#cb2-403" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-404"><a href="#cb2-404" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_x_continuous</span>(</span>
 <span id="cb2-405"><a href="#cb2-405" aria-hidden="true" tabindex="-1"></a>        <span class="at">breaks =</span> <span class="cn">NULL</span>,</span>
@@ -878,7 +901,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-419"><a href="#cb2-419" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(</span>
 <span id="cb2-420"><a href="#cb2-420" aria-hidden="true" tabindex="-1"></a>        data_nested_interaction<span class="sc">$</span>data[[<span class="dv">2</span>]],</span>
 <span id="cb2-421"><a href="#cb2-421" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-422"><a href="#cb2-422" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-422"><a href="#cb2-422" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-423"><a href="#cb2-423" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-424"><a href="#cb2-424" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-425"><a href="#cb2-425" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -886,7 +909,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-427"><a href="#cb2-427" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_line</span>(</span>
 <span id="cb2-428"><a href="#cb2-428" aria-hidden="true" tabindex="-1"></a>        data_nested_interaction<span class="sc">$</span>data[[<span class="dv">2</span>]],</span>
 <span id="cb2-429"><a href="#cb2-429" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(</span>
-<span id="cb2-430"><a href="#cb2-430" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> <span class="fu">get</span>(outcome_of_interest),</span>
+<span id="cb2-430"><a href="#cb2-430" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted, <span class="at">y =</span> .data[[outcome_of_interest]],</span>
 <span id="cb2-431"><a href="#cb2-431" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm, <span class="at">group =</span> study_id_screening</span>
 <span id="cb2-432"><a href="#cb2-432" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb2-433"><a href="#cb2-433" aria-hidden="true" tabindex="-1"></a>        <span class="at">alpha =</span> <span class="fl">0.2</span></span>
@@ -904,7 +927,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-445"><a href="#cb2-445" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted_2, <span class="at">y =</span> estimate, <span class="at">color =</span> studyarm,</span>
 <span id="cb2-446"><a href="#cb2-446" aria-hidden="true" tabindex="-1"></a>          <span class="at">group =</span> gid</span>
 <span id="cb2-447"><a href="#cb2-447" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-448"><a href="#cb2-448" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="dv">2</span></span>
+<span id="cb2-448"><a href="#cb2-448" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="dv">2</span></span>
 <span id="cb2-449"><a href="#cb2-449" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-450"><a href="#cb2-450" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
 <span id="cb2-451"><a href="#cb2-451" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(</span>
@@ -935,7 +958,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-476"><a href="#cb2-476" aria-hidden="true" tabindex="-1"></a>          <span class="at">x =</span> time_linear_shifted_2, <span class="at">ymin =</span> conf.low, <span class="at">ymax =</span> conf.high,</span>
 <span id="cb2-477"><a href="#cb2-477" aria-hidden="true" tabindex="-1"></a>          <span class="at">color =</span> studyarm</span>
 <span id="cb2-478"><a href="#cb2-478" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb2-479"><a href="#cb2-479" aria-hidden="true" tabindex="-1"></a>        <span class="at">size =</span> <span class="fl">1.5</span></span>
+<span id="cb2-479"><a href="#cb2-479" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
 <span id="cb2-480"><a href="#cb2-480" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb2-481"><a href="#cb2-481" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_x_continuous</span>(</span>
 <span id="cb2-482"><a href="#cb2-482" aria-hidden="true" tabindex="-1"></a>        <span class="at">breaks =</span> <span class="cn">NULL</span>,</span>
@@ -975,9 +998,14 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 
 <!-- -->
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-r4ds2" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for Data Science</em>. 2nd ed. O’Reilly Media. <a href="https://r4ds.hadley.nz/">https://r4ds.hadley.nz/</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1469,21 +1497,25 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Create ME table</span></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>What the model's coefficients mean is explained in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>; <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-tables-create_me_table)</span> describes what this table shows and doesn't.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>“ME” means mixed effects. A function is a reusable recipe: this one accepts a visit dataset, the outcome column's name and an optional subgroup name. With <span class="in">`interaction_variable = NULL`</span>, it fits visit × arm; supplying a subgroup adds the three-way interaction. <span class="in">`tidy()`</span> turns model output into a table-shaped object, and <span class="in">`flextable()`</span> formats it. The returned object is a table, not the fitted model itself. You can use the helper without understanding every formatting line; begin with its arguments and model formula.</span>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: create-me-table</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Create ME plot</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>What the model's coefficients mean is explained in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>; <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-tables-create_me_table)</span> describes what this table shows and doesn't.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: create-me-table</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>Inside, the function refits the same model in three codings (models A, B and C) to read off cell means and contrasts; <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span> explains each one, and <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> the method behind model C.</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="fu">## Create ME plot</span></span>
 <span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: create-me-plot</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>This helper accepts the same analysis inputs plus a title. It returns a plot object combining individual trajectories, estimated means, confidence intervals and p-value annotations. The long function mainly prepares those layers and arranges subgroup panels. Read it in that order: model fits, extracted estimates, observed counts, drawing layers. The two subgroup panels assume a two-level factor. For general guidance on writing and reading reusable recipes, see the Functions chapter in <span class="co">[</span><span class="ot">R for Data Science</span><span class="co">](https://r4ds.hadley.nz/)</span> <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>Inside, the function fits alternative codings (models A, B and C) intended to expose cell means and contrasts; equivalence requires the same analysis rows and model specification. <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span> explains each one, and <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> the method behind model C.</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: create-me-plot</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -123,17 +123,6 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
   content: '⏳';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -143,6 +132,17 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 </style>
@@ -414,6 +414,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </div>
 <section id="mixed-model-data" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-model-data">Mixed model data</h2>
+<p><code>mixed_model_data</code> is a named list containing the two visit datasets. The labels <code>itt</code> and <code>pp</code> let the later loops select a population by name. Each dataset still contains repeated rows per participant; the helper’s random intercept accounts for that dependence. <code>mixed_model_tables</code> begins empty and will hold the resulting tables.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -428,6 +429,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="mixed-models-overall" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-models-overall">Mixed models overall</h2>
+<p>For each population and outcome, this calls <code>create_me_table()</code>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <code>mixed_model_tables[["itt"]][["act_score"]][["overall"]]</code> selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.</p>
 <p>The model and what its coefficients mean are explained in <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -451,6 +453,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="mixed-models-subgroups" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-models-subgroups">Mixed models subgroups</h2>
+<p>The extra loop asks whether the arm-by-visit pattern differs by one baseline subgroup at a time. Children and adults are compared only for outcomes used in both groups; the adult and caregiver quality-of-life measures are not interchangeable. A missing outcome or model predictor can change the rows used by a particular fit, so the same dataset name does not guarantee the same analysis sample for every outcome.</p>
 <p>Reading the three-way visit × arm × subgroup terms is covered in <a href="../quarto/methods_interactions.html#reading-the-coefficients-linear-mixed-models">Interactions</a>, and the meaning of their p-values in <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -983,28 +986,34 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed model data</span></span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-data</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed models overall</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="in">`mixed_model_data`</span> is a named list containing the two visit datasets. The labels <span class="in">`itt`</span> and <span class="in">`pp`</span> let the later loops select a population by name. Each dataset still contains repeated rows per participant; the helper's random intercept accounts for that dependence. <span class="in">`mixed_model_tables`</span> begins empty and will hold the resulting tables.</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-data</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>The model and what its coefficients mean are explained in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span>.</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed models overall</span></span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-models-overall</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed models subgroups</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>Reading the three-way visit × arm × subgroup terms is covered in <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd#reading-the-coefficients-linear-mixed-models)</span>, and the meaning of their p-values in <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>For each population and outcome, this calls <span class="in">`create_me_table()`</span>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <span class="in">`mixed_model_tables[["itt"]][["act_score"]][["overall"]]`</span> selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>The model and what its coefficients mean are explained in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span>.</span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-models-overall</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-models-subgroups</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed models subgroups</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>The extra loop asks whether the arm-by-visit pattern differs by one baseline subgroup at a time. Children and adults are compared only for outcomes used in both groups; the adult and caregiver quality-of-life measures are not interchangeable. A missing outcome or model predictor can change the rows used by a particular fit, so the same dataset name does not guarantee the same analysis sample for every outcome.</span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>Reading the three-way visit × arm × subgroup terms is covered in <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd#reading-the-coefficients-linear-mixed-models)</span>, and the meaning of their p-values in <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-models-subgroups</span></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

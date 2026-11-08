@@ -131,6 +131,17 @@ div.csl-indent {
   }
 }</script>
 <style>
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
+  background-image: none;
+}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -151,17 +162,6 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
-  background-image: none;
-}
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
   background-image: none;
 }
 </style>
@@ -375,7 +375,10 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
    
   <ul>
   <li><a href="#effect-modification-in-a-trial" id="toc-effect-modification-in-a-trial" class="nav-link active" data-scroll-target="#effect-modification-in-a-trial">Effect modification in a trial</a></li>
-  <li><a href="#reading-the-coefficients-count-models" id="toc-reading-the-coefficients-count-models" class="nav-link" data-scroll-target="#reading-the-coefficients-count-models">Reading the coefficients: count models</a></li>
+  <li><a href="#reading-the-coefficients-count-models" id="toc-reading-the-coefficients-count-models" class="nav-link" data-scroll-target="#reading-the-coefficients-count-models">Reading the coefficients: count models</a>
+  <ul class="collapse">
+  <li><a href="#keep-three-quantities-separate" id="toc-keep-three-quantities-separate" class="nav-link" data-scroll-target="#keep-three-quantities-separate">Keep three quantities separate</a></li>
+  </ul></li>
   <li><a href="#reading-the-coefficients-linear-mixed-models" id="toc-reading-the-coefficients-linear-mixed-models" class="nav-link" data-scroll-target="#reading-the-coefficients-linear-mixed-models">Reading the coefficients: linear mixed models</a></li>
   <li><a href="#scale-matters" id="toc-scale-matters" class="nav-link" data-scroll-target="#scale-matters">Scale matters</a></li>
   </ul>
@@ -413,6 +416,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <section id="effect-modification-in-a-trial" class="level2">
 <h2 class="anchored" data-anchor-id="effect-modification-in-a-trial">Effect modification in a trial</h2>
 <p>A subgroup analysis asks whether the intervention’s effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an <strong>arm × subgroup interaction</strong> to the model. The interaction lets the arm effect take a different value in each subgroup level.</p>
+<p>An overall effect averages across the participants being compared. A subgroup analysis asks an additional question: does that effect differ by a characteristic such as preferred language? This does not mean language itself was randomized. The subgroup main effect should not be read as a causal effect of speaking one language rather than another.</p>
 </section>
 <section id="reading-the-coefficients-count-models" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-coefficients-count-models">Reading the coefficients: count models</h2>
@@ -426,7 +430,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<p>On the log scale, and after exponentiating:</p>
+<p>The model fits coefficients on a log scale. Applying <code>exp()</code> converts them to ratios. English is the <strong>reference level</strong>, the category used as the starting comparison; it is not a statement that English speakers are the typical or preferred population. After exponentiating:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -454,6 +458,42 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </tbody>
 </table>
 <p>So a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if <code>studyarm1</code> is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn’t an effect in anyone; it’s how much the effect changes between levels.</p>
+<section id="keep-three-quantities-separate" class="level3">
+<h3 class="anchored" data-anchor-id="keep-three-quantities-separate">Keep three quantities separate</h3>
+<p>For the invented example above:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 30%">
+<col style="width: 40%">
+<col style="width: 30%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;">Value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Intervention/control IRR in English speakers</td>
+<td style="text-align: right;">0.80</td>
+<td>Intervention rate is 20% lower</td>
+</tr>
+<tr class="even">
+<td>Intervention/control IRR in Spanish speakers</td>
+<td style="text-align: right;">1.00</td>
+<td>Equal modeled rates</td>
+</tr>
+<tr class="odd">
+<td>Ratio of those IRRs</td>
+<td style="text-align: right;">1.25</td>
+<td>The arm comparison differs between subgroups</td>
+</tr>
+</tbody>
+</table>
+<p>The last value is a comparison <strong>of comparisons</strong>. It does not mean Spanish speakers have 25% more events.</p>
+</section>
 </section>
 <section id="reading-the-coefficients-linear-mixed-models" class="level2">
 <h2 class="anchored" data-anchor-id="reading-the-coefficients-linear-mixed-models">Reading the coefficients: linear mixed models</h2>
@@ -463,11 +503,13 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <li>each term is a <strong>difference</strong>: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a>);</li>
 <li>with six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.</li>
 </ul>
+<p>In ordinary language, the three-way interaction asks: “Does the difference in improvement between the two arms also differ between subgroups?” Work out the arm comparison within each subgroup before comparing those comparisons.</p>
 <p>That’s why tables of raw coefficients from these models are hard to read. <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a> explains what these terms’ p-values test, and <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a> shows how to get the effects themselves.</p>
 </section>
 <section id="scale-matters" class="level2">
 <h2 class="anchored" data-anchor-id="scale-matters">Scale matters</h2>
 <p>An interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both <span class="citation" data-cites="knol2012presenting">(<a href="#ref-knol2012presenting" role="doc-biblioref">Knol and VanderWeele 2012</a>)</span>.</p>
+<p>For a brief clinical-statistics explanation, read <a href="https://doi.org/10.1136/bmj.326.7382.219">Altman and Bland on comparing two estimates</a> <span class="citation" data-cites="altman2003interaction">(<a href="#ref-altman2003interaction" role="doc-biblioref">Altman and Bland 2003</a>)</span>. For reporting guidance, <a href="https://doi.org/10.1093/ije/dyr218">Knol and VanderWeele</a> explain why subgroup-specific effects belong alongside the interaction measure <span class="citation" data-cites="knol2012presenting">(<a href="#ref-knol2012presenting" role="doc-biblioref">Knol and VanderWeele 2012</a>)</span>.</p>
 
 
 <!-- -->
@@ -476,6 +518,9 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-altman2003interaction" class="csl-entry" role="listitem">
+Altman, Douglas G., and J. Martin Bland. 2003. <span>“Interaction Revisited: The Difference Between Two Estimates.”</span> <em>BMJ</em> 326 (7382): 219. <a href="https://doi.org/10.1136/bmj.326.7382.219">https://doi.org/10.1136/bmj.326.7382.219</a>.
+</div>
 <div id="ref-knol2012presenting" class="csl-entry" role="listitem">
 Knol, Mirjam J., and Tyler J. VanderWeele. 2012. <span>“Recommendations for Presenting Analyses of Effect Modification and Interaction.”</span> <em>International Journal of Epidemiology</em> 41 (2): 514–20. <a href="https://doi.org/10.1093/ije/dyr218">https://doi.org/10.1093/ije/dyr218</a>.
 </div>
@@ -954,41 +999,59 @@ Knol, Mirjam J., and Tyler J. VanderWeele. 2012. <span>“Recommendations for Pr
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>A subgroup analysis asks whether the intervention's effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an **arm × subgroup interaction** to the model. The interaction lets the arm effect take a different value in each subgroup level.</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the coefficients: count models</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>An overall effect averages across the participants being compared. A subgroup analysis asks an additional question: does that effect differ by a characteristic such as preferred language? This does not mean language itself was randomized. The subgroup main effect should not be read as a causal effect of speaking one language rather than another.</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>For a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the coefficients: count models</span></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">glm.nb</span>(</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>On the log scale, and after exponentiating:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>For a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">glm.nb</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  rescue_puffs_itt <span class="sc">~</span> studyarm <span class="sc">*</span> prefer_language <span class="sc">+</span> <span class="fu">offset</span>(<span class="fu">log</span>(followup_time_itt)),</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> participants</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Exponentiated coefficient <span class="pp">|</span> Meaning <span class="pp">|</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`studyarm1`</span> <span class="pp">|</span> Incidence rate ratio (IRR), intervention vs control, **in the reference level only** (English) <span class="pp">|</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`prefer_languageSpanish`</span> <span class="pp">|</span> Rate ratio, Spanish vs English, **in the control arm only** <span class="pp">|</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`studyarm1:prefer_languageSpanish`</span> <span class="pp">|</span> **Ratio of the two IRRs**: IRR in Spanish speakers ÷ IRR in English speakers <span class="pp">|</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>So a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if <span class="in">`studyarm1`</span> is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn't an effect in anyone; it's how much the effect changes between levels.</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>The model fits coefficients on a log scale. Applying <span class="in">`exp()`</span> converts them to ratios. English is the **reference level**, the category used as the starting comparison; it is not a statement that English speakers are the typical or preferred population. After exponentiating:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Exponentiated coefficient <span class="pp">|</span> Meaning <span class="pp">|</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`studyarm1`</span> <span class="pp">|</span> Incidence rate ratio (IRR), intervention vs control, **in the reference level only** (English) <span class="pp">|</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`prefer_languageSpanish`</span> <span class="pp">|</span> Rate ratio, Spanish vs English, **in the control arm only** <span class="pp">|</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`studyarm1:prefer_languageSpanish`</span> <span class="pp">|</span> **Ratio of the two IRRs**: IRR in Spanish speakers ÷ IRR in English speakers <span class="pp">|</span></span>
 <span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the coefficients: linear mixed models</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>So a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if <span class="in">`studyarm1`</span> is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn't an effect in anyone; it's how much the effect changes between levels.</span>
 <span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>The same logic holds on an additive scale. In <span class="in">`outcome ~ time_factor * studyarm * subgroup + (1 | id)`</span>:</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### Keep three quantities separate</span></span>
 <span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the two-way and three-way terms involving <span class="in">`studyarm`</span> describe how the arm effect differs between visits and between subgroup levels;</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>each term is a **difference**: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span>);</span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>with six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.</span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>That's why tables of raw coefficients from these models are hard to read. <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span> explains what these terms' p-values test, and <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> shows how to get the effects themselves.</span>
-<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scale matters</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>For the invented example above:</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Quantity <span class="pp">|</span> Value <span class="pp">|</span> Interpretation <span class="pp">|</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---|</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Intervention/control IRR in English speakers <span class="pp">|</span> 0.80 <span class="pp">|</span> Intervention rate is 20% lower <span class="pp">|</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Intervention/control IRR in Spanish speakers <span class="pp">|</span> 1.00 <span class="pp">|</span> Equal modeled rates <span class="pp">|</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Ratio of those IRRs <span class="pp">|</span> 1.25 <span class="pp">|</span> The arm comparison differs between subgroups <span class="pp">|</span></span>
 <span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>An interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both <span class="co">[</span><span class="ot">@knol2012presenting</span><span class="co">]</span>.</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>The last value is a comparison **of comparisons**. It does not mean Spanish speakers have 25% more events.</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading the coefficients: linear mixed models</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>The same logic holds on an additive scale. In <span class="in">`outcome ~ time_factor * studyarm * subgroup + (1 | id)`</span>:</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>the two-way and three-way terms involving <span class="in">`studyarm`</span> describe how the arm effect differs between visits and between subgroup levels;</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>each term is a **difference**: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span>);</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>with six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>In ordinary language, the three-way interaction asks: “Does the difference in improvement between the two arms also differ between subgroups?” Work out the arm comparison within each subgroup before comparing those comparisons.</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>That's why tables of raw coefficients from these models are hard to read. <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span> explains what these terms' p-values test, and <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> shows how to get the effects themselves.</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Scale matters</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>An interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both <span class="co">[</span><span class="ot">@knol2012presenting</span><span class="co">]</span>.</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>For a brief clinical-statistics explanation, read <span class="co">[</span><span class="ot">Altman and Bland on comparing two estimates</span><span class="co">](https://doi.org/10.1136/bmj.326.7382.219)</span> <span class="co">[</span><span class="ot">@altman2003interaction</span><span class="co">]</span>. For reporting guidance, <span class="co">[</span><span class="ot">Knol and VanderWeele</span><span class="co">](https://doi.org/10.1093/ije/dyr218)</span> explain why subgroup-specific effects belong alongside the interaction measure <span class="co">[</span><span class="ot">@knol2012presenting</span><span class="co">]</span>.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

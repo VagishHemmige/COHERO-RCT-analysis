@@ -62,7 +62,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -415,6 +434,8 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </div>
 <section id="count-models" class="level2">
 <h2 class="anchored" data-anchor-id="count-models">Count models</h2>
+<p>Each input row represents one participant, with a count and a follow-up duration. A <code>for</code> loop repeats the same formula for each outcome named in <code>count_outcomes</code>. <code>glm.nb()</code> fits a negative binomial model, which allows more variation in counts than a Poisson model. <code>offset(log(followup_time_itt))</code> accounts for exposure time with its coefficient fixed at one. <code>tbl_regression(exp = TRUE)</code> converts log-scale coefficients to rate ratios, and <code>tbl_stack()</code> combines the outcome tables.</p>
+<p>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html">MASS function reference</a> for fitting details <span class="citation" data-cites="massglmnb">(<a href="#ref-massglmnb" role="doc-biblioref">MASS authors, n.d.</a>)</span>.</p>
 <p>Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in <a href="../quarto/methods_longitudinal.html#count-outcomes-are-different">Longitudinal data and mixed models</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -448,6 +469,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 <section id="count-interaction-models" class="level2">
 <h2 class="anchored" data-anchor-id="count-interaction-models">Count interaction models</h2>
+<p>These loops add one subgroup at a time; they do not fit all subgroup variables together. <code>studyarm * subgroup</code> includes the arm term, subgroup term and their interaction. The named list stores each table first by outcome and then by subgroup, making the analysis that generated it identifiable. Read the reference category before interpreting the arm coefficient: it now applies within that category.</p>
 <p>What each coefficient of an arm × subgroup model means is in <a href="../quarto/methods_interactions.html#reading-the-coefficients-count-models">Interactions</a>, what the interaction p-value tests in <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>, and how to get the IRR in each subgroup level in <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -491,6 +513,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 <section id="rescue-models-alternative" class="level2">
 <h2 class="anchored" data-anchor-id="rescue-models-alternative">Rescue models alternative</h2>
+<p>These additional fits were retained from the earlier analysis. Their formula uses <code>log(offset(followup_time_itt))</code>, which is not the working offset syntax shown above; <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/1">#1</a> tracks the correction. Treat this block as a documented implementation problem, not as a second recommended way to specify a rate model.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -515,6 +538,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 <section id="controller-pdc-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="controller-pdc-comparison">Controller PDC comparison</h2>
+<p>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <code>add_p()</code> asks gtsummary to choose its default comparison test. The resulting table’s footnote identifies the test; readers should not assume it is a t test. The <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">gtsummary tutorial</a> explains summary statistics, missing rows and test annotations <span class="citation" data-cites="gtsummarytutorial">(<a href="#ref-gtsummarytutorial" role="doc-biblioref"><span class="nocase">gtsummary authors</span>, n.d.</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -529,9 +553,17 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 
 <!-- -->
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-gtsummarytutorial" class="csl-entry" role="listitem">
+<span class="nocase">gtsummary authors</span>. n.d. <em>Tbl_summary() Tutorial</em>. Accessed November 8, 2026. <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html</a>.
+</div>
+<div id="ref-massglmnb" class="csl-entry" role="listitem">
+MASS authors. n.d. <em>Fit a Negative Binomial Generalized Linear Model</em>. Accessed November 8, 2026. <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html">https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1024,35 +1056,45 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count models</span></span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd#count-outcomes-are-different)</span>.</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>Each input row represents one participant, with a count and a follow-up duration. A <span class="in">`for`</span> loop repeats the same formula for each outcome named in <span class="in">`count_outcomes`</span>. <span class="in">`glm.nb()`</span> fits a negative binomial model, which allows more variation in counts than a Poisson model. <span class="in">`offset(log(followup_time_itt))`</span> accounts for exposure time with its coefficient fixed at one. <span class="in">`tbl_regression(exp = TRUE)`</span> converts log-scale coefficients to rate ratios, and <span class="in">`tbl_stack()`</span> combines the outcome tables.</span>
 <span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-models</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count interaction models</span></span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>What each coefficient of an arm × subgroup model means is in <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd#reading-the-coefficients-count-models)</span>, what the interaction p-value tests in <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>, and how to get the IRR in each subgroup level in <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span>.</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <span class="co">[</span><span class="ot">MASS function reference</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html)</span> for fitting details <span class="co">[</span><span class="ot">@massglmnb</span><span class="co">]</span>.</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd#count-outcomes-are-different)</span>.</span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-models</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-interaction-models</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rescue models alternative</span></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: rescue-models-alternative</span></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Controller PDC comparison</span></span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: controller-pdc-comparison</span></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count interaction models</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>These loops add one subgroup at a time; they do not fit all subgroup variables together. <span class="in">`studyarm * subgroup`</span> includes the arm term, subgroup term and their interaction. The named list stores each table first by outcome and then by subgroup, making the analysis that generated it identifiable. Read the reference category before interpreting the arm coefficient: it now applies within that category.</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>What each coefficient of an arm × subgroup model means is in <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd#reading-the-coefficients-count-models)</span>, what the interaction p-value tests in <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>, and how to get the IRR in each subgroup level in <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span>.</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-interaction-models</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rescue models alternative</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>These additional fits were retained from the earlier analysis. Their formula uses <span class="in">`log(offset(followup_time_itt))`</span>, which is not the working offset syntax shown above; <span class="co">[</span><span class="ot">#1</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/1)</span> tracks the correction. Treat this block as a documented implementation problem, not as a second recommended way to specify a rate model.</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: rescue-models-alternative</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Controller PDC comparison</span></span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <span class="in">`add_p()`</span> asks gtsummary to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The <span class="co">[</span><span class="ot">gtsummary tutorial</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)</span> explains summary statistics, missing rows and test annotations <span class="co">[</span><span class="ot">@gtsummarytutorial</span><span class="co">]</span>.</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: controller-pdc-comparison</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -62,7 +62,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -414,6 +433,10 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </div>
 <section id="build-visit-data" class="level2">
 <h2 class="anchored" data-anchor-id="build-visit-data">Build visit data</h2>
+<p>The input is the imported REDCap table; the intended output still has one row per participant and recorded visit. <code>mutate()</code> creates or changes columns without summarizing the rows. <code>case_when()</code> maps each event name to its scheduled month. <code>time_linear</code> stores that number; <code>time_factor</code> stores the visit as a category for the models.</p>
+<p>The code groups by participant before <code>fill()</code> carries baseline information down later rows. This assumes the baseline row precedes the rows that need it. It carries assignment and baseline subgroup information, not a missed visit’s outcome score. See the <a href="https://tidyr.tidyverse.org/reference/fill.html">fill documentation</a> for direction and grouping <span class="citation" data-cites="tidyrfill">(<a href="#ref-tidyrfill" role="doc-biblioref"><span class="nocase">tidyr authors</span>, n.d.</a>)</span>.</p>
+<p>Selected 999 codes become <code>NA</code>, R’s missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16">#16</a>. Scores are then derived from the item columns: <code>rowMeans(..., na.rm = TRUE)</code> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</p>
+<p>The baseline adherence and asthma-control groups are carried to later visits, so a participant does not switch subgroup because a later score changes. The small horizontal time shift is only for separating points in plots. For the R verbs in this block, see <a href="https://r4ds.hadley.nz/data-transform.html">Data transformation</a> <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -525,6 +548,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="per-protocol-population" class="level2">
 <h2 class="anchored" data-anchor-id="per-protocol-population">Per protocol population</h2>
+<p><code>clean_asthma_data_itt</code> retains the visit records for the intention-to-treat analysis, which compares participants by assigned arm. The project’s per-protocol dataset is a filtered copy keeping observations on or before the app-glitch cutoff. Here, “per protocol” means this specific date restriction, not a general selection of participants who adhered to treatment. A missing visit date produces a missing comparison and is not retained by <code>filter(post_glitch_date == FALSE)</code>. The two datasets feed the same model code later.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -535,6 +559,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="study-dates" class="level2">
 <h2 class="anchored" data-anchor-id="study-dates">Study dates</h2>
+<p>Filtering to baseline makes a participant-level lookup table of consent and scheduled follow-up dates. The medication script joins this lookup onto app records to place them within each participant’s follow-up. Check that the lookup has one row per participant: otherwise each medication record could match several rows. A blank follow-up date also needs attention because later comparisons against that date cannot establish whether a record is in the window.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -552,9 +577,17 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 
 <!-- -->
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-tidyrfill" class="csl-entry" role="listitem">
+<span class="nocase">tidyr authors</span>. n.d. <em>Fill in Missing Values with Previous or Next Value</em>. Accessed November 8, 2026. <a href="https://tidyr.tidyverse.org/reference/fill.html">https://tidyr.tidyverse.org/reference/fill.html</a>.
+</div>
+<div id="ref-r4ds2" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for Data Science</em>. 2nd ed. O’Reilly Media. <a href="https://r4ds.hadley.nz/">https://r4ds.hadley.nz/</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1047,24 +1080,36 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Build visit data</span></span>
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-visit-data</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Per protocol population</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: per-protocol-population</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## Study dates</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: study-dates</span></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>The input is the imported REDCap table; the intended output still has one row per participant and recorded visit. <span class="in">`mutate()`</span> creates or changes columns without summarizing the rows. <span class="in">`case_when()`</span> maps each event name to its scheduled month. <span class="in">`time_linear`</span> stores that number; <span class="in">`time_factor`</span> stores the visit as a category for the models.</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>The code groups by participant before <span class="in">`fill()`</span> carries baseline information down later rows. This assumes the baseline row precedes the rows that need it. It carries assignment and baseline subgroup information, not a missed visit's outcome score. See the <span class="co">[</span><span class="ot">fill documentation</span><span class="co">](https://tidyr.tidyverse.org/reference/fill.html)</span> for direction and grouping <span class="co">[</span><span class="ot">@tidyrfill</span><span class="co">]</span>.</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>Selected 999 codes become <span class="in">`NA`</span>, R's missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <span class="co">[</span><span class="ot">#16</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16)</span>. Scores are then derived from the item columns: <span class="in">`rowMeans(..., na.rm = TRUE)`</span> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>The baseline adherence and asthma-control groups are carried to later visits, so a participant does not switch subgroup because a later score changes. The small horizontal time shift is only for separating points in plots. For the R verbs in this block, see <span class="co">[</span><span class="ot">Data transformation</span><span class="co">](https://r4ds.hadley.nz/data-transform.html)</span> <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-visit-data</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Per protocol population</span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="in">`clean_asthma_data_itt`</span> retains the visit records for the intention-to-treat analysis, which compares participants by assigned arm. The project's per-protocol dataset is a filtered copy keeping observations on or before the app-glitch cutoff. Here, “per protocol” means this specific date restriction, not a general selection of participants who adhered to treatment. A missing visit date produces a missing comparison and is not retained by <span class="in">`filter(post_glitch_date == FALSE)`</span>. The two datasets feed the same model code later.</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: per-protocol-population</span></span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Study dates</span></span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>Filtering to baseline makes a participant-level lookup table of consent and scheduled follow-up dates. The medication script joins this lookup onto app records to place them within each participant's follow-up. Check that the lookup has one row per participant: otherwise each medication record could match several rows. A blank follow-up date also needs attention because later comparisons against that date cannot establish whether a record is in the window.</span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: study-dates</span></span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

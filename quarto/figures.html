@@ -62,7 +62,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -111,17 +130,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -131,6 +139,17 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Pending.callout {
@@ -415,6 +434,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </div>
 <section id="act-plots" class="level2">
 <h2 class="anchored" data-anchor-id="act-plots">ACT plots</h2>
+<p>ACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant’s recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -481,6 +501,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="count-outcome-plots" class="level2">
 <h2 class="anchored" data-anchor-id="count-outcome-plots">Count outcome plots</h2>
+<p>The loop creates one plot per count outcome and saves it under that outcome’s name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <code>aes()</code> maps variables to positions and colours, while <code>geom_*()</code> chooses marks. The <a href="https://ggplot2.tidyverse.org/articles/ggplot2.html">ggplot2 introduction</a> explains this layering <span class="citation" data-cites="ggplotintro">(<a href="#ref-ggplotintro" role="doc-biblioref"><span class="nocase">ggplot2 authors</span>, n.d.</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -490,8 +511,8 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (outcome <span class="cf">in</span> count_outcomes) {</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  count_outcome_plots[[outcome]] <span class="ot">&lt;-</span> rescue_medication_merged <span class="sc">%&gt;%</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>() <span class="sc">+</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_quasirandom</span>(<span class="at">mapping =</span> <span class="fu">aes_string</span>(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"studyarm"</span>, <span class="at">y =</span> outcome, <span class="at">color =</span> <span class="st">"studyarm"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_quasirandom</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> studyarm, <span class="at">y =</span> .data[[outcome]], <span class="at">color =</span> studyarm</span>
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">+</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_bw</span>()</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -500,6 +521,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="medication-plots" class="level2">
 <h2 class="anchored" data-anchor-id="medication-plots">Medication plots</h2>
+<p>Rescue counts are shown on ordinary and logarithmic scales. A log scale makes multiplicative differences easier to see, but zero cannot be shown on that scale and may be omitted with a warning. Compare it with the ordinary-scale plot before interpreting the distribution. Controller PDC plots show participant proportions; their interpretation depends on the denominator described in <a href="../quarto/03_derive_medication_outcomes.html#controller-day-grid">Derive medication outcomes</a>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -556,6 +578,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="mixed-model-plots-overall" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-model-plots-overall">Mixed model plots overall</h2>
+<p>Faint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.</p>
 <p>What the plotted means, error bars and p-values come from is in <a href="../quarto/methods_in_this_code.html#mixed-model-plots-create_me_plot">How this code does it</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -582,7 +605,9 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="mixed-model-plots-subgroups" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-model-plots-subgroups">Mixed model plots subgroups</h2>
-<p>Each level’s panel shows the arm effect within that level, and the bottom row the difference between levels; see <a href="../quarto/methods_in_this_code.html#mixed-model-plots-create_me_plot">How this code does it</a> and <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>.</p>
+<p>The loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the <a href="../quarto/methods_interaction_p_values.html">interaction explanation</a> before comparing a small p-value in one panel with a large one in another.</p>
+<p>The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.</p>
+<p>Each level’s panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see <a href="../quarto/methods_in_this_code.html#mixed-model-plots-create_me_plot">How this code does it</a> and <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -631,9 +656,14 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 
 <!-- -->
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-ggplotintro" class="csl-entry" role="listitem">
+<span class="nocase">ggplot2 authors</span>. n.d. <em>Introduction to Ggplot2</em>. Accessed November 8, 2026. <a href="https://ggplot2.tidyverse.org/articles/ggplot2.html">https://ggplot2.tidyverse.org/articles/ggplot2.html</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1123,42 +1153,54 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## ACT plots</span></span>
 <span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: act-plots</span></span>
-<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcome plots</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>ACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant's recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: act-plots</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-outcome-plots</span></span>
-<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## Medication plots</span></span>
-<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: medication-plots</span></span>
-<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed model plots overall</span></span>
-<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>What the plotted means, error bars and p-values come from is in <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span>.</span>
-<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-plots-overall</span></span>
-<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed model plots subgroups</span></span>
-<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>Each level's panel shows the arm effect within that level, and the bottom row the difference between levels; see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span> and <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
-<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-plots-subgroups</span></span>
-<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcome plots</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <span class="in">`aes()`</span> maps variables to positions and colours, while <span class="in">`geom_*()`</span> chooses marks. The <span class="co">[</span><span class="ot">ggplot2 introduction</span><span class="co">](https://ggplot2.tidyverse.org/articles/ggplot2.html)</span> explains this layering <span class="co">[</span><span class="ot">@ggplotintro</span><span class="co">]</span>.</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-outcome-plots</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Medication plots</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>Rescue counts are shown on ordinary and logarithmic scales. A log scale makes multiplicative differences easier to see, but zero cannot be shown on that scale and may be omitted with a warning. Compare it with the ordinary-scale plot before interpreting the distribution. Controller PDC plots show participant proportions; their interpretation depends on the denominator described in <span class="co">[</span><span class="ot">Derive medication outcomes</span><span class="co">](03_derive_medication_outcomes.qmd#controller-day-grid)</span>.</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: medication-plots</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed model plots overall</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>Faint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>What the plotted means, error bars and p-values come from is in <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span>.</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-plots-overall</span></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed model plots subgroups</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>The loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the <span class="co">[</span><span class="ot">interaction explanation</span><span class="co">](methods_interaction_p_values.qmd)</span> before comparing a small p-value in one panel with a large one in another.</span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>Each level's panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#mixed-model-plots-create_me_plot)</span> and <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-plots-subgroups</span></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

@@ -131,15 +131,15 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
 }
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
 }
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -153,15 +153,15 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   content: '📊';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
 }
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
 }
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 </style>
@@ -380,6 +380,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
   <li><a href="#it-depends-on-the-scale" id="toc-it-depends-on-the-scale" class="nav-link" data-scroll-target="#it-depends-on-the-scale">It depends on the scale</a></li>
   <li><a href="#many-tests" id="toc-many-tests" class="nav-link" data-scroll-target="#many-tests">Many tests</a></li>
   <li><a href="#report-the-effects-not-only-the-p-value" id="toc-report-the-effects-not-only-the-p-value" class="nav-link" data-scroll-target="#report-the-effects-not-only-the-p-value">Report the effects, not only the p-value</a></li>
+  <li><a href="#reading-a-subgroup-result" id="toc-reading-a-subgroup-result" class="nav-link" data-scroll-target="#reading-a-subgroup-result">Reading a subgroup result</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/edit/main/quarto/methods_interaction_p_values.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -415,15 +416,17 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <section id="it-tests-a-difference-between-effects" class="level2">
 <h2 class="anchored" data-anchor-id="it-tests-a-difference-between-effects">It tests a difference between effects</h2>
 <p>The p-value of an arm × subgroup interaction tests one null hypothesis: <strong>the arm effect is the same in every level of the subgroup</strong>. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.</p>
+<p>A p-value measures how incompatible the observed test statistic is with a specified null hypothesis and model assumptions. It is not the probability that the null hypothesis is true, nor the probability that a result happened “by chance.” Here the null is about equal effects on the scale being tested.</p>
 <p>Altman and Bland make the general point: to compare two estimates, test their difference directly; don’t compare their separate p-values <span class="citation" data-cites="altman2003interaction">(<a href="#ref-altman2003interaction" role="doc-biblioref">Altman and Bland 2003</a>)</span>.</p>
 </section>
 <section id="significant-in-one-subgroup-and-not-the-other-is-not-evidence-of-a-difference" class="level2">
 <h2 class="anchored" data-anchor-id="significant-in-one-subgroup-and-not-the-other-is-not-evidence-of-a-difference">“Significant in one subgroup and not the other” is not evidence of a difference</h2>
 <p>A common mistake is to fit the model in each subgroup separately, find p &lt; 0.05 in one and p &gt; 0.05 in the other, and conclude the intervention works only in the first. Two estimates can be almost identical while one crosses 0.05 and the other doesn’t, especially when the subgroups differ in size. Brookes and colleagues showed by simulation how often subgroup-specific tests produce this pattern when the true effect is the same in both groups, and that the interaction test is the right comparison <span class="citation" data-cites="brookes2004subgroup">(<a href="#ref-brookes2004subgroup" role="doc-biblioref">Brookes et al. 2004</a>)</span>.</p>
+<p>For example, two wholly invented estimates could both be an IRR of 0.80, with intervals of 0.65–0.98 and 0.55–1.16. One interval excludes 1 and the other includes it, yet the estimated effects are identical. The interaction test directly addresses whether the effects differ.</p>
 </section>
 <section id="it-has-low-power" class="level2">
 <h2 class="anchored" data-anchor-id="it-has-low-power">It has low power</h2>
-<p>A trial sized to detect the overall effect has far less power to detect an interaction of the same size. In Brookes and colleagues’ simulations, a trial with 80% power for the overall effect had only about 29% power for an interaction of that magnitude, and roughly four times the sample size was needed to match <span class="citation" data-cites="brookes2004subgroup">(<a href="#ref-brookes2004subgroup" role="doc-biblioref">Brookes et al. 2004</a>)</span>. In a pilot trial this matters even more: a large p-value for interaction is weak evidence that the effects are the same.</p>
+<p><strong>Power</strong> is the probability that a study’s test detects a specified effect when that effect is present, under the assumptions used for the calculation. A trial sized to detect the overall effect has far less power to detect an interaction of the same size. In Brookes and colleagues’ simulations, a trial with 80% power for the overall effect had only about 29% power for an interaction of that magnitude, and roughly four times the sample size was needed to match <span class="citation" data-cites="brookes2004subgroup">(<a href="#ref-brookes2004subgroup" role="doc-biblioref">Brookes et al. 2004</a>)</span>. In a pilot trial this matters even more: a large p-value for interaction is weak evidence that the effects are the same.</p>
 </section>
 <section id="it-depends-on-the-scale" class="level2">
 <h2 class="anchored" data-anchor-id="it-depends-on-the-scale">It depends on the scale</h2>
@@ -431,11 +434,16 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 <section id="many-tests" class="level2">
 <h2 class="anchored" data-anchor-id="many-tests">Many tests</h2>
-<p>Each subgroup variable, outcome, population and visit adds tests. With several subgroups, several outcomes, two populations and an interaction p-value at every visit, some small p-values are expected by chance alone. Wang and colleagues’ guidance on reporting subgroup analyses asks that the number of subgroup analyses be stated, that prespecified and post hoc analyses be distinguished, and that interaction tests rather than subgroup-specific tests be the basis for claims of different effects <span class="citation" data-cites="wang2007subgroup">(<a href="#ref-wang2007subgroup" role="doc-biblioref">Wang et al. 2007</a>)</span>. In this analysis every subgroup analysis is post hoc and none is adjusted for multiplicity (see the <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md">analysis plan</a>).</p>
+<p>Each subgroup variable, outcome, population and visit adds tests. With several subgroups, several outcomes, two populations and an interaction p-value at every visit, some small p-values are expected by chance alone. Wang and colleagues’ guidance on reporting subgroup analyses asks that the number of subgroup analyses be stated, that prespecified and post hoc analyses be distinguished, and that interaction tests rather than subgroup-specific tests be the basis for claims of different effects <span class="citation" data-cites="wang2007subgroup">(<a href="#ref-wang2007subgroup" role="doc-biblioref">Wang et al. 2007</a>)</span>. The retrospective <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md">analysis plan</a> currently treats the subgroup analyses as post hoc unless protocol documentation establishes otherwise; the code applies no multiplicity adjustment.</p>
 </section>
 <section id="report-the-effects-not-only-the-p-value" class="level2">
 <h2 class="anchored" data-anchor-id="report-the-effects-not-only-the-p-value">Report the effects, not only the p-value</h2>
 <p>Because the interaction p-value says nothing about the size of the effect in each group, it’s best reported alongside the effect within each subgroup level, with its confidence interval <span class="citation" data-cites="knol2012presenting">(<a href="#ref-knol2012presenting" role="doc-biblioref">Knol and VanderWeele 2012</a>)</span>. <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a> shows how to get those.</p>
+</section>
+<section id="reading-a-subgroup-result" class="level2">
+<h2 class="anchored" data-anchor-id="reading-a-subgroup-result">Reading a subgroup result</h2>
+<p>Read the estimated effects and intervals first, then the interaction p-value. Ask what scale was tested, how precise each estimate is, and how many subgroup comparisons were examined. A wide interval and a large interaction p-value can leave substantial differences unresolved.</p>
+<p>Start with <a href="https://doi.org/10.1136/bmj.326.7382.219">Altman and Bland’s short Statistics Note</a> <span class="citation" data-cites="altman2003interaction">(<a href="#ref-altman2003interaction" role="doc-biblioref">Altman and Bland 2003</a>)</span>. <a href="https://doi.org/10.1056/NEJMsr077003">Wang and colleagues</a> provide a clinical-trial reporting checklist <span class="citation" data-cites="wang2007subgroup">(<a href="#ref-wang2007subgroup" role="doc-biblioref">Wang et al. 2007</a>)</span>; <a href="https://doi.org/10.1016/j.jclinepi.2003.08.009">Brookes and colleagues</a> give the simulation evidence on power <span class="citation" data-cites="brookes2004subgroup">(<a href="#ref-brookes2004subgroup" role="doc-biblioref">Brookes et al. 2004</a>)</span>.</p>
 
 
 <!-- -->
@@ -931,27 +939,38 @@ Wang, Rui, Stephen W. Lagakos, James H. Ware, David J. Hunter, and Jeffrey M. Dr
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>The p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in every level of the subgroup**. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>Altman and Bland make the general point: to compare two estimates, test their difference directly; don't compare their separate p-values <span class="co">[</span><span class="ot">@altman2003interaction</span><span class="co">]</span>.</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>A p-value measures how incompatible the observed test statistic is with a specified null hypothesis and model assumptions. It is not the probability that the null hypothesis is true, nor the probability that a result happened “by chance.” Here the null is about equal effects on the scale being tested.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## "Significant in one subgroup and not the other" is not evidence of a difference</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Altman and Bland make the general point: to compare two estimates, test their difference directly; don't compare their separate p-values <span class="co">[</span><span class="ot">@altman2003interaction</span><span class="co">]</span>.</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>A common mistake is to fit the model in each subgroup separately, find p &lt; 0.05 in one and p &gt; 0.05 in the other, and conclude the intervention works only in the first. Two estimates can be almost identical while one crosses 0.05 and the other doesn't, especially when the subgroups differ in size. Brookes and colleagues showed by simulation how often subgroup-specific tests produce this pattern when the true effect is the same in both groups, and that the interaction test is the right comparison <span class="co">[</span><span class="ot">@brookes2004subgroup</span><span class="co">]</span>.</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## "Significant in one subgroup and not the other" is not evidence of a difference</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## It has low power</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>A common mistake is to fit the model in each subgroup separately, find p &lt; 0.05 in one and p &gt; 0.05 in the other, and conclude the intervention works only in the first. Two estimates can be almost identical while one crosses 0.05 and the other doesn't, especially when the subgroups differ in size. Brookes and colleagues showed by simulation how often subgroup-specific tests produce this pattern when the true effect is the same in both groups, and that the interaction test is the right comparison <span class="co">[</span><span class="ot">@brookes2004subgroup</span><span class="co">]</span>.</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>A trial sized to detect the overall effect has far less power to detect an interaction of the same size. In Brookes and colleagues' simulations, a trial with 80% power for the overall effect had only about 29% power for an interaction of that magnitude, and roughly four times the sample size was needed to match <span class="co">[</span><span class="ot">@brookes2004subgroup</span><span class="co">]</span>. In a pilot trial this matters even more: a large p-value for interaction is weak evidence that the effects are the same.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>For example, two wholly invented estimates could both be an IRR of 0.80, with intervals of 0.65–0.98 and 0.55–1.16. One interval excludes 1 and the other includes it, yet the estimated effects are identical. The interaction test directly addresses whether the effects differ.</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## It depends on the scale</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## It has low power</span></span>
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>As the <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span> page explains, an interaction is measured on a scale. A test on the ratio scale (count models) and a test on the difference scale (mixed models) are answering different questions, and can disagree on the same data.</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>**Power** is the probability that a study's test detects a specified effect when that effect is present, under the assumptions used for the calculation. A trial sized to detect the overall effect has far less power to detect an interaction of the same size. In Brookes and colleagues' simulations, a trial with 80% power for the overall effect had only about 29% power for an interaction of that magnitude, and roughly four times the sample size was needed to match <span class="co">[</span><span class="ot">@brookes2004subgroup</span><span class="co">]</span>. In a pilot trial this matters even more: a large p-value for interaction is weak evidence that the effects are the same.</span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Many tests</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## It depends on the scale</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Each subgroup variable, outcome, population and visit adds tests. With several subgroups, several outcomes, two populations and an interaction p-value at every visit, some small p-values are expected by chance alone. Wang and colleagues' guidance on reporting subgroup analyses asks that the number of subgroup analyses be stated, that prespecified and post hoc analyses be distinguished, and that interaction tests rather than subgroup-specific tests be the basis for claims of different effects <span class="co">[</span><span class="ot">@wang2007subgroup</span><span class="co">]</span>. In this analysis every subgroup analysis is post hoc and none is adjusted for multiplicity (see the <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span>).</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>As the <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span> page explains, an interaction is measured on a scale. A test on the ratio scale (count models) and a test on the difference scale (mixed models) are answering different questions, and can disagree on the same data.</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Report the effects, not only the p-value</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Many tests</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>Because the interaction p-value says nothing about the size of the effect in each group, it's best reported alongside the effect within each subgroup level, with its confidence interval <span class="co">[</span><span class="ot">@knol2012presenting</span><span class="co">]</span>. <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> shows how to get those.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>Each subgroup variable, outcome, population and visit adds tests. With several subgroups, several outcomes, two populations and an interaction p-value at every visit, some small p-values are expected by chance alone. Wang and colleagues' guidance on reporting subgroup analyses asks that the number of subgroup analyses be stated, that prespecified and post hoc analyses be distinguished, and that interaction tests rather than subgroup-specific tests be the basis for claims of different effects <span class="co">[</span><span class="ot">@wang2007subgroup</span><span class="co">]</span>. The retrospective <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span> currently treats the subgroup analyses as post hoc unless protocol documentation establishes otherwise; the code applies no multiplicity adjustment.</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Report the effects, not only the p-value</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>Because the interaction p-value says nothing about the size of the effect in each group, it's best reported alongside the effect within each subgroup level, with its confidence interval <span class="co">[</span><span class="ot">@knol2012presenting</span><span class="co">]</span>. <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span> shows how to get those.</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading a subgroup result</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>Read the estimated effects and intervals first, then the interaction p-value. Ask what scale was tested, how precise each estimate is, and how many subgroup comparisons were examined. A wide interval and a large interaction p-value can leave substantial differences unresolved.</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>Start with <span class="co">[</span><span class="ot">Altman and Bland's short Statistics Note</span><span class="co">](https://doi.org/10.1136/bmj.326.7382.219)</span> <span class="co">[</span><span class="ot">@altman2003interaction</span><span class="co">]</span>. <span class="co">[</span><span class="ot">Wang and colleagues</span><span class="co">](https://doi.org/10.1056/NEJMsr077003)</span> provide a clinical-trial reporting checklist <span class="co">[</span><span class="ot">@wang2007subgroup</span><span class="co">]</span>; <span class="co">[</span><span class="ot">Brookes and colleagues</span><span class="co">](https://doi.org/10.1016/j.jclinepi.2003.08.009)</span> give the simulation evidence on power <span class="co">[</span><span class="ot">@brookes2004subgroup</span><span class="co">]</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

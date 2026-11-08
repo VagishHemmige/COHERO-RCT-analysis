@@ -62,7 +62,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="site_libs/quarto-nav/quarto-nav.js"></script>
@@ -111,6 +130,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
+  background-image: none;
+}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -131,17 +161,6 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
-  background-image: none;
-}
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
   background-image: none;
 }
 </style>
@@ -356,6 +375,8 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
   <ul>
   <li><a href="#what-this-analysis-does" id="toc-what-this-analysis-does" class="nav-link active" data-scroll-target="#what-this-analysis-does">What this analysis does</a></li>
   <li><a href="#how-to-read-this-site" id="toc-how-to-read-this-site" class="nav-link" data-scroll-target="#how-to-read-this-site">How to read this site</a></li>
+  <li><a href="#follow-the-rows" id="toc-follow-the-rows" class="nav-link" data-scroll-target="#follow-the-rows">Follow the rows</a></li>
+  <li><a href="#terms-used-throughout" id="toc-terms-used-throughout" class="nav-link" data-scroll-target="#terms-used-throughout">Terms used throughout</a></li>
   <li><a href="#status" id="toc-status" class="nav-link" data-scroll-target="#status">Status</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/edit/main/index.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
@@ -390,22 +411,126 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 
 <section id="what-this-analysis-does" class="level2">
 <h2 class="anchored" data-anchor-id="what-this-analysis-does">What this analysis does</h2>
-<p>This site shows the code for the analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. The analysis looks at asthma control, quality of life, activity limitation, controller adherence, app-recorded inhaler use and 12-month health care use, in intention-to-treat and per-protocol populations. It uses the trial’s REDCap export and the data recorded by the COHERO app, which are not part of this site or its repository.</p>
+<p>This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.</p>
+<p>There are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.</p>
+<p>The detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.</p>
 </section>
 <section id="how-to-read-this-site" class="level2">
 <h2 class="anchored" data-anchor-id="how-to-read-this-site">How to read this site</h2>
-<p>The <strong>Methods</strong> pages explain, in general terms, the techniques the code uses: mixed models for repeated measures, interactions, what a p-value for interaction means, and how to get the effect within each subgroup and visit with emmeans. They end with how this code does each of these. Each page under <strong>Code</strong> shows one script, in the order <code>R/main.R</code> runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md">analysis plan</a>, a retrospective record written after the results were seen.</p>
+<p>If you have some R and introductory statistics experience, start with <a href="./quarto/methods_longitudinal.html">Longitudinal data and mixed models</a>. Then read <a href="./quarto/methods_interactions.html">Interactions</a> and <a href="./quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>. You can skip the optional algebra in <a href="./quarto/methods_stratified_effects.html">Effects behind an interaction</a> on a first pass.</p>
+<p>The <strong>Code</strong> pages follow the order of <code>R/main.R</code>. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.</p>
+</section>
+<section id="follow-the-rows" class="level2">
+<h2 class="anchored" data-anchor-id="follow-the-rows">Follow the rows</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Stage</th>
+<th>What a row represents</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Imported visit data</td>
+<td>A participant at a recorded visit</td>
+<td>Several rows can belong to the same person</td>
+</tr>
+<tr class="even">
+<td>App medication records</td>
+<td>A recorded medication event</td>
+<td>Many records must be summarized before comparing participants</td>
+</tr>
+<tr class="odd">
+<td>Participant-day grid</td>
+<td>A candidate day for a participant</td>
+<td>Days without records affect the adherence denominator</td>
+</tr>
+<tr class="even">
+<td>Count-model data</td>
+<td>A participant with counts and follow-up time</td>
+<td>Time at risk matters when comparing counts</td>
+</tr>
+<tr class="odd">
+<td>Mixed-model data</td>
+<td>A participant at a visit</td>
+<td>The model accounts for repeated measurements within a person</td>
+</tr>
+</tbody>
+</table>
+<p>The grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.</p>
+</section>
+<section id="terms-used-throughout" class="level2">
+<h2 class="anchored" data-anchor-id="terms-used-throughout">Terms used throughout</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Term</th>
+<th>Meaning here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Arm</td>
+<td>The assigned intervention or control group</td>
+</tr>
+<tr class="even">
+<td>Baseline</td>
+<td>The starting assessment</td>
+</tr>
+<tr class="odd">
+<td>Intention to treat (ITT)</td>
+<td>Comparing participants by assigned arm, using available observations</td>
+</tr>
+<tr class="even">
+<td>Per protocol (PP)</td>
+<td>This project’s restriction to observations on or before the app-glitch cutoff; not a general definition of adherence</td>
+</tr>
+<tr class="odd">
+<td>Subgroup</td>
+<td>A participant characteristic used to ask whether the arm effect differs between groups</td>
+</tr>
+<tr class="even">
+<td>ACT / AQLQ / PACQLQ / AFS</td>
+<td>Code labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification</td>
+</tr>
+<tr class="odd">
+<td>PDC</td>
+<td>Proportion of days covered; here calculated from recorded controller use, as explained on the medication page</td>
+</tr>
+<tr class="even">
+<td>Confidence interval</td>
+<td>An interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions</td>
+</tr>
+</tbody>
+</table>
+<p>For R syntax, <a href="https://r4ds.hadley.nz/">R for Data Science</a> is a free reference with worked examples <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>. You only need the linked topic when it helps with the section you are reading.</p>
 </section>
 <section id="status" class="level2">
 <h2 class="anchored" data-anchor-id="status">Status</h2>
-<p>In progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository’s <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues">Issues</a>. Pages on the clinical background and the study design will be added later.</p>
+<p>The project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues">Issues</a>.</p>
+<p>The <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md">analysis plan</a> records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.</p>
 
 
 <!-- -->
 
+
 </section>
 
-</main> <!-- /main -->
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-r4ds2" class="csl-entry" role="listitem">
+Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for Data Science</em>. 2nd ed. O’Reilly Media. <a href="https://r4ds.hadley.nz/">https://r4ds.hadley.nz/</a>.
+</div>
+</div></section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -873,15 +998,50 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">## What this analysis does</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>This site shows the code for the analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. The analysis looks at asthma control, quality of life, activity limitation, controller adherence, app-recorded inhaler use and 12-month health care use, in intention-to-treat and per-protocol populations. It uses the trial's REDCap export and the data recorded by the COHERO app, which are not part of this site or its repository.</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## How to read this site</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>There are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>The **Methods** pages explain, in general terms, the techniques the code uses: mixed models for repeated measures, interactions, what a p-value for interaction means, and how to get the effect within each subgroup and visit with emmeans. They end with how this code does each of these. Each page under **Code** shows one script, in the order <span class="in">`R/main.R`</span> runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span>, a retrospective record written after the results were seen.</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>The detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Status</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## How to read this site</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>In progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository's <span class="co">[</span><span class="ot">Issues</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues)</span>. Pages on the clinical background and the study design will be added later.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>If you have some R and introductory statistics experience, start with <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](quarto/methods_longitudinal.qmd)</span>. Then read <span class="co">[</span><span class="ot">Interactions</span><span class="co">](quarto/methods_interactions.qmd)</span> and <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](quarto/methods_interaction_p_values.qmd)</span>. You can skip the optional algebra in <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](quarto/methods_stratified_effects.qmd)</span> on a first pass.</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>The **Code** pages follow the order of <span class="in">`R/main.R`</span>. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Follow the rows</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Stage <span class="pp">|</span> What a row represents <span class="pp">|</span> Why it matters <span class="pp">|</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Imported visit data <span class="pp">|</span> A participant at a recorded visit <span class="pp">|</span> Several rows can belong to the same person <span class="pp">|</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> App medication records <span class="pp">|</span> A recorded medication event <span class="pp">|</span> Many records must be summarized before comparing participants <span class="pp">|</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Participant-day grid <span class="pp">|</span> A candidate day for a participant <span class="pp">|</span> Days without records affect the adherence denominator <span class="pp">|</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Count-model data <span class="pp">|</span> A participant with counts and follow-up time <span class="pp">|</span> Time at risk matters when comparing counts <span class="pp">|</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mixed-model data <span class="pp">|</span> A participant at a visit <span class="pp">|</span> The model accounts for repeated measurements within a person <span class="pp">|</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>The grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Terms used throughout</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Term <span class="pp">|</span> Meaning here <span class="pp">|</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Arm <span class="pp">|</span> The assigned intervention or control group <span class="pp">|</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Baseline <span class="pp">|</span> The starting assessment <span class="pp">|</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Intention to treat (ITT) <span class="pp">|</span> Comparing participants by assigned arm, using available observations <span class="pp">|</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Per protocol (PP) <span class="pp">|</span> This project's restriction to observations on or before the app-glitch cutoff; not a general definition of adherence <span class="pp">|</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Subgroup <span class="pp">|</span> A participant characteristic used to ask whether the arm effect differs between groups <span class="pp">|</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ACT / AQLQ / PACQLQ / AFS <span class="pp">|</span> Code labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PDC <span class="pp">|</span> Proportion of days covered; here calculated from recorded controller use, as explained on the medication page <span class="pp">|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Confidence interval <span class="pp">|</span> An interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions <span class="pp">|</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>For R syntax, <span class="co">[</span><span class="ot">R for Data Science</span><span class="co">](https://r4ds.hadley.nz/)</span> is a free reference with worked examples <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>. You only need the linked topic when it helps with the section you are reading.</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Status</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>The project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in <span class="co">[</span><span class="ot">Issues</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues)</span>.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span> records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

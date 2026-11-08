@@ -112,17 +112,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -132,6 +121,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 div.callout-Rcode.callout {
@@ -391,6 +391,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 
 
 <p>This page maps the ideas on the other methods pages to the analysis code, as it stands now, and notes what is planned to change.</p>
+<p>Think of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.</p>
 <section id="mixed-model-tables-create_me_table" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-model-tables-create_me_table">Mixed-model tables: <code>create_me_table()</code></h2>
 <p><a href="../quarto/functions.html#create-me-table"><code>create_me_table()</code></a> fits <code>outcome ~ time_factor * studyarm + (1 | study_id_screening)</code>, or the three-way version with a subgroup, and returns the model’s coefficients as a table. <a href="../quarto/05_fit_mixed_models.html">5. Fit mixed models</a> calls it 56 times: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations.</p>
@@ -430,14 +431,17 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </tr>
 </tbody>
 </table>
-<p>All three are the <strong>same model</strong>: they fit identically and differ only in which combinations of the fitted values they report. Model C is the “refit with a different coding” approach from <a href="../quarto/methods_stratified_effects.html">Effects behind an interaction</a>, so the subgroup plots already show the arm effect within each level, which the tables don’t.</p>
+<p>These codings are intended to represent the same mean structure and random intercept. Equivalent estimates require the same analysis rows and an equivalent model specification. In the current subgroup code, a missing subgroup can become the text “NA” in a pasted cell label for model B, while A and C omit missing subgroup values. Equivalence therefore needs checking rather than assuming.</p>
+<p>Model C uses nested terms to expose subgroup-specific arm comparisons; it does not literally relevel a factor. The panels show mean trajectories and p-values for within-subgroup contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</p>
+<p>To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.</p>
 </section>
 <section id="count-models" class="level2">
 <h2 class="anchored" data-anchor-id="count-models">Count models</h2>
-<p><a href="../quarto/04_fit_count_models.html">4. Fit count models</a> fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn’t shown directly.</p>
+<p><a href="../quarto/04_fit_count_models.html">4. Fit count models</a> fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn’t shown directly. The separate alternative rescue fits retain an offset-syntax defect documented on the <a href="../quarto/04_fit_count_models.html#rescue-models-alternative">count-model page</a>.</p>
 </section>
 <section id="what-is-planned-to-change" class="level2">
 <h2 class="anchored" data-anchor-id="what-is-planned-to-change">What is planned to change</h2>
+<p>These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.</p>
 <ul>
 <li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10">#10</a>: fit each model once and pass it to both the table and the plot, taking cell means and contrasts with emmeans instead of refitting in other codings.</li>
 <li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8">#8</a>: move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.</li>
@@ -920,33 +924,41 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>This page maps the ideas on the other methods pages to the analysis code, as it stands now, and notes what is planned to change.</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed-model tables: `create_me_table()`</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Think of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.</span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`create_me_table()`</span><span class="co">](functions.qmd#create-me-table)</span> fits <span class="in">`outcome ~ time_factor * studyarm + (1 | study_id_screening)`</span>, or the three-way version with a subgroup, and returns the model's coefficients as a table. <span class="co">[</span><span class="ot">5. Fit mixed models</span><span class="co">](05_fit_mixed_models.qmd)</span> calls it 56 times: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed-model tables: `create_me_table()`</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>So the tables show the raw coefficients described on <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. They don't show the arm effect in each subgroup level directly.</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`create_me_table()`</span><span class="co">](functions.qmd#create-me-table)</span> fits <span class="in">`outcome ~ time_factor * studyarm + (1 | study_id_screening)`</span>, or the three-way version with a subgroup, and returns the model's coefficients as a table. <span class="co">[</span><span class="ot">5. Fit mixed models</span><span class="co">](05_fit_mixed_models.qmd)</span> calls it 56 times: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed-model plots: `create_me_plot()`</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>So the tables show the raw coefficients described on <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. They don't show the arm effect in each subgroup level directly.</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`create_me_plot()`</span><span class="co">](functions.qmd#create-me-plot)</span> draws the same analyses, called from <span class="co">[</span><span class="ot">Figures</span><span class="co">](figures.qmd)</span> for the same 56 analyses. Inside, it refits the model in up to three codings, each chosen to make different numbers appear directly as coefficients:</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed-model plots: `create_me_plot()`</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Inside the function <span class="pp">|</span> Coding <span class="pp">|</span> What it's used for <span class="pp">|</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model A <span class="pp">|</span> <span class="in">`time_factor * studyarm`</span> (times the subgroup) <span class="pp">|</span> The p-values printed above each visit: the change-from-baseline arm differences (marked †), or, with a subgroup, the differences between levels <span class="pp">|</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model B <span class="pp">|</span> One coefficient per visit-by-arm cell (<span class="in">`me_factor - 1`</span>) <span class="pp">|</span> Each cell's mean and confidence interval, the points and bars on the plot <span class="pp">|</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model C, subgroups only <span class="pp">|</span> The arm effect nested within each level <span class="pp">|</span> The p-values printed in each level's panel: the baseline arm difference and the change-from-baseline arm differences within that level <span class="pp">|</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>All three are the **same model**: they fit identically and differ only in which combinations of the fitted values they report. Model C is the "refit with a different coding" approach from <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span>, so the subgroup plots already show the arm effect within each level, which the tables don't.</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`create_me_plot()`</span><span class="co">](functions.qmd#create-me-plot)</span> draws the same analyses, called from <span class="co">[</span><span class="ot">Figures</span><span class="co">](figures.qmd)</span> for the same 56 analyses. Inside, it refits the model in up to three codings, each chosen to make different numbers appear directly as coefficients:</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Inside the function <span class="pp">|</span> Coding <span class="pp">|</span> What it's used for <span class="pp">|</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model A <span class="pp">|</span> <span class="in">`time_factor * studyarm`</span> (times the subgroup) <span class="pp">|</span> The p-values printed above each visit: the change-from-baseline arm differences (marked †), or, with a subgroup, the differences between levels <span class="pp">|</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model B <span class="pp">|</span> One coefficient per visit-by-arm cell (<span class="in">`me_factor - 1`</span>) <span class="pp">|</span> Each cell's mean and confidence interval, the points and bars on the plot <span class="pp">|</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Model C, subgroups only <span class="pp">|</span> The arm effect nested within each level <span class="pp">|</span> The p-values printed in each level's panel: the baseline arm difference and the change-from-baseline arm differences within that level <span class="pp">|</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count models</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>These codings are intended to represent the same mean structure and random intercept. Equivalent estimates require the same analysis rows and an equivalent model specification. In the current subgroup code, a missing subgroup can become the text "NA" in a pasted cell label for model B, while A and C omit missing subgroup values. Equivalence therefore needs checking rather than assuming.</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">4. Fit count models</span><span class="co">](04_fit_count_models.qmd)</span> fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn't shown directly.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Model C uses nested terms to expose subgroup-specific arm comparisons; it does not literally relevel a factor. The panels show mean trajectories and p-values for within-subgroup contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is planned to change</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#10</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)</span>: fit each model once and pass it to both the table and the plot, taking cell means and contrasts with emmeans instead of refitting in other codings.</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#8</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8)</span>: move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#9</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9)</span>: the examples on <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span>, run on synthetic data where the true effects are known.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count models</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">4. Fit count models</span><span class="co">](04_fit_count_models.qmd)</span> fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn't shown directly. The separate alternative rescue fits retain an offset-syntax defect documented on the <span class="co">[</span><span class="ot">count-model page</span><span class="co">](04_fit_count_models.qmd#rescue-models-alternative)</span>.</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## What is planned to change</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#10</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)</span>: fit each model once and pass it to both the table and the plot, taking cell means and contrasts with emmeans instead of refitting in other codings.</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#8</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8)</span>: move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.</span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">#9</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9)</span>: the examples on <span class="co">[</span><span class="ot">Effects behind an interaction</span><span class="co">](methods_stratified_effects.qmd)</span>, run on synthetic data where the true effects are known.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
