@@ -131,6 +131,17 @@ div.csl-indent {
   }
 }</script>
 <style>
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
+  background-image: none;
+}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -151,17 +162,6 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
-  background-image: none;
-}
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
   background-image: none;
 }
 </style>
@@ -246,6 +246,13 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   <a href="../quarto/methods_stratified_effects.html" class="sidebar-item-text sidebar-link"><i class="bi bi-book" role="img">
 </i> 
  <span class="menu-text">Effects behind an interaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/methods_reading_trajectory_figure.html" class="sidebar-item-text sidebar-link"><i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text">How to read the trajectory figure</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -632,28 +639,37 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co"># "0.012", with † for the follow-up contrasts (change from baseline); the</span></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># row's heading says these are p values</span></span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>format_p_labels <span class="ot">&lt;-</span> <span class="cf">function</span>(effects, <span class="at">dagger =</span> <span class="cn">TRUE</span>) {</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>  effects <span class="sc">%&gt;%</span></span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">time_linear =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(time_factor))) <span class="sc">%&gt;%</span></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p.value =</span> <span class="fu">round</span>(p.value, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p_value_label =</span> <span class="fu">as.character</span>(p.value)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p_value_label =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>      time_linear <span class="sc">==</span> <span class="dv">0</span> <span class="sc">|</span> <span class="sc">!</span>dagger,</span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>      p_value_label,</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(p_value_label, <span class="st">"†"</span>)</span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Rows for one level of the modifier, or every row when there is none</span></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>rows_for_level <span class="ot">&lt;-</span> <span class="cf">function</span>(rows, modifier, level) {</span>
-<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(modifier)) {</span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>    rows</span>
-<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>    rows <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">as.character</span>(.data[[modifier]]) <span class="sc">==</span> level)</span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co"># A p value for display (issue #33): "&lt;0.001" below 0.001, otherwise three</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="co"># decimals ("0.040", "1.000"), and blank when there is none. Only the label</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co"># is rounded; the estimates keep full precision.</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>format_p_value <span class="ot">&lt;-</span> <span class="cf">function</span>(p) {</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ifelse</span>(</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(p), <span class="st">""</span>,</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ifelse</span>(p <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"&lt;0.001"</span>, <span class="fu">sprintf</span>(<span class="st">"%.3f"</span>, p))</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="co"># The p values of a set of contrasts as labels, with † for the follow-up</span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="co"># contrasts (change from baseline); the row's heading says they are p values</span></span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>format_p_labels <span class="ot">&lt;-</span> <span class="cf">function</span>(effects, <span class="at">dagger =</span> <span class="cn">TRUE</span>) {</span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>  effects <span class="sc">%&gt;%</span></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">time_linear =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(time_factor))) <span class="sc">%&gt;%</span></span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p_value_label =</span> <span class="fu">format_p_value</span>(p.value)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">p_value_label =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>      time_linear <span class="sc">==</span> <span class="dv">0</span> <span class="sc">|</span> <span class="sc">!</span>dagger <span class="sc">|</span> p_value_label <span class="sc">==</span> <span class="st">""</span>,</span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>      p_value_label,</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(p_value_label, <span class="st">"\u2020"</span>)</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="co"># Rows for one level of the modifier, or every row when there is none</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a>rows_for_level <span class="ot">&lt;-</span> <span class="cf">function</span>(rows, modifier, level) {</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">is.null</span>(modifier)) {</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>    rows</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>    rows <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="fu">as.character</span>(.data[[modifier]]) <span class="sc">==</span> level)</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -800,27 +816,36 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="p-values-and-numbers-observed" class="level3">
 <h3 class="anchored" data-anchor-id="p-values-and-numbers-observed">P-values and numbers observed</h3>
-<p><code>plot_p_values()</code> draws a row of p-values aligned to the visits, under a heading saying which comparison they test. <code>plot_numbers_table()</code> draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.</p>
+<p><code>plot_p_values()</code> draws a row of p-values aligned to the visits, under a heading saying which comparison they test; with three or more levels, alternate values sit on a second line so they do not overlap. <code>format_p_value()</code> writes each one to three decimals, or as “&lt;0.001”. <code>plot_numbers_table()</code> draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># A row of p values aligned to the visits, under a heading: the effect</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># within a level (marked † at follow-up, where it concerns change from</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># baseline) or the difference between levels. Returns a ggplot.</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plot_p_values <span class="ot">&lt;-</span> <span class="cf">function</span>(effects, visits, <span class="at">title =</span> <span class="cn">NULL</span>, <span class="at">dagger =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">show_baseline_p =</span> <span class="cn">TRUE</span>) {</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  p_values <span class="ot">&lt;-</span> <span class="fu">format_p_labels</span>(effects, <span class="at">dagger =</span> dagger)</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>show_baseline_p) {</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    p_values <span class="ot">&lt;-</span> p_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(time_linear <span class="sc">!=</span> <span class="dv">0</span>)</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(p_values, <span class="fu">aes</span>(<span class="at">x =</span> time_linear, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">label =</span> p_value_label)) <span class="sc">+</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">size =</span> <span class="fl">2.3</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">trajectory_x_scale</span>(visits) <span class="sc">+</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">trajectory_coord</span>(visits) <span class="sc">+</span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> title) <span class="sc">+</span></span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_void</span>() <span class="sc">+</span></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fl">7.5</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>))</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># baseline) or the difference between levels. With stagger = TRUE, every</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># second visit's label sits on a second line, so labels on narrow panels do</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># not run into each other. Returns a ggplot.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plot_p_values <span class="ot">&lt;-</span> <span class="cf">function</span>(effects, visits, <span class="at">title =</span> <span class="cn">NULL</span>, <span class="at">dagger =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">show_baseline_p =</span> <span class="cn">TRUE</span>, <span class="at">stagger =</span> <span class="cn">FALSE</span>) {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  p_values <span class="ot">&lt;-</span> <span class="fu">format_p_labels</span>(effects, <span class="at">dagger =</span> dagger) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">line =</span> <span class="cf">if</span> (stagger) {</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      <span class="sc">-</span>((<span class="fu">match</span>(time_linear, visits) <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">%%</span> <span class="dv">2</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="dv">0</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span>show_baseline_p) {</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    p_values <span class="ot">&lt;-</span> p_values <span class="sc">%&gt;%</span> <span class="fu">filter</span>(time_linear <span class="sc">!=</span> <span class="dv">0</span>)</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(p_values, <span class="fu">aes</span>(<span class="at">x =</span> time_linear, <span class="at">y =</span> line, <span class="at">label =</span> p_value_label)) <span class="sc">+</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_text</span>(<span class="at">size =</span> <span class="fl">2.3</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>) <span class="sc">+</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">trajectory_x_scale</span>(visits) <span class="sc">+</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">trajectory_coord</span>(</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>      visits, <span class="at">y_limits =</span> <span class="cf">if</span> (stagger) <span class="fu">c</span>(<span class="sc">-</span><span class="fl">1.4</span>, <span class="fl">0.4</span>) <span class="cf">else</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="fl">0.4</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> title) <span class="sc">+</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fl">7.5</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>))</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 <div class="cell">
@@ -1040,83 +1065,107 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-102"><a href="#cb10-102" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (show_p) {</span>
-<span id="cb10-103"><a href="#cb10-103" aria-hidden="true" tabindex="-1"></a>    within_title <span class="ot">&lt;-</span> <span class="st">"p, intervention vs control (\u2020 change from baseline)"</span></span>
-<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a>    between_title <span class="ot">&lt;-</span> <span class="cf">function</span>(comparison) {</span>
-<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(<span class="st">"p, difference between levels ("</span>, comparison, <span class="st">")"</span>)</span>
-<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>    within_row <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_levels), <span class="cf">function</span>(i) {</span>
-<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_p_values</span>(</span>
-<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>        <span class="fu">rows_for_level</span>(estimates<span class="sc">$</span>within_levels, modifier, levels_shown[[i]]),</span>
-<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a>        visits, <span class="at">title =</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) within_title <span class="cf">else</span> <span class="cn">NULL</span>,</span>
-<span id="cb10-111"><a href="#cb10-111" aria-hidden="true" tabindex="-1"></a>        <span class="at">show_baseline_p =</span> show_baseline_p</span>
-<span id="cb10-112"><a href="#cb10-112" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a>    between_rows <span class="ot">&lt;-</span> <span class="fu">lapply</span>(comparisons, <span class="cf">function</span>(comparison) {</span>
-<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_p_values</span>(</span>
-<span id="cb10-116"><a href="#cb10-116" aria-hidden="true" tabindex="-1"></a>        estimates<span class="sc">$</span>between_levels <span class="sc">%&gt;%</span></span>
-<span id="cb10-117"><a href="#cb10-117" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(<span class="fu">as.character</span>(.data<span class="sc">$</span>comparison) <span class="sc">==</span> .env<span class="sc">$</span>comparison),</span>
-<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a>        visits,</span>
-<span id="cb10-119"><a href="#cb10-119" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="cf">if</span> (show_effect_panel) {</span>
-<span id="cb10-120"><a href="#cb10-120" aria-hidden="true" tabindex="-1"></a>          <span class="fu">paste</span>(<span class="st">"p,"</span>, comparison)</span>
-<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
-<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a>          <span class="fu">between_title</span>(comparison)</span>
-<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a>        },</span>
-<span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>        <span class="at">dagger =</span> <span class="cn">FALSE</span>, <span class="at">show_baseline_p =</span> show_baseline_p</span>
-<span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_effect_panel <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(comparisons) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Between-level p values sit under their own effect columns</span></span>
-<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a>      rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(<span class="fu">c</span>(within_row, between_rows)))</span>
-<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a>      heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, <span class="fl">0.4</span>)</span>
-<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
-<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a>      rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(<span class="fu">c</span>(within_row, <span class="fu">spacers</span>(extra))))</span>
-<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a>      heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, <span class="fl">0.4</span>)</span>
-<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (between_row <span class="cf">in</span> between_rows) {</span>
-<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a>        rows <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a>          rows, <span class="fu">list</span>(<span class="fu">c</span>(<span class="fu">list</span>(between_row), <span class="fu">spacers</span>(n_levels <span class="sc">-</span> <span class="dv">1</span> <span class="sc">+</span> extra)))</span>
-<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a>        heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, <span class="fl">0.4</span>)</span>
-<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a>  numbers_row <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_levels), <span class="cf">function</span>(i) {</span>
-<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_numbers_table</span>(</span>
-<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a>        data, outcome, modifier, levels_shown[[i]],</span>
-<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>        <span class="at">show_row_labels =</span> i <span class="sc">==</span> <span class="dv">1</span>, <span class="at">title =</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) <span class="st">"Observed, n"</span> <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a>    }),</span>
-<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a>    <span class="fu">spacers</span>(extra)</span>
-<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(numbers_row))</span>
-<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a>  heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, <span class="fl">0.5</span>)</span>
-<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a>  caption <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories) <span class="st">"Faint lines: individual participants."</span>,</span>
-<span id="cb10-157"><a href="#cb10-157" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories <span class="sc">&amp;&amp;</span> jitter_x <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Trajectories are shifted sideways for readability."</span></span>
-<span id="cb10-159"><a href="#cb10-159" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories <span class="sc">&amp;&amp;</span> jitter_y <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Individual values are randomly displaced; means use the exact values."</span></span>
-<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Points and bars: model-estimated means (95% CI)."</span>,</span>
-<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_effect_panel) {</span>
-<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Effects: intervention minus control in change from baseline (95% CI)."</span></span>
-<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a>    },</span>
-<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_p) <span class="st">"† adjusted for baseline differences"</span></span>
-<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a>  <span class="fu">wrap_plots</span>(<span class="fu">unlist</span>(rows, <span class="at">recursive =</span> <span class="cn">FALSE</span>),</span>
-<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="fu">length</span>(widths), <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a>             <span class="at">widths =</span> widths, <span class="at">heights =</span> heights) <span class="sc">+</span></span>
-<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_annotation</span>(</span>
-<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title,</span>
-<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="fu">paste</span>(<span class="fu">strwrap</span>(<span class="fu">paste</span>(caption, <span class="at">collapse =</span> <span class="st">" "</span>), <span class="dv">110</span>),</span>
-<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a>                      <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
-<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a>      <span class="at">theme =</span> <span class="fu">theme_publication</span>()</span>
-<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb10-103"><a href="#cb10-103" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Three or more levels leave too little width per visit for the labels</span></span>
+<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a>    <span class="co"># on one line (#33)</span></span>
+<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>    stagger <span class="ot">&lt;-</span> n_levels <span class="sc">&gt;=</span> <span class="dv">3</span></span>
+<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>    p_height <span class="ot">&lt;-</span> <span class="cf">if</span> (stagger) <span class="fl">0.6</span> <span class="cf">else</span> <span class="fl">0.4</span></span>
+<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>    within_title <span class="ot">&lt;-</span> <span class="st">"p, intervention vs control (\u2020 change from baseline)"</span></span>
+<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a>    within_row <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_levels), <span class="cf">function</span>(i) {</span>
+<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_p_values</span>(</span>
+<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a>        <span class="fu">rows_for_level</span>(estimates<span class="sc">$</span>within_levels, modifier, levels_shown[[i]]),</span>
+<span id="cb10-111"><a href="#cb10-111" aria-hidden="true" tabindex="-1"></a>        visits, <span class="at">title =</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) within_title <span class="cf">else</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-112"><a href="#cb10-112" aria-hidden="true" tabindex="-1"></a>        <span class="at">show_baseline_p =</span> show_baseline_p, <span class="at">stagger =</span> stagger</span>
+<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a>    between_rows <span class="ot">&lt;-</span> <span class="fu">lapply</span>(comparisons, <span class="cf">function</span>(comparison) {</span>
+<span id="cb10-116"><a href="#cb10-116" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_p_values</span>(</span>
+<span id="cb10-117"><a href="#cb10-117" aria-hidden="true" tabindex="-1"></a>        estimates<span class="sc">$</span>between_levels <span class="sc">%&gt;%</span></span>
+<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(<span class="fu">as.character</span>(.data<span class="sc">$</span>comparison) <span class="sc">==</span> .env<span class="sc">$</span>comparison),</span>
+<span id="cb10-119"><a href="#cb10-119" aria-hidden="true" tabindex="-1"></a>        visits,</span>
+<span id="cb10-120"><a href="#cb10-120" aria-hidden="true" tabindex="-1"></a>        <span class="at">title =</span> <span class="cf">if</span> (show_effect_panel) <span class="fu">paste</span>(<span class="st">"p,"</span>, comparison) <span class="cf">else</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a>        <span class="at">dagger =</span> <span class="cn">FALSE</span>, <span class="at">show_baseline_p =</span> show_baseline_p, <span class="at">stagger =</span> stagger</span>
+<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a>    })</span>
+<span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_effect_panel <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(comparisons) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Between-level p values sit under their own effect columns</span></span>
+<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a>      rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(<span class="fu">c</span>(within_row, between_rows)))</span>
+<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a>      heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, p_height)</span>
+<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a>    } <span class="cf">else</span> {</span>
+<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a>      rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(<span class="fu">c</span>(within_row, <span class="fu">spacers</span>(extra))))</span>
+<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a>      heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, p_height)</span>
+<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> (<span class="fu">length</span>(comparisons) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a>        <span class="fu">stopifnot</span>(<span class="fu">length</span>(comparisons) <span class="sc">==</span> n_levels <span class="sc">-</span> <span class="dv">1</span>)</span>
+<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Each level's difference from the first sits under that level; the</span></span>
+<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>        <span class="co"># heading takes the first level's column, which has no difference</span></span>
+<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a>        between_heading <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a>          <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste0</span>(</span>
+<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a>            <span class="st">"p, difference between levels (each minus "</span>,</span>
+<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a>            levels_shown[[<span class="dv">1</span>]], <span class="st">")"</span></span>
+<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a>          )) <span class="sc">+</span></span>
+<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a>          <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a>          <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fl">7.5</span>, <span class="at">colour =</span> <span class="st">"grey20"</span>))</span>
+<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a>        rows <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a>          rows, <span class="fu">list</span>(<span class="fu">c</span>(<span class="fu">list</span>(between_heading), between_rows, <span class="fu">spacers</span>(extra)))</span>
+<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a>        heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, p_height)</span>
+<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a>  numbers_row <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lapply</span>(<span class="fu">seq_len</span>(n_levels), <span class="cf">function</span>(i) {</span>
+<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a>      <span class="fu">plot_numbers_table</span>(</span>
+<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a>        data, outcome, modifier, levels_shown[[i]],</span>
+<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a>        <span class="at">show_row_labels =</span> i <span class="sc">==</span> <span class="dv">1</span>, <span class="at">title =</span> <span class="cf">if</span> (i <span class="sc">==</span> <span class="dv">1</span>) <span class="st">"Observed, n"</span> <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a>    }),</span>
+<span id="cb10-157"><a href="#cb10-157" aria-hidden="true" tabindex="-1"></a>    <span class="fu">spacers</span>(extra)</span>
+<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-159"><a href="#cb10-159" aria-hidden="true" tabindex="-1"></a>  rows <span class="ot">&lt;-</span> <span class="fu">c</span>(rows, <span class="fu">list</span>(numbers_row))</span>
+<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a>  heights <span class="ot">&lt;-</span> <span class="fu">c</span>(heights, <span class="fl">0.5</span>)</span>
+<span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a>  <span class="co"># What each element shows (issue #34)</span></span>
+<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a>  caption <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories) <span class="st">"Faint lines: each participant's recorded values."</span>,</span>
+<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories <span class="sc">&amp;&amp;</span> jitter_x <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Trajectories are shifted sideways for readability."</span></span>
+<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_trajectories <span class="sc">&amp;&amp;</span> jitter_y <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Individual values are randomly displaced; means use the exact values."</span></span>
+<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a>    <span class="fu">paste</span>(</span>
+<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Points and bars: each arm's model-estimated mean and its 95%"</span>,</span>
+<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a>      <span class="st">"confidence interval (the uncertainty in the mean, not the spread of"</span>,</span>
+<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>      <span class="st">"individual values)."</span></span>
+<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_effect_panel) {</span>
+<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Effects: intervention minus control in change from baseline (95% CI)."</span></span>
+<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_p) {</span>
+<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(</span>
+<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a>        <span class="st">"p values: at baseline, the difference between arms; at follow-up"</span>,</span>
+<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a>        <span class="st">"(\u2020), the difference between arms in change from baseline."</span></span>
+<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_p <span class="sc">&amp;&amp;</span> <span class="fu">length</span>(comparisons) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(</span>
+<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Between levels: each level's effect minus the first level's"</span>,</span>
+<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a>        <span class="st">"(the reference), not a test across all levels."</span></span>
+<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (show_p) <span class="st">"Not adjusted for multiple comparisons."</span></span>
+<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a>  <span class="fu">wrap_plots</span>(<span class="fu">unlist</span>(rows, <span class="at">recursive =</span> <span class="cn">FALSE</span>),</span>
+<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a>             <span class="at">ncol =</span> <span class="fu">length</span>(widths), <span class="at">byrow =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>             <span class="at">widths =</span> widths, <span class="at">heights =</span> heights) <span class="sc">+</span></span>
+<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_annotation</span>(</span>
+<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> title,</span>
+<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>      <span class="at">caption =</span> <span class="fu">paste</span>(<span class="fu">strwrap</span>(<span class="fu">paste</span>(caption, <span class="at">collapse =</span> <span class="st">" "</span>), <span class="dv">110</span>),</span>
+<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>                      <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>),</span>
+<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>      <span class="at">theme =</span> <span class="fu">theme_publication</span>()</span>
+<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1692,7 +1741,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb11-111"><a href="#cb11-111" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-112"><a href="#cb11-112" aria-hidden="true" tabindex="-1"></a><span class="fu">### P-values and numbers observed</span></span>
 <span id="cb11-113"><a href="#cb11-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="in">`plot_p_values()`</span> draws a row of p-values aligned to the visits, under a heading saying which comparison they test. <span class="in">`plot_numbers_table()`</span> draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.</span>
+<span id="cb11-114"><a href="#cb11-114" aria-hidden="true" tabindex="-1"></a><span class="in">`plot_p_values()`</span> draws a row of p-values aligned to the visits, under a heading saying which comparison they test; with three or more levels, alternate values sit on a second line so they do not overlap. <span class="in">`format_p_value()`</span> writes each one to three decimals, or as "&lt;0.001". <span class="in">`plot_numbers_table()`</span> draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.</span>
 <span id="cb11-115"><a href="#cb11-115" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-118"><a href="#cb11-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb11-119"><a href="#cb11-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: plot-p-values</span></span>

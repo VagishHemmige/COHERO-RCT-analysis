@@ -130,17 +130,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -161,6 +150,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -245,6 +245,13 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
   <a href="../quarto/methods_stratified_effects.html" class="sidebar-item-text sidebar-link"><i class="bi bi-book" role="img">
 </i> 
  <span class="menu-text">Effects behind an interaction</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/methods_reading_trajectory_figure.html" class="sidebar-item-text sidebar-link"><i class="bi bi-book" role="img">
+</i> 
+ <span class="menu-text">How to read the trajectory figure</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -646,7 +653,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <h2 class="anchored" data-anchor-id="mixed-model-plots-subgroups">Mixed model plots subgroups</h2>
 <p>The loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the <a href="../quarto/methods_interaction_p_values.html">interaction explanation</a> before comparing a small p-value in one panel with a large one in another.</p>
 <p>The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.</p>
-<p>Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another tests the difference between levels; see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a> and <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>.</p>
+<p>Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another, under each level after the first, tests its difference from the first level; see <a href="../quarto/methods_reading_trajectory_figure.html">How to read the trajectory figure</a>, <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a> and <a href="../quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1220,7 +1227,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.</span>
 <span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another tests the difference between levels; see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span> and <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another, under each level after the first, tests its difference from the first level; see <span class="co">[</span><span class="ot">How to read the trajectory figure</span><span class="co">](methods_reading_trajectory_figure.qmd)</span>, <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span> and <span class="co">[</span><span class="ot">What a p-value for interaction means</span><span class="co">](methods_interaction_p_values.qmd)</span>.</span>
 <span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: mixed-model-plots-subgroups</span></span>
