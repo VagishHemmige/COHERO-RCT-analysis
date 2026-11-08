@@ -2,7 +2,7 @@
 #   three steps: fit a model, estimate effects from it, report them as a
 #   table and a figure built from parts. Each takes its inputs as arguments.
 # Needs: setup.R (packages, figure_labels, arm_labels); plot_style.R
-#   (theme_publication(), publication_colours, figure_label()) when the
+#   (theme_publication(), publication_colors, figure_label()) when the
 #   figure functions run. Produces: functions only.
 # Ported from the outcome_functions chunk of
 #   MR_SJ_asthma_pilot_2023-9-15.Rmd. The original fitted each model up to
@@ -200,7 +200,7 @@ rows_for_level <- function(rows, modifier, level) {
 ## ---- plot-means
 # Model-estimated mean (95% CI) for each arm at each visit, optionally over
 # the individual trajectories. Arms differ by
-# colour, shape and line type; label_arms names them at the right-hand end of
+# color, shape and line type; label_arms names them at the right-hand end of
 # their lines instead of in a legend. Returns a ggplot.
 plot_means <- function(data, estimates, outcome, modifier = NULL,
                        level = NULL, y_limits, show_trajectories = TRUE,
@@ -213,7 +213,7 @@ plot_means <- function(data, estimates, outcome, modifier = NULL,
     add_plot_offset(offset)
 
   panel <- ggplot(means, aes(
-    x = time_plot, y = estimate, colour = studyarm, group = studyarm
+    x = time_plot, y = estimate, color = studyarm, group = studyarm
   ))
 
   if (show_trajectories) {
@@ -264,12 +264,12 @@ plot_means <- function(data, estimates, outcome, modifier = NULL,
     theme(
       legend.position = "none",
       axis.text.x = if (show_x_axis) {
-        element_text(colour = "grey30")
+        element_text(color = "gray30")
       } else {
         element_blank()
       },
       axis.text.y = if (show_y_title) {
-        element_text(colour = "grey30")
+        element_text(color = "gray30")
       } else {
         element_blank()
       }
@@ -286,21 +286,21 @@ plot_effects <- function(estimates, visits, modifier = NULL, level = NULL,
                          title = NULL) {
   if (is.null(comparison)) {
     effects <- rows_for_level(estimates$within_levels, modifier, level)
-    colour <- publication_colours[2]
+    color <- publication_colors[2]
   } else {
     effects <- estimates$between_levels %>%
       filter(as.character(comparison) == .env$comparison)
-    colour <- publication_colours[3]
+    color <- publication_colors[3]
   }
   effects <- effects %>%
     mutate(time_linear = as.numeric(as.character(time_factor))) %>%
     filter(time_linear > 0)
 
   panel <- ggplot(effects, aes(x = time_linear, y = estimate)) +
-    geom_hline(yintercept = 0, colour = "grey40", linewidth = 0.4) +
+    geom_hline(yintercept = 0, color = "gray40", linewidth = 0.4) +
     geom_errorbar(aes(ymin = conf.low, ymax = conf.high),
-                  width = 0, linewidth = 0.6, colour = colour) +
-    geom_point(size = 2, colour = colour)
+                  width = 0, linewidth = 0.6, color = color) +
+    geom_point(size = 2, color = color)
 
   panel +
     trajectory_x_scale(visits) +
@@ -317,7 +317,7 @@ plot_effects <- function(estimates, visits, modifier = NULL, level = NULL,
     theme_publication() +
     theme(
       axis.text.y = if (show_y_title) {
-        element_text(colour = "grey30")
+        element_text(color = "gray30")
       } else {
         element_blank()
       }
@@ -342,14 +342,14 @@ plot_p_values <- function(effects, visits, title = NULL, dagger = TRUE,
     p_values <- p_values %>% filter(time_linear != 0)
   }
   ggplot(p_values, aes(x = time_linear, y = line, label = p_value_label)) +
-    geom_text(size = 2.3, colour = "grey20") +
+    geom_text(size = 2.3, color = "gray20") +
     trajectory_x_scale(visits) +
     trajectory_coord(
       visits, y_limits = if (stagger) c(-1.4, 0.4) else c(-0.4, 0.4)
     ) +
     labs(title = title) +
     theme_void() +
-    theme(plot.title = element_text(size = 7.5, colour = "grey20"))
+    theme(plot.title = element_text(size = 7.5, color = "gray20"))
 }
 
 ## ---- plot-numbers-table
@@ -366,7 +366,7 @@ plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
     ))
 
   ggplot(counts, aes(
-    x = time_linear, y = arm, label = n_obs, colour = studyarm
+    x = time_linear, y = arm, label = n_obs, color = studyarm
   )) +
     geom_text(size = 2.7) +
     trajectory_x_scale(visits) +
@@ -380,7 +380,7 @@ plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
       axis.ticks.x = element_blank(),
       axis.text.x = element_blank(),
       axis.text.y = if (show_row_labels) {
-        element_text(colour = "grey20", face = "bold")
+        element_text(color = "gray20", face = "bold")
       } else {
         element_blank()
       },
@@ -529,7 +529,7 @@ compose_trajectory_figure <- function(data, estimates, outcome,
             levels_shown[[1]], ")"
           )) +
           theme_void() +
-          theme(plot.title = element_text(size = 7.5, colour = "grey20"))
+          theme(plot.title = element_text(size = 7.5, color = "gray20"))
         rows <- c(
           rows, list(c(list(between_heading), between_rows, spacers(extra)))
         )

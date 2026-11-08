@@ -17,7 +17,7 @@
 
 ## ---- clean-medication-records
 # Records with no study ID are not participants and are excluded from all
-# analyses (study team decision). Records are relabelled controller or rescue
+# analyses (study team decision). Records are relabeled controller or rescue
 # by medication name where the app's own label is not Control or Rescue.
 medication_data_clean <- raw_medications %>%
   filter(!is.na(SUBJECTID)) %>%

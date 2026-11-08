@@ -5,7 +5,7 @@
 #   files in the folder named by COHERO_DATA_DIR, and synthetic_truth (the
 #   effects built into the data, for the recovery checks).
 #
-# Every value here is made up in code and labelled synthetic. None is derived
+# Every value here is made up in code and labeled synthetic. None is derived
 # from study data. The file structure (column names, types, sheets) is
 # inferred from the analysis code, because the study files are not available
 # to check against. Each inference that matters is listed under
@@ -206,12 +206,12 @@ for (i in seq_len(n_participants)) {
     adherence <- p$adherence_propensity +
       treated * synthetic_truth$adherence_propensity_difference
     for (item in adherence_items) {
-      centre <- if (item %in% positive_adherence_items) {
+      center <- if (item %in% positive_adherence_items) {
         2.5 + adherence
       } else {
         1.5 - adherence
       }
-      row[[item]] <- clamp(round(centre + rnorm(1, 0, 0.7)), 0, 4)
+      row[[item]] <- clamp(round(center + rnorm(1, 0, 0.7)), 0, 4)
     }
     redcap_rows[[length(redcap_rows) + 1]] <- row
   }
@@ -244,7 +244,7 @@ puff_records <- function(p, study_period, medication, med_type) {
     PuffDate = p$consent_date + study_period,
     Puffs = 1,
     # ASSUMPTION A5: header "Med. Type". When present it matches the
-    # inhaler; mostly blank, so relabelling by name is exercised.
+    # inhaler; mostly blank, so relabeling by name is exercised.
     `Med. Type` = ifelse(runif(n_puffs) < 0.2, med_type, NA_character_),
     `Text 1` = NA_character_, `Text 2` = NA_character_,
     `Text 3` = NA_character_, `Text 4` = NA_character_,
@@ -293,7 +293,7 @@ for (i in seq_len(n_participants)) {
     "Control"
   )
 
-  # A few records for an inhaler the analysis does not recognise
+  # A few records for an inhaler the analysis does not recognize
   unknown <- puff_records(p, sample(follow_up_days, 2), "Inhaler A", NA)
 
   puff_rows[[i]] <- bind_rows(rescue, controller, unknown) %>%

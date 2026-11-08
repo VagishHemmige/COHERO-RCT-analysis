@@ -21,7 +21,7 @@ repository/
 ├── _quarto.yml              # Quarto configuration
 ├── index.qmd                # Website entry point
 ├── 404.qmd                  # Page for a missing address
-├── styles.css               # Website icon colours and marks
+├── styles.css               # Website icon colors and marks
 ├── README.md                # Overview and execution
 ├── README.Rmd               # Optional source for README.md
 ├── analysis-plan.md         # Scientific objectives and methods

@@ -55,7 +55,7 @@ All definitions below are as computed by the code. Scale items coded 999 are tre
 
 ### App-recorded inhaler use (consent to the 12-month visit)
 
-- **Inhaler type:** records labelled Control or Rescue keep their label. Other records are relabelled by medication name: Advair, Breo, Dulera, Flovent, QVAR and Symbicort as controller; Combivent, ProAir, Ventolin and Proventil as rescue.
+- **Inhaler type:** records labeled Control or Rescue keep their label. Other records are relabeled by medication name: Advair, Breo, Dulera, Flovent, QVAR and Symbicort as controller; Combivent, ProAir, Ventolin and Proventil as rescue.
 - **Rescue puffs:** number of rescue records per participant. **Rescue days:** number of distinct days with a rescue record.
 - **Controller proportion of days covered (PDC):** for each participant, the share of days from consent to the 12-month visit with at least one controller record. Also computed within each visit interval (consent to 2 months, 2–4, 4–6, 6–9, 9–12 months) and attached to the visit that closes the interval.
 - Records dated after the participant's 12-month visit are excluded.
@@ -152,7 +152,7 @@ Items follow the CONSORT 2010 extension to randomised pilot and feasibility tria
 | 13a, 13b | Participant flow | 3, 6 |
 | 14a, 14b | Recruitment dates; why the trial ended | Reporting |
 | 15 | Baseline table | 7 |
-| 16 | Numbers analysed per objective | 6, 7 |
+| 16 | Numbers analyzed per objective | 6, 7 |
 | 17a | Results with uncertainty | 7 |
 | 18 | Other analyses informing the definitive trial | 7 |
 | 19, 19a | Harms; unintended consequences | Open |
