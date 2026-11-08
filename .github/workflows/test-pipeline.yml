@@ -49,6 +49,8 @@ jobs:
             any::gganimate
             any::flextable
             any::gtsummary
+            # gtsummary's tbl_regression() needs it, but only suggests it
+            any::broom.helpers
             any::patchwork
 
       - name: Run the analysis on synthetic data
