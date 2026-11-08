@@ -131,15 +131,15 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
 }
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
 }
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Pending.callout {
@@ -153,15 +153,15 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
   content: '⏳';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
+div.callout-Results.callout {
+  border-left-color: #198754;
 }
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
 }
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -453,7 +453,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </tbody>
 </table>
 <p>Degrees of freedom are Satterthwaite’s, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10">#10</a>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</p>
-<p><a href="../quarto/functions.html#plot-effect-trajectories"><code>plot_effect_trajectories()</code></a> draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</p>
+<p><a href="../quarto/functions.html#the-whole-figure"><code>compose_trajectory_figure()</code></a> draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with <code>show_effect_panel = TRUE</code> it also shows each contrast’s estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</p>
 <p>To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.</p>
 </section>
 <section id="count-models" class="level2">
@@ -969,7 +969,7 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, <span class="co">[</span><span class="ot">#10</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)</span>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`plot_effect_trajectories()`</span><span class="co">](functions.qmd#plot-effect-trajectories)</span> draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`compose_trajectory_figure()`</span><span class="co">](functions.qmd#the-whole-figure)</span> draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with <span class="in">`show_effect_panel = TRUE`</span> it also shows each contrast's estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
