@@ -68,6 +68,13 @@ The figure is built from small parts, each returning an ordinary ggplot, and one
 #| eval: false
 ```
 
+`jitter_trajectories()` changes only how the individual trajectories are drawn: it can move each participant's whole line sideways, so overlapping lines separate, and it can move each plotted value up or down, so exact values cannot be read off. A fixed seed makes the result reproducible. Model means, confidence intervals, counts and p-values always come from the unchanged data.
+
+```{r}
+#| label: jitter-trajectories
+#| eval: false
+```
+
 ### Means
 
 `plot_means()` draws each arm's model-estimated mean and 95% confidence interval at each visit, optionally over the individual trajectories. The arms differ by colour, point shape and line type, and are named at the end of their lines rather than in a legend.
@@ -110,6 +117,15 @@ The figure is built from small parts, each returning an ordinary ggplot, and one
 | `show_p` | `TRUE` | Adds rows of p-values for the effect within each level and the difference between levels |
 | `show_baseline_p` | `TRUE` | Includes the baseline p-value. CONSORT advises against testing baseline differences in randomised trials |
 | `show_effect_panel` | `FALSE` | Adds the effects row, with a column for each difference between levels |
+
+Three more settings change only what is displayed, for readability or disclosure ([#11](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/11)). Their defaults change nothing; the values for public figures are still to be decided with the disclosure rules.
+
+| Setting | Default | What it does |
+|---|---|---|
+| `jitter_x` | `0` | Moves each participant's trajectory sideways by up to this many months |
+| `jitter_y` | `0` | Moves each plotted value up or down by up to this much, in the outcome's units |
+| `min_cell` | `NULL` | Shows any count below this number as, for example, "<11" |
+| `seed` | `20261108` | Makes the jitter reproducible |
 
 The result is a patchwork object. To change every panel, add to it with `&`, for example `figure & theme(text = element_text(family = "Arial"))`; to change one panel, index it, for example `figure[[1]]`. For general guidance on writing and reading reusable recipes, see the Functions chapter in [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
 

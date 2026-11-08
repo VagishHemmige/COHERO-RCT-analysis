@@ -50,6 +50,44 @@ testthat::test_that("the trajectory figure's options change it as recorded", {
   )
 })
 
+## ---- display-options
+# Jitter and small-cell suppression change only what is drawn (#11)
+testthat::test_that("jitter and small-cell options change only the display", {
+  data <- mixed_model_data[["itt"]]
+  estimates <- mixed_model_estimates[["itt"]][["act_score"]][["overall"]]
+  draw <- function(...) {
+    figure <- compose_trajectory_figure(data, estimates, "act_score", ...)
+    lapply(ggplot2::ggplot_build(figure[[1]])$data, as.data.frame)
+  }
+  plain <- draw()
+  jittered <- draw(jitter_x = 0.1, jitter_y = 1)
+
+  # Layer 1 is the individual trajectories; layers 3-5 are the model means
+  testthat::expect_false(isTRUE(all.equal(plain[[1]]$y, jittered[[1]]$y)))
+  testthat::expect_false(isTRUE(all.equal(plain[[1]]$x, jittered[[1]]$x)))
+  testthat::expect_equal(plain[3:5], jittered[3:5])
+  # The same seed gives the same figure; another seed a different one
+  testthat::expect_equal(jittered, draw(jitter_x = 0.1, jitter_y = 1))
+  testthat::expect_false(isTRUE(all.equal(
+    jittered[[1]]$y, draw(jitter_x = 0.1, jitter_y = 1, seed = 1)[[1]]$y
+  )))
+  # Each participant's trajectory moves sideways as a whole
+  sideways <- draw(jitter_x = 0.1)[[1]]
+  shift <- sideways$x - plain[[1]]$x
+  testthat::expect_true(all(tapply(shift, sideways$group, function(s) {
+    diff(range(s)) < 1e-9
+  })))
+
+  # Counts below the threshold are shown as "<threshold"
+  table <- compose_trajectory_figure(
+    data, estimates, "act_score", min_cell = 38
+  )[[5]]
+  labels <- as.character(ggplot2::ggplot_build(table)$data[[1]]$label)
+  testthat::expect_true("<38" %in% labels)
+  testthat::expect_false(any(suppressWarnings(as.numeric(labels)) < 38,
+                             na.rm = TRUE))
+})
+
 ## ---- figure-export
 testthat::test_that("figures save as PDF, SVG and PNG", {
   file <- file.path(tempdir(), "export-check")
