@@ -165,17 +165,26 @@ trajectory_coord <- function(visits, y_limits = NULL) {
   )
 }
 
-# "0.012", with † for the follow-up contrasts (change from baseline); the
-# row's heading says these are p values
+# A p value for display (issue #33): "<0.001" below 0.001, otherwise three
+# decimals ("0.040", "1.000"), and blank when there is none. Only the label
+# is rounded; the estimates keep full precision.
+format_p_value <- function(p) {
+  ifelse(
+    is.na(p), "",
+    ifelse(p < 0.001, "<0.001", sprintf("%.3f", p))
+  )
+}
+
+# The p values of a set of contrasts as labels, with † for the follow-up
+# contrasts (change from baseline); the row's heading says they are p values
 format_p_labels <- function(effects, dagger = TRUE) {
   effects %>%
     mutate(time_linear = as.numeric(as.character(time_factor))) %>%
-    mutate(p.value = round(p.value, 3)) %>%
-    mutate(p_value_label = as.character(p.value)) %>%
+    mutate(p_value_label = format_p_value(p.value)) %>%
     mutate(p_value_label = ifelse(
-      time_linear == 0 | !dagger,
+      time_linear == 0 | !dagger | p_value_label == "",
       p_value_label,
-      paste0(p_value_label, "†")
+      paste0(p_value_label, "\u2020")
     ))
 }
 
@@ -318,17 +327,26 @@ plot_effects <- function(estimates, visits, modifier = NULL, level = NULL,
 ## ---- plot-p-values
 # A row of p values aligned to the visits, under a heading: the effect
 # within a level (marked † at follow-up, where it concerns change from
-# baseline) or the difference between levels. Returns a ggplot.
+# baseline) or the difference between levels. With stagger = TRUE, every
+# second visit's label sits on a second line, so labels on narrow panels do
+# not run into each other. Returns a ggplot.
 plot_p_values <- function(effects, visits, title = NULL, dagger = TRUE,
-                          show_baseline_p = TRUE) {
-  p_values <- format_p_labels(effects, dagger = dagger)
+                          show_baseline_p = TRUE, stagger = FALSE) {
+  p_values <- format_p_labels(effects, dagger = dagger) %>%
+    mutate(line = if (stagger) {
+      -((match(time_linear, visits) - 1) %% 2)
+    } else {
+      0
+    })
   if (!show_baseline_p) {
     p_values <- p_values %>% filter(time_linear != 0)
   }
-  ggplot(p_values, aes(x = time_linear, y = 0, label = p_value_label)) +
+  ggplot(p_values, aes(x = time_linear, y = line, label = p_value_label)) +
     geom_text(size = 2.3, colour = "grey20") +
     trajectory_x_scale(visits) +
-    trajectory_coord(visits) +
+    trajectory_coord(
+      visits, y_limits = if (stagger) c(-1.4, 0.4) else c(-0.4, 0.4)
+    ) +
     labs(title = title) +
     theme_void() +
     theme(plot.title = element_text(size = 7.5, colour = "grey20"))
@@ -473,15 +491,16 @@ compose_trajectory_figure <- function(data, estimates, outcome,
   }
 
   if (show_p) {
+    # Three or more levels leave too little width per visit for the labels
+    # on one line (#33)
+    stagger <- n_levels >= 3
+    p_height <- if (stagger) 0.6 else 0.4
     within_title <- "p, intervention vs control (\u2020 change from baseline)"
-    between_title <- function(comparison) {
-      paste0("p, difference between levels (", comparison, ")")
-    }
     within_row <- lapply(seq_len(n_levels), function(i) {
       plot_p_values(
         rows_for_level(estimates$within_levels, modifier, levels_shown[[i]]),
         visits, title = if (i == 1) within_title else NULL,
-        show_baseline_p = show_baseline_p
+        show_baseline_p = show_baseline_p, stagger = stagger
       )
     })
     between_rows <- lapply(comparisons, function(comparison) {
@@ -489,26 +508,32 @@ compose_trajectory_figure <- function(data, estimates, outcome,
         estimates$between_levels %>%
           filter(as.character(.data$comparison) == .env$comparison),
         visits,
-        title = if (show_effect_panel) {
-          paste("p,", comparison)
-        } else {
-          between_title(comparison)
-        },
-        dagger = FALSE, show_baseline_p = show_baseline_p
+        title = if (show_effect_panel) paste("p,", comparison) else NULL,
+        dagger = FALSE, show_baseline_p = show_baseline_p, stagger = stagger
       )
     })
     if (show_effect_panel && length(comparisons) > 0) {
       # Between-level p values sit under their own effect columns
       rows <- c(rows, list(c(within_row, between_rows)))
-      heights <- c(heights, 0.4)
+      heights <- c(heights, p_height)
     } else {
       rows <- c(rows, list(c(within_row, spacers(extra))))
-      heights <- c(heights, 0.4)
-      for (between_row in between_rows) {
+      heights <- c(heights, p_height)
+      if (length(comparisons) > 0) {
+        stopifnot(length(comparisons) == n_levels - 1)
+        # Each level's difference from the first sits under that level; the
+        # heading takes the first level's column, which has no difference
+        between_heading <- ggplot() +
+          labs(title = paste0(
+            "p, difference between levels (each minus ",
+            levels_shown[[1]], ")"
+          )) +
+          theme_void() +
+          theme(plot.title = element_text(size = 7.5, colour = "grey20"))
         rows <- c(
-          rows, list(c(list(between_row), spacers(n_levels - 1 + extra)))
+          rows, list(c(list(between_heading), between_rows, spacers(extra)))
         )
-        heights <- c(heights, 0.4)
+        heights <- c(heights, p_height)
       }
     }
   }
@@ -525,19 +550,36 @@ compose_trajectory_figure <- function(data, estimates, outcome,
   rows <- c(rows, list(numbers_row))
   heights <- c(heights, 0.5)
 
+  # What each element shows (issue #34)
   caption <- c(
-    if (show_trajectories) "Faint lines: individual participants.",
+    if (show_trajectories) "Faint lines: each participant's recorded values.",
     if (show_trajectories && jitter_x > 0) {
       "Trajectories are shifted sideways for readability."
     },
     if (show_trajectories && jitter_y > 0) {
       "Individual values are randomly displaced; means use the exact values."
     },
-    "Points and bars: model-estimated means (95% CI).",
+    paste(
+      "Points and bars: each arm's model-estimated mean and its 95%",
+      "confidence interval (the uncertainty in the mean, not the spread of",
+      "individual values)."
+    ),
     if (show_effect_panel) {
       "Effects: intervention minus control in change from baseline (95% CI)."
     },
-    if (show_p) "† adjusted for baseline differences"
+    if (show_p) {
+      paste(
+        "p values: at baseline, the difference between arms; at follow-up",
+        "(\u2020), the difference between arms in change from baseline."
+      )
+    },
+    if (show_p && length(comparisons) > 0) {
+      paste(
+        "Between levels: each level's effect minus the first level's",
+        "(the reference), not a test across all levels."
+      )
+    },
+    if (show_p) "Not adjusted for multiple comparisons."
   )
 
   wrap_plots(unlist(rows, recursive = FALSE),

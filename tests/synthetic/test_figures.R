@@ -86,6 +86,20 @@ testthat::test_that("jitter changes only the display", {
                               jittered[[1]]$y <= limits[2]))
 })
 
+## ---- p-value-labels
+# Display cases from issue #33: below, at and above the threshold, near one,
+# and missing
+testthat::test_that("p values are formatted for display", {
+  testthat::expect_equal(
+    format_p_value(c(0.00001, 0.0009999, 0.001, 0.0404, 0.04, 0.9996, 1, NA)),
+    c("<0.001", "<0.001", "0.001", "0.040", "0.040", "1.000", "1.000", "")
+  )
+  labels <- format_p_labels(tibble::tibble(
+    time_factor = factor(c("0", "2", "4")), p.value = c(0.5, 0.00001, NA)
+  ))$p_value_label
+  testthat::expect_equal(labels, c("0.500", "<0.001\u2020", ""))
+})
+
 ## ---- figure-export
 testthat::test_that("figures save as PDF, SVG and PNG", {
   file <- file.path(tempdir(), "export-check")
