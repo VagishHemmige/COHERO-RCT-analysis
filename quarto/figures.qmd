@@ -69,7 +69,7 @@ The loops add one subgroup at a time and return plots in a list indexed by popul
 
 The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.
 
-Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another tests the difference between levels; see [How this code does it](methods_in_this_code.qmd#estimates-and-plots) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
+Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another, under each level after the first, tests its difference from the first level; see [How to read the trajectory figure](methods_reading_trajectory_figure.qmd), [How this code does it](methods_in_this_code.qmd#estimates-and-plots) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
 
 ```{r}
 #| label: mixed-model-plots-subgroups

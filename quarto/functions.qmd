@@ -95,7 +95,7 @@ The figure is built from small parts, each returning an ordinary ggplot, and one
 
 ### P-values and numbers observed
 
-`plot_p_values()` draws a row of p-values aligned to the visits, under a heading saying which comparison they test. `plot_numbers_table()` draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.
+`plot_p_values()` draws a row of p-values aligned to the visits, under a heading saying which comparison they test; with three or more levels, alternate values sit on a second line so they do not overlap. `format_p_value()` writes each one to three decimals, or as "<0.001". `plot_numbers_table()` draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.
 
 ```{r}
 #| label: plot-p-values

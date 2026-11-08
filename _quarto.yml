@@ -51,6 +51,9 @@ website:
           - href: quarto/methods_stratified_effects.qmd
             text: Effects behind an interaction
             icon: book
+          - href: quarto/methods_reading_trajectory_figure.qmd
+            text: How to read the trajectory figure
+            icon: book
           - href: quarto/methods_in_this_code.qmd
             text: How this code does it
             icon: book

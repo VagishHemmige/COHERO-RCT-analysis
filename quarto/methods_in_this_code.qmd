@@ -21,7 +21,7 @@ Think of the workflow in three steps: prepare the observations, fit the model, t
 |---|---|
 | Mean in each visit × arm cell (and subgroup level), with its 95% confidence interval | The points and bars on the plot |
 | Arm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level | The p-values printed above each visit, or in each level's panel |
-| Difference in that effect between each subgroup level and the first level | The row of p-values under the panels |
+| Difference in that effect between each subgroup level and the first level | The row of p-values under each level after the first |
 
 Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)). Using one fit also means the means, the p-values and the table come from the same analysis rows.
 
@@ -37,5 +37,5 @@ To read a plot, first identify the outcome, population, visit and subgroup. Then
 
 These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.
 
-- [#8](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8): move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.
-- [#9](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9): the examples on [Effects behind an interaction](methods_stratified_effects.qmd), run on synthetic data where the true effects are known.
+- [#8](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8): move all tables to gtsummary. The decision to report both kinds of table, the model terms and the effects within each subgroup level, is recorded there.
+- [#25](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/25): run the examples on these Methods pages on synthetic data, where the true effects are known.
