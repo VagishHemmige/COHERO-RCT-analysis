@@ -1,0 +1,54 @@
+---
+title: "4. Fit count models"
+format: html
+---
+
+Fit the negative binomial models for the count outcomes (12-month health care use and rescue inhaler use), overall and with subgroup interactions, and compare controller PDC between arms.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/04_fit_count_models.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/04_fit_count_models.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/04_fit_count_models.R")
+```
+
+## Count models
+
+```{r}
+#| label: count-models
+#| eval: false
+```
+
+## Count interaction models
+
+```{r}
+#| label: count-interaction-models
+#| eval: false
+```
+
+## Rescue models alternative
+
+```{r}
+#| label: rescue-models-alternative
+#| eval: false
+```
+
+## Controller PDC comparison
+
+```{r}
+#| label: controller-pdc-comparison
+#| eval: false
+```

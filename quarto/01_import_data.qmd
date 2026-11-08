@@ -1,0 +1,54 @@
+---
+title: "1. Import data"
+format: html
+---
+
+Read the four study files and tidy their column names.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/01_import_data.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/01_import_data.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/01_import_data.R")
+```
+
+## Import REDCap
+
+```{r}
+#| label: import-redcap
+#| eval: false
+```
+
+## Import notifications
+
+```{r}
+#| label: import-notifications
+#| eval: false
+```
+
+## Import medications
+
+```{r}
+#| label: import-medications
+#| eval: false
+```
+
+## Import followup dates
+
+```{r}
+#| label: import-followup-dates
+#| eval: false
+```

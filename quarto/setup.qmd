@@ -1,0 +1,49 @@
+---
+title: "Setup"
+format: html
+---
+
+Attach packages and define constants shared by every script.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/setup.R")
+```
+
+## Load packages
+
+```{r}
+#| label: load-packages
+#| eval: false
+```
+
+## Data paths
+
+```{r}
+#| label: data-paths
+#| eval: false
+```
+
+## Define constants
+
+```{r}
+#| label: define-constants
+#| eval: false
+```
+
+## Output folders
+
+```{r}
+#| label: output-folders
+#| eval: false
+```

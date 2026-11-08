@@ -7,11 +7,11 @@
 .DS_Store
 Rplots.pdf
 
-# Quarto. No website yet. When one is added, keep docs/ tracked if the site
-# is published from docs/; add docs/ here if a GitHub Actions workflow
-# renders and publishes the site instead.
+# Quarto. The site is rendered and published by the GitHub Actions workflow
+# (.github/workflows/publish.yml), so the rendered docs/ is not committed.
 /.quarto/
 **/*.quarto_ipynb
+/docs/
 
 # Credentials and local settings (COHERO_DATA_DIR lives in .Renviron)
 .Renviron
