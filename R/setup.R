@@ -198,6 +198,40 @@ population_labels <- c(
   pp = "per-protocol analysis"
 )
 
+## ---- figure-labels
+# Readable names for variables in figures, used by label_figure() (in
+# plot_style.R). Names and units only: the instruments' score ranges and
+# directions wait for the scoring sources to be confirmed (analysis-plan.md).
+figure_labels <- c(
+  act_score = "ACT score",
+  aqlq_score = "AQLQ score",
+  pacqlq_score = "PACQLQ score",
+  afs_score = "Activity limitation (AFS) score",
+  self_reported_adherence = "Self-reported adherence score",
+  ed_visit_number_times_12months = "Emergency department visits, 12 months",
+  hospitalization_number_times_12months = "Hospitalisations, 12 months",
+  urgent_care_number_times_12months = "Urgent care visits, 12 months",
+  rescue_puffs_itt = "Rescue inhaler puffs",
+  rescue_days_itt = "Days with rescue inhaler use",
+  controller_pdc_itt = "Controller proportion of days covered",
+  controller_pdc_pp = "Controller proportion of days covered",
+  controller_pdc_quarter_itt =
+    "Controller proportion of days covered, interval",
+  controller_pdc_quarter_pp =
+    "Controller proportion of days covered, interval",
+  prefer_language = "Preferred language",
+  participant_sex = "Sex",
+  child_adult = "Child or adult",
+  self_reported_adherence_binary = "Baseline self-reported adherence",
+  act_binary = "Baseline asthma control",
+  studyarm = "Study arm",
+  time_linear = "Months since baseline",
+  time_linear_shifted = "Months since baseline"
+)
+
+# Names for the arms, in place of their codes
+arm_labels <- c("0" = "Control", "1" = "Intervention")
+
 ## ---- output-folders
 dir.create("figures", showWarnings = FALSE)
 dir.create("tables", showWarnings = FALSE)

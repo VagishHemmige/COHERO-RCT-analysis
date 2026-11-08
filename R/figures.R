@@ -24,16 +24,28 @@ act_plots[["act_by_visit_itt"]] <- clean_asthma_data_itt %>%
   geom_quasirandom(mapping = aes(
     x = studyarm, y = act_score, color = studyarm
   )) +
-  facet_wrap(~time_factor, nrow = 1) +
-  theme_bw()
+  facet_wrap(
+    ~time_factor, nrow = 1,
+    labeller = labeller(time_factor = function(month) paste("Month", month))
+  ) +
+  theme_publication() +
+  label_figure() +
+  # The legend names the arms; six narrow panels leave no room on the axis
+  theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 
 act_plots[["act_by_visit_pp"]] <- clean_asthma_data_pp %>%
   ggplot() +
   geom_quasirandom(mapping = aes(
     x = studyarm, y = act_score, color = studyarm
   )) +
-  facet_wrap(~time_factor, nrow = 1) +
-  theme_bw()
+  facet_wrap(
+    ~time_factor, nrow = 1,
+    labeller = labeller(time_factor = function(month) paste("Month", month))
+  ) +
+  theme_publication() +
+  label_figure() +
+  # The legend names the arms; six narrow panels leave no room on the axis
+  theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 
 # Spaghetti plots of ACT
 act_plots[["act_spaghetti_itt"]] <- clean_asthma_data_itt %>%
@@ -46,7 +58,8 @@ act_plots[["act_spaghetti_itt"]] <- clean_asthma_data_itt %>%
     x = time_linear_shifted, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure()
 
 act_plots[["act_spaghetti_pp"]] <- clean_asthma_data_pp %>%
   ggplot() +
@@ -58,7 +71,8 @@ act_plots[["act_spaghetti_pp"]] <- clean_asthma_data_pp %>%
     x = time_linear_shifted, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure()
 
 # Self-reported adherence vs interval controller PDC
 act_plots[["adherence_vs_pdc_itt"]] <- clean_asthma_data_itt %>%
@@ -66,14 +80,18 @@ act_plots[["adherence_vs_pdc_itt"]] <- clean_asthma_data_itt %>%
   geom_point(mapping = aes(
     x = self_reported_adherence, y = controller_pdc_quarter_itt,
     color = studyarm
-  ))
+  )) +
+  theme_publication() +
+  label_figure()
 
 act_plots[["adherence_vs_pdc_pp"]] <- clean_asthma_data_pp %>%
   ggplot() +
   geom_point(mapping = aes(
     x = self_reported_adherence, y = controller_pdc_quarter_pp,
     color = studyarm
-  ))
+  )) +
+  theme_publication() +
+  label_figure()
 
 ## ---- count-outcome-plots
 # Each count outcome by arm, to check that outliers have been dealt with
@@ -85,7 +103,8 @@ for (outcome in count_outcomes) {
     geom_quasirandom(mapping = aes(
       x = studyarm, y = .data[[outcome]], color = studyarm
     )) +
-    theme_bw()
+    theme_publication() +
+    label_figure(arm_axis = TRUE)
 }
 
 ## ---- medication-plots
@@ -97,14 +116,16 @@ medication_plots[["rescue_puffs"]] <- rescue_medication_merged %>%
   geom_quasirandom(mapping = aes(
     x = studyarm, y = rescue_puffs_itt, color = studyarm
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure(arm_axis = TRUE)
 
 medication_plots[["rescue_puffs_log"]] <- rescue_medication_merged %>%
   ggplot() +
   geom_quasirandom(mapping = aes(
     x = studyarm, y = rescue_puffs_itt, color = studyarm
   )) +
-  theme_bw() +
+  theme_publication() +
+  label_figure(arm_axis = TRUE) +
   scale_y_log10()
 
 # Rescue days, linear and log scale
@@ -113,14 +134,16 @@ medication_plots[["rescue_days"]] <- rescue_medication_merged %>%
   geom_quasirandom(mapping = aes(
     x = studyarm, y = rescue_days_itt, color = studyarm
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure(arm_axis = TRUE)
 
 medication_plots[["rescue_days_log"]] <- rescue_medication_merged %>%
   ggplot() +
   geom_quasirandom(mapping = aes(
     x = studyarm, y = rescue_days_itt, color = studyarm
   )) +
-  theme_bw() +
+  theme_publication() +
+  label_figure(arm_axis = TRUE) +
   scale_y_log10()
 
 # Controller PDC for the year
@@ -129,14 +152,16 @@ medication_plots[["controller_pdc_itt"]] <- controller_medication_merged %>%
   geom_quasirandom(mapping = aes(
     x = studyarm, y = controller_pdc_itt, color = studyarm
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure(arm_axis = TRUE)
 
 medication_plots[["controller_pdc_pp"]] <- controller_medication_merged %>%
   ggplot() +
   geom_quasirandom(mapping = aes(
     x = studyarm, y = controller_pdc_pp, color = studyarm
   )) +
-  theme_bw()
+  theme_publication() +
+  label_figure(arm_axis = TRUE)
 
 ## ---- mixed-model-plots-overall
 # Outcome over time by arm, for each outcome, drawn from the estimates of the
@@ -147,8 +172,8 @@ for (population in names(mixed_model_data)) {
   mixed_model_plots[[population]] <- list()
 
   for (outcome in repeated_outcomes) {
-    plot_title <- paste(
-      outcome, "vs. time in", population_labels[[population]]
+    plot_title <- paste0(
+      figure_label(outcome), " over time, ", population_labels[[population]]
     )
 
     mixed_model_plots[[population]][[outcome]] <- list()
@@ -171,8 +196,9 @@ for (population in names(mixed_model_data)) {
     outcome <- analysis$outcome
 
     for (subgroup in analysis$subgroups) {
-      plot_title <- paste(
-        outcome, "vs. time, stratified by", subgroup, "in",
+      plot_title <- paste0(
+        figure_label(outcome), " over time, by ",
+        tolower(figure_label(subgroup)), ", ",
         population_labels[[population]]
       )
 

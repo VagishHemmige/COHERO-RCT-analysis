@@ -197,7 +197,7 @@ plot_effect_trajectories <- function(trial_data, estimates, outcome_of_interest,
         ),
         linewidth = 1.5
       ) +
-      theme_bw() +
+      theme_publication() +
       geom_text(
         filter(mixed_model_predictions, studyarm == 1),
         mapping = aes(x = time_linear, y = 0, label = n_obs, color = studyarm)
@@ -216,11 +216,11 @@ plot_effect_trajectories <- function(trial_data, estimates, outcome_of_interest,
         limits = c(-0.5, 12.5),
         minor_breaks = 0:12
       ) +
-      ylab(outcome_of_interest) +
-      xlab("Time (months)") +
-      scale_color_discrete(
-        name = "Study Arm",
-        labels = c("Control", "Treatment")
+      ylab(figure_label(outcome_of_interest)) +
+      xlab(figure_label("time_linear")) +
+      scale_colour_discrete(
+        name = figure_label("studyarm"),
+        labels = arm_labels
       ) +
       labs(caption = "† adjusted for baseline differences") +
       theme(plot.caption = element_text(hjust = 0.0555)) +
@@ -314,7 +314,7 @@ plot_effect_trajectories <- function(trial_data, estimates, outcome_of_interest,
           ),
           linewidth = 2
         ) +
-        theme_bw() +
+        theme_publication() +
         geom_text(
           filter(level_predictions, studyarm == 0),
           mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)
@@ -346,10 +346,10 @@ plot_effect_trajectories <- function(trial_data, estimates, outcome_of_interest,
         ) +
         scale_y_continuous(limits = c(-3, y_max)) +
         theme(axis.title.x = element_blank()) +
-        ylab(outcome_of_interest) +
-        scale_color_discrete(
-          name = "Study Arm",
-          labels = c("Control", "Treatment")
+        ylab(figure_label(outcome_of_interest)) +
+        scale_colour_discrete(
+          name = figure_label("studyarm"),
+          labels = arm_labels
         )
     }
 
