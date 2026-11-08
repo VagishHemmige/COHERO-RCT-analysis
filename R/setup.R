@@ -226,7 +226,7 @@ figure_labels <- c(
   act_binary = "Baseline asthma control",
   studyarm = "Study arm",
   time_linear = "Months since baseline",
-  time_linear_shifted = "Months since baseline"
+  time_plot = "Months since baseline"
 )
 
 # Names for the arms, in place of their codes

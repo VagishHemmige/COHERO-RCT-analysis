@@ -27,6 +27,29 @@ testthat::test_that("representative figures look as recorded", {
   )
 })
 
+testthat::test_that("the trajectory figure's options change it as recorded", {
+  # Effect panel on; p values, baseline test and trajectories off
+  vdiffr::expect_doppelganger(
+    "ACT effects by sex, ITT",
+    compose_trajectory_figure(
+      mixed_model_data[["itt"]],
+      mixed_model_estimates[["itt"]][["act_score"]][["participant_sex"]],
+      "act_score", modifier = "participant_sex",
+      show_trajectories = FALSE, show_p = FALSE, show_baseline_p = FALSE,
+      show_effect_panel = TRUE
+    )
+  )
+  # P values without the baseline test, no trajectories
+  vdiffr::expect_doppelganger(
+    "ACT means and p values without baseline test, ITT",
+    compose_trajectory_figure(
+      mixed_model_data[["itt"]],
+      mixed_model_estimates[["itt"]][["act_score"]][["overall"]],
+      "act_score", show_trajectories = FALSE, show_baseline_p = FALSE
+    )
+  )
+})
+
 ## ---- figure-export
 testthat::test_that("figures save as PDF, SVG and PNG", {
   file <- file.path(tempdir(), "export-check")

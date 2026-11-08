@@ -1,7 +1,7 @@
 # Purpose: build the figures: ACT by visit, count outcomes, rescue and
 #   controller use, and the mixed-model plots for every outcome and subgroup.
 # Needs: setup.R (count_outcomes, repeated_outcomes, population_labels);
-#   functions.R (plot_effect_trajectories());
+#   functions.R (compose_trajectory_figure(), add_plot_offset());
 #   03_derive_medication_outcomes.R (clean_asthma_data_itt,
 #   clean_asthma_data_pp, rescue_medication_merged,
 #   controller_medication_merged); 05_fit_mixed_models.R (mixed_model_data,
@@ -49,26 +49,28 @@ act_plots[["act_by_visit_pp"]] <- clean_asthma_data_pp %>%
 
 # Spaghetti plots of ACT
 act_plots[["act_spaghetti_itt"]] <- clean_asthma_data_itt %>%
+  add_plot_offset() %>%
   ggplot() +
   geom_point(mapping = aes(
-    x = time_linear_shifted, y = act_score, color = studyarm,
+    x = time_plot, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
   geom_line(mapping = aes(
-    x = time_linear_shifted, y = act_score, color = studyarm,
+    x = time_plot, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
   theme_publication() +
   label_figure()
 
 act_plots[["act_spaghetti_pp"]] <- clean_asthma_data_pp %>%
+  add_plot_offset() %>%
   ggplot() +
   geom_point(mapping = aes(
-    x = time_linear_shifted, y = act_score, color = studyarm,
+    x = time_plot, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
   geom_line(mapping = aes(
-    x = time_linear_shifted, y = act_score, color = studyarm,
+    x = time_plot, y = act_score, color = studyarm,
     group = study_id_screening
   )) +
   theme_publication() +
@@ -178,11 +180,11 @@ for (population in names(mixed_model_data)) {
 
     mixed_model_plots[[population]][[outcome]] <- list()
     mixed_model_plots[[population]][[outcome]][["overall"]] <-
-      plot_effect_trajectories(
+      compose_trajectory_figure(
         mixed_model_data[[population]],
         mixed_model_estimates[[population]][[outcome]][["overall"]],
-        outcome_of_interest = outcome,
-        plot_title = plot_title
+        outcome,
+        title = plot_title
       )
   }
 }
@@ -203,12 +205,12 @@ for (population in names(mixed_model_data)) {
       )
 
       mixed_model_plots[[population]][[outcome]][[subgroup]] <-
-        plot_effect_trajectories(
+        compose_trajectory_figure(
           mixed_model_data[[population]],
           mixed_model_estimates[[population]][[outcome]][[subgroup]],
-          outcome_of_interest = outcome,
-          interaction_variable = subgroup,
-          plot_title = plot_title
+          outcome,
+          modifier = subgroup,
+          title = plot_title
         )
     }
   }

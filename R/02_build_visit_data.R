@@ -66,16 +66,6 @@ clean_asthma_data_itt <- clean_asthma_data %>%
   )) %>%
   # Visits after the app update glitch
   mutate(post_glitch_date = (date_of_observation > glitch_date)) %>%
-  # Visit-by-arm cell label, and a time offset so arms do not overlap in plots
-  mutate(me_factor = paste(
-    "time", time_linear, "studyarm", studyarm,
-    sep = "_"
-  )) %>%
-  mutate(time_linear_shifted = ifelse(
-    studyarm == 1,
-    time_linear + 0.1,
-    time_linear - 0.1
-  )) %>%
   # Self-reported controller adherence score. See analysis-plan.md.
   mutate(self_reported_adherence = 32 -
     only_give_controller_medication_needed -

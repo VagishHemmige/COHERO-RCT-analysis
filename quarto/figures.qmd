@@ -54,7 +54,7 @@ Rescue counts are shown on ordinary and logarithmic scales. A log scale makes mu
 
 ## Mixed model plots overall
 
-Faint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.
+Faint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The table under the plot, "Observed, n", counts the participants with the outcome recorded at each visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.
 
 What the plotted means, error bars and p-values come from is in [How this code does it](methods_in_this_code.qmd#estimates-and-plots).
 
@@ -69,7 +69,7 @@ The loops add one subgroup at a time and return plots in a list indexed by popul
 
 The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.
 
-Each level's panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see [How this code does it](methods_in_this_code.qmd#estimates-and-plots) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
+Each subgroup level has its own column with its own participants, side by side on the same scale. Under the panels, one row of p-values tests the contrast within each level and another tests the difference between levels; see [How this code does it](methods_in_this_code.qmd#estimates-and-plots) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
 
 ```{r}
 #| label: mixed-model-plots-subgroups

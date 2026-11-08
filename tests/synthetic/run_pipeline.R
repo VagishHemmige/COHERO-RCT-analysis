@@ -86,9 +86,9 @@ panels_match_levels <- tryCatch({
   reversed_fit <- fit_mixed_model(
     reversed_data, "act_score", modifier = "participant_sex"
   )
-  reversed_plot <- plot_effect_trajectories(
+  reversed_plot <- compose_trajectory_figure(
     reversed_data, estimate_effects(reversed_fit, modifier = "participant_sex"),
-    "act_score", "participant_sex"
+    "act_score", modifier = "participant_sex"
   )
   baseline_levels <- reversed_data %>%
     filter(time_factor == "0") %>%

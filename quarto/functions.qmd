@@ -55,11 +55,65 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 #| eval: false
 ```
 
-## Plot effect trajectories
+## The trajectory figure, in parts
 
-`plot_effect_trajectories()` draws the data and those estimates: individual trajectories, estimated means, confidence intervals, numbers observed and p-value annotations. It fits nothing. With a subgroup, it draws one panel per level, each with that level's participants, and a row of p values for the difference between levels. Read it in that order: p-value labels, counts joined to the means, then the drawing layers. For general guidance on writing and reading reusable recipes, see the Functions chapter in [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
+The figure is built from small parts, each returning an ordinary ggplot, and one function that arranges them. Someone who wants only the means, or a different arrangement, can use the parts directly. None of them fits a model: they draw the data and the estimates from `estimate_effects()`.
+
+### Shared helpers
+
+`add_plot_offset()` shifts each arm a little left or right of its visit, so the two arms' points and bars sit side by side. One offset serves both the individual trajectories and the model means. The other helpers set the visits on the x-axis, format p-values, and pick out one subgroup level.
 
 ```{r}
-#| label: plot-effect-trajectories
+#| label: add-plot-offset
+#| eval: false
+```
+
+### Means
+
+`plot_means()` draws each arm's model-estimated mean and 95% confidence interval at each visit, optionally over the individual trajectories. The arms differ by colour, point shape and line type, and are named at the end of their lines rather than in a legend.
+
+```{r}
+#| label: plot-means
+#| eval: false
+```
+
+### Effects
+
+`plot_effects()` draws the effect at each follow-up visit with its 95% confidence interval and a line at zero: either the intervention minus control difference in change from baseline, or how much that effect differs between a subgroup level and the first level.
+
+```{r}
+#| label: plot-effects
+#| eval: false
+```
+
+### P-values and numbers observed
+
+`plot_p_values()` draws a row of p-values aligned to the visits, under a heading saying which comparison they test. `plot_numbers_table()` draws the number of participants with the outcome recorded, one row per arm, in the same columns as the visits above.
+
+```{r}
+#| label: plot-p-values
+#| eval: false
+```
+
+```{r}
+#| label: plot-numbers-table
+#| eval: false
+```
+
+### The whole figure
+
+`compose_trajectory_figure()` arranges the parts in one grid, so the visits line up from top to bottom: one column per subgroup level (a single column without a subgroup), with rows for the means, the effects, the p-values and the numbers table. Four options choose what a figure shows ([#35](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/35)):
+
+| Option | Default | What it does |
+|---|---|---|
+| `show_trajectories` | `TRUE` | Draws individual participants behind the means. Plots of real individual records are not published |
+| `show_p` | `TRUE` | Adds rows of p-values for the effect within each level and the difference between levels |
+| `show_baseline_p` | `TRUE` | Includes the baseline p-value. CONSORT advises against testing baseline differences in randomised trials |
+| `show_effect_panel` | `FALSE` | Adds the effects row, with a column for each difference between levels |
+
+The result is a patchwork object. To change every panel, add to it with `&`, for example `figure & theme(text = element_text(family = "Arial"))`; to change one panel, index it, for example `figure[[1]]`. For general guidance on writing and reading reusable recipes, see the Functions chapter in [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
+
+```{r}
+#| label: compose-trajectory-figure
 #| eval: false
 ```
