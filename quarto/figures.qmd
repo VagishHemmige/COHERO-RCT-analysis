@@ -1,0 +1,61 @@
+---
+title: "Figures"
+format: html
+---
+
+Build the figures: ACT by visit, count outcomes, rescue and controller use, and the mixed-model plots for every outcome and subgroup.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/figures.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/figures.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/figures.R")
+```
+
+## ACT plots
+
+```{r}
+#| label: act-plots
+#| eval: false
+```
+
+## Count outcome plots
+
+```{r}
+#| label: count-outcome-plots
+#| eval: false
+```
+
+## Medication plots
+
+```{r}
+#| label: medication-plots
+#| eval: false
+```
+
+## Mixed model plots overall
+
+```{r}
+#| label: mixed-model-plots-overall
+#| eval: false
+```
+
+## Mixed model plots subgroups
+
+```{r}
+#| label: mixed-model-plots-subgroups
+#| eval: false
+```

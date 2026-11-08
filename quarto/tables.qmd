@@ -1,0 +1,40 @@
+---
+title: "Tables"
+format: html
+---
+
+Build Table 1 and the count-outcome summary.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/tables.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/tables.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/tables.R")
+```
+
+## Table 1
+
+```{r}
+#| label: table-1
+#| eval: false
+```
+
+## Count outcome summary
+
+```{r}
+#| label: count-outcome-summary
+#| eval: false
+```

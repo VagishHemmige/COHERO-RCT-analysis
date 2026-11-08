@@ -1,0 +1,47 @@
+---
+title: "5. Fit mixed models"
+format: html
+---
+
+Fit the linear mixed models for the repeated outcomes, overall and with subgroup interactions, in the ITT and per-protocol populations.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/05_fit_mixed_models.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/05_fit_mixed_models.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/05_fit_mixed_models.R")
+```
+
+## Mixed model data
+
+```{r}
+#| label: mixed-model-data
+#| eval: false
+```
+
+## Mixed models overall
+
+```{r}
+#| label: mixed-models-overall
+#| eval: false
+```
+
+## Mixed models subgroups
+
+```{r}
+#| label: mixed-models-subgroups
+#| eval: false
+```

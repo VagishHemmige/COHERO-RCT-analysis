@@ -1,0 +1,39 @@
+---
+title: "Functions"
+format: html
+---
+
+Reusable helper functions. Each takes its inputs as arguments.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
+
+This R script file is itself reliant on the following helper files:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/functions.R")
+```
+
+## Create ME table
+
+```{r}
+#| label: create-me-table
+#| eval: false
+```
+
+## Create ME plot
+
+```{r}
+#| label: create-me-plot
+#| eval: false
+```

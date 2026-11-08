@@ -1,0 +1,111 @@
+# Stub site: Home and the Code pages only. Background, study methods,
+# project-document and About pages come later (r-analysis-workflow,
+# references/quarto.md). Published by .github/workflows/publish.yml to the
+# gh-pages branch; docs/ is not committed.
+project:
+  type: website
+  output-dir: docs
+  # Only the site's pages, so the root .md files are not rendered as pages.
+  render:
+    - index.qmd
+    - 404.qmd
+    - quarto/**
+
+bibliography: references.bib
+
+author:
+  - name: "Vagish Hemmige"
+
+website:
+  title: "COHERO RCT analysis"
+  site-url: https://vagishhemmige.github.io/COHERO-RCT-analysis
+  repo-url: https://github.com/VagishHemmige/COHERO-RCT-analysis
+  repo-branch: main
+  repo-actions: [edit, issue]
+  page-navigation: true
+
+  # Each kind of page has one icon, coloured in styles.css: laptop = R code.
+  sidebar:
+    style: docked
+    collapse-level: 3
+    search: true
+    contents:
+      - href: index.qmd
+        text: Home
+        icon: house
+
+      - section: Code
+        contents:
+          - section: Setup and helper functions
+            contents:
+              - href: quarto/setup.qmd
+                text: Setup
+                icon: laptop
+              - href: quarto/functions.qmd
+                text: Functions
+                icon: laptop
+
+          # One numbered page per definitive script, in the order main.R
+          # sources them.
+          - section: Data processing and analysis
+            contents:
+              - href: quarto/01_import_data.qmd
+                text: 1. Import data
+                icon: laptop
+              - href: quarto/02_build_visit_data.qmd
+                text: 2. Build visit data
+                icon: laptop
+              - href: quarto/03_derive_medication_outcomes.qmd
+                text: 3. Derive medication outcomes
+                icon: laptop
+              - href: quarto/04_fit_count_models.qmd
+                text: 4. Fit count models
+                icon: laptop
+              - href: quarto/05_fit_mixed_models.qmd
+                text: 5. Fit mixed models
+                icon: laptop
+
+          - section: Tables and figures
+            contents:
+              - href: quarto/tables.qmd
+                text: Tables
+                icon: laptop
+              - href: quarto/figures.qmd
+                text: Figures
+                icon: laptop
+
+# Rcode for code, Results for results, Pending for provisional content
+# (added by quarto/_pending.lua).
+custom-callout:
+  Rcode:
+    icon: true
+    icon-symbol: "💻"
+    color: "#d63384"
+  Results:
+    icon: true
+    icon-symbol: "📊"
+    color: "#198754"
+  Pending:
+    icon: true
+    icon-symbol: "⏳"
+    color: "#f0c400"
+
+filters:
+  # Runs before custom-callout, which styles the callout it adds.
+  - quarto/_pending.lua
+  - custom-callout
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+    code-fold: true
+    code-tools: true
+    page-layout: full
+    code-summary: "Click to show/hide R Code"
+
+# The site shows code; it never runs the analysis. Only the read_chunk()
+# imports set eval: true.
+execute:
+  eval: false
