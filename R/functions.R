@@ -121,6 +121,37 @@ add_plot_offset <- function(data, offset = 0.18, exposure = "studyarm",
       shifts[match(as.character(.data[[exposure]]), exposure_levels)])
 }
 
+## ---- jitter-trajectories
+# Display-only changes to the individual trajectories (issue #11). Model
+# means, confidence intervals, counts and p values always come from the
+# unchanged data.
+# - jitter_x: each participant's whole trajectory moves left or right by one
+#   random amount, up to this many months, so overlapping lines separate
+#   without zigzagging between visits.
+# - jitter_y: each plotted value moves up or down by a random amount, up to
+#   this much in the outcome's units, so exact values cannot be read off.
+#   Whether to use it, and how much, is a disclosure decision (#11).
+# A fixed seed makes a jittered figure reproducible, without changing R's
+# random numbers anywhere else.
+jitter_trajectories <- function(trajectories, outcome, jitter_x = 0,
+                                jitter_y = 0, seed = 20261108) {
+  if (jitter_x == 0 && jitter_y == 0) {
+    return(trajectories)
+  }
+  withr::with_seed(seed, {
+    ids <- unique(trajectories$study_id_screening)
+    shifts <- stats::setNames(
+      stats::runif(length(ids), -jitter_x, jitter_x), ids
+    )
+    trajectories %>%
+      mutate(
+        time_plot = time_plot + shifts[as.character(study_id_screening)],
+        "{outcome}" := .data[[outcome]] +
+          stats::runif(n(), -jitter_y, jitter_y)
+      )
+  })
+}
+
 # The visits on the x-axis, with room either side for the offsets. The
 # panels zoom with coord_cartesian() rather than scale limits, so text placed
 # beyond the last visit (the arm names) is kept, not dropped.
@@ -165,7 +196,8 @@ rows_for_level <- function(rows, modifier, level) {
 plot_means <- function(data, estimates, outcome, modifier = NULL,
                        level = NULL, y_limits, show_trajectories = TRUE,
                        label_arms = TRUE, show_y_title = TRUE,
-                       show_x_axis = FALSE, title = NULL, offset = 0.18) {
+                       show_x_axis = FALSE, title = NULL, offset = 0.18,
+                       jitter_x = 0, jitter_y = 0, seed = 20261108) {
   visits <- sort(unique(data$time_linear))
   means <- rows_for_level(estimates$means, modifier, level) %>%
     mutate(time_linear = as.numeric(as.character(time_factor))) %>%
@@ -178,7 +210,8 @@ plot_means <- function(data, estimates, outcome, modifier = NULL,
   if (show_trajectories) {
     trajectories <- rows_for_level(data, modifier, level) %>%
       filter(!is.na(.data[[outcome]])) %>%
-      add_plot_offset(offset)
+      add_plot_offset(offset) %>%
+      jitter_trajectories(outcome, jitter_x, jitter_y, seed)
     panel <- panel +
       geom_line(
         data = trajectories,
@@ -342,15 +375,18 @@ plot_numbers_table <- function(data, outcome, modifier = NULL, level = NULL,
 # modifier), rows for the means, the effects and the numbers table, built as
 # one grid so the visits line up from top to bottom. The four options are
 # chosen per figure (#35); the defaults reproduce the earlier figure's
-# content. Returns a patchwork object: change every panel with `&`, or one
-# panel by indexing it.
+# content. jitter_x and jitter_y change only what is displayed (#11); both
+# default to no change. A data set with cells small enough to need
+# suppressing should not be shown in this figure at all. Returns a patchwork object: change every
+# panel with `&`, or one panel by indexing it.
 compose_trajectory_figure <- function(data, estimates, outcome,
                                       modifier = NULL, title = NULL,
                                       show_trajectories = TRUE,
                                       show_p = TRUE,
                                       show_baseline_p = TRUE,
                                       show_effect_panel = FALSE,
-                                      offset = 0.18) {
+                                      offset = 0.18, jitter_x = 0,
+                                      jitter_y = 0, seed = 20261108) {
   visits <- sort(unique(data$time_linear))
   if (is.null(modifier)) {
     levels_shown <- list(NULL)
@@ -362,10 +398,12 @@ compose_trajectory_figure <- function(data, estimates, outcome,
   }
   n_levels <- length(levels_shown)
 
-  # One y range for every means panel
+  # One y range for every means panel, widened by any vertical jitter so
+  # every displaced value stays on the axis
   means_limits <- range(
     estimates$means$conf.low, estimates$means$conf.high,
-    if (show_trajectories) data[[outcome]],
+    if (show_trajectories) data[[outcome]] + jitter_y,
+    if (show_trajectories) data[[outcome]] - jitter_y,
     na.rm = TRUE
   )
 
@@ -393,7 +431,8 @@ compose_trajectory_figure <- function(data, estimates, outcome,
         y_limits = means_limits, show_trajectories = show_trajectories,
         label_arms = i == n_levels, show_y_title = i == 1,
         show_x_axis = !show_effect_panel,
-        title = level_title(levels_shown[[i]]), offset = offset
+        title = level_title(levels_shown[[i]]), offset = offset,
+        jitter_x = jitter_x, jitter_y = jitter_y, seed = seed
       )
     }),
     spacers(extra)
@@ -488,6 +527,12 @@ compose_trajectory_figure <- function(data, estimates, outcome,
 
   caption <- c(
     if (show_trajectories) "Faint lines: individual participants.",
+    if (show_trajectories && jitter_x > 0) {
+      "Trajectories are shifted sideways for readability."
+    },
+    if (show_trajectories && jitter_y > 0) {
+      "Individual values are randomly displaced; means use the exact values."
+    },
     "Points and bars: model-estimated means (95% CI).",
     if (show_effect_panel) {
       "Effects: intervention minus control in change from baseline (95% CI)."
