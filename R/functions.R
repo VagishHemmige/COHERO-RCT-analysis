@@ -1,127 +1,162 @@
-# Purpose: reusable helper functions. Each takes its inputs as arguments.
+# Purpose: reusable helper functions for the repeated-outcome analyses, in
+#   three steps: fit a model, estimate effects from it, report them. Each
+#   takes its inputs as arguments.
 # Needs: setup.R (packages). Produces: functions only.
 # Ported from the outcome_functions chunk of
-#   MR_SJ_asthma_pilot_2023-9-15.Rmd. create_me_plot() follows with
-#   figures.R.
+#   MR_SJ_asthma_pilot_2023-9-15.Rmd. The original fitted each model up to
+#   four times in different codings; here it is fitted once and the
+#   estimates come from emmeans (issue #10).
+#
+# Names are general: an exposure (here the study arm), a time variable and
+#   an optional modifier (a subgroup), so the same functions serve any
+#   exposure-by-time analysis with or without effect modification.
 
-## ---- create-me-table
-# Mixed model of an outcome on visit (factor) by arm, with a random intercept
-# for participant, returned as a flextable of the tidied coefficients. With
-# an interaction variable, the model is visit by arm by that variable.
-create_me_table <- function(trial_data, outcome_of_interest,
-                            interaction_variable = NULL) {
-  # Primary analysis without interactions if interaction_variable is NULL
-  if (is.null(interaction_variable)) {
-    lmer_formula <- paste0(
-      outcome_of_interest,
-      " ~ time_factor * studyarm + (1 | study_id_screening)"
-    ) %>%
-      as.formula()
+## ---- fit-mixed-model
+# Linear mixed model of an outcome on time (as a factor) by exposure, with a
+# random intercept for each participant. With a modifier, the model is time
+# by exposure by modifier.
+fit_mixed_model <- function(data, outcome, modifier = NULL,
+                            exposure = "studyarm", time = "time_factor",
+                            id = "study_id_screening") {
+  fixed_effects <- paste(c(time, exposure, modifier), collapse = " * ")
+  model_formula <- paste0(
+    outcome, " ~ ", fixed_effects, " + (1 | ", id, ")"
+  ) %>%
+    as.formula()
 
-    lmer(lmer_formula, data = trial_data) %>%
-      tidy(., conf.int = TRUE) %>%
-      flextable() %>%
-      set_caption(paste0(outcome_of_interest, " vs. time")) %>%
-      return()
-  } else {
-    lmer_formula <- paste0(
-      outcome_of_interest, "~time_factor*studyarm*", interaction_variable,
-      "+(1|study_id_screening)"
-    ) %>%
-      as.formula()
-
-    lmer(lmer_formula, data = trial_data) %>%
-      tidy(., conf.int = TRUE) %>%
-      flextable() %>%
-      set_caption(paste0(
-        outcome_of_interest, " vs. time * ", interaction_variable
-      )) %>%
-      return()
-  }
+  lmer(model_formula, data = data)
 }
 
-## ---- create-me-plot
+## ---- tabulate-model-terms
+# The fitted model's coefficients as a flextable: the baseline exposure
+# difference, the time-by-exposure interaction terms and, with a modifier,
+# the three-way terms
+tabulate_model_terms <- function(fit, caption) {
+  fit %>%
+    tidy(conf.int = TRUE) %>%
+    flextable() %>%
+    set_caption(caption)
+}
+
+## ---- estimate-effects
+# Estimates from a fitted model, with emmeans: the mean in each time x
+# exposure (x modifier level) cell, and for each modifier level the exposure
+# effect at each time. At the first (baseline) time the effect is the
+# exposure difference; at later times it is the time-by-exposure interaction,
+# the change from baseline in the exposed group minus that in the reference
+# group. With a modifier, the difference in that effect between each level
+# and the first level. Degrees of freedom are Satterthwaite's, as in the
+# model table, and p values are not adjusted for multiplicity.
+estimate_effects <- function(fit, exposure = "studyarm",
+                             time = "time_factor", modifier = NULL) {
+  emm <- function(specs, by = NULL) {
+    emmeans(fit, specs = specs, by = by,
+            lmer.df = "satterthwaite", lmerTest.limit = Inf)
+  }
+  tidy_emm <- function(x) {
+    as_tibble(as.data.frame(summary(x, infer = TRUE, adjust = "none")))
+  }
+  first <- "trt.vs.ctrl1"
+  baseline <- ref_grid(fit)@levels[[time]][1]
+  # The later time in a "t - baseline" interaction contrast
+  contrast_time <- function(x) str_remove(x, " - .*$")
+
+  means <- emm(exposure, by = c(time, modifier)) %>%
+    tidy_emm() %>%
+    rename(estimate = emmean, conf.low = lower.CL, conf.high = upper.CL)
+
+  at_baseline <- emm(exposure, by = c(time, modifier)) %>%
+    contrast(first) %>%
+    tidy_emm() %>%
+    filter(.data[[time]] == baseline)
+  over_time <- emm(c(exposure, time), by = modifier) %>%
+    contrast(interaction = c(first, first)) %>%
+    tidy_emm() %>%
+    mutate(!!time := contrast_time(.data[[paste0(time, "_", first)]]))
+  within_levels <- bind_rows(at_baseline, over_time) %>%
+    select(any_of(c(modifier, time)), estimate, conf.low = lower.CL,
+           conf.high = upper.CL, p.value)
+
+  between_levels <- NULL
+  if (!is.null(modifier)) {
+    between_at_baseline <- emm(c(exposure, modifier), by = time) %>%
+      contrast(interaction = c(first, first)) %>%
+      tidy_emm() %>%
+      filter(.data[[time]] == baseline)
+    between_over_time <- emm(c(exposure, time, modifier)) %>%
+      contrast(interaction = c(first, first, first)) %>%
+      tidy_emm() %>%
+      mutate(!!time := contrast_time(.data[[paste0(time, "_", first)]]))
+    between_levels <- bind_rows(between_at_baseline, between_over_time) %>%
+      mutate(
+        comparison = .data[[paste0(modifier, "_", first)]],
+        .before = 1
+      ) %>%
+      select(comparison, all_of(time), estimate, conf.low = lower.CL,
+             conf.high = upper.CL, p.value)
+  }
+
+  list(
+    means = means %>%
+      select(
+        all_of(c(time, exposure, modifier)), estimate, conf.low, conf.high
+      ),
+    within_levels = within_levels,
+    between_levels = between_levels
+  )
+}
+
+## ---- plot-effect-trajectories
 # Spaghetti plot of an outcome over time by arm: individual trajectories,
 # model-estimated means with 95% confidence intervals, numbers observed, and
-# p values for the arm difference at each visit. With an interaction
-# variable (a two-level factor), one panel per level plus a row of p values
-# for the difference between levels, combined with patchwork. The function
-# refits its own models; see the efficiency issue.
-create_me_plot <- function(trial_data, outcome_of_interest,
-                           interaction_variable = NULL,
-                           plot_title = "Plot") {
-  if (is.null(interaction_variable)) {
-    # Top of the plot
-    y_max <- trial_data %>%
-      select(all_of(outcome_of_interest)) %>%
-      max(., na.rm = TRUE) + 3
+# p values for the arm effect at each visit (at baseline the arm difference;
+# at follow-up, marked †, the difference in change from baseline). With a
+# modifier, one panel per level plus a row of p values for the difference in
+# that effect between levels, combined with patchwork. Takes the estimates
+# from estimate_effects(); it fits nothing.
+plot_effect_trajectories <- function(trial_data, estimates, outcome_of_interest,
+                                     interaction_variable = NULL,
+                                     plot_title = "Plot") {
+  # Top of the plot
+  y_max <- trial_data %>%
+    select(all_of(outcome_of_interest)) %>%
+    max(., na.rm = TRUE) + 3
 
-    lmer_formula_1 <- paste0(
-      outcome_of_interest, "~time_factor*studyarm+(1|study_id_screening)"
-    ) %>%
-      as.formula()
-    lmer_formula_2 <- paste0(
-      outcome_of_interest, "~ me_factor-1 + (1|study_id_screening)"
-    ) %>%
-      as.formula()
-
-    # Mixed model with time as a factor: p values for the arm difference
-    mixed_model_a <- lmer(lmer_formula_1, data = trial_data)
-
-    # Same model, parameterized by visit-by-arm cell: no p values for the
-    # arm difference, but a mean and confidence interval for each cell
-    mixed_model_b <- lmer(lmer_formula_2, data = trial_data)
-
-    mixed_model_a_p_values <- mixed_model_a %>%
-      tidy(., conf.int = TRUE) %>%
-      filter(str_detect(term, "studyarm")) %>%
-      mutate(time_linear = case_when(
-        str_detect(term, "time_factor2") == TRUE ~ 2,
-        str_detect(term, "time_factor4") == TRUE ~ 4,
-        str_detect(term, "time_factor6") == TRUE ~ 6,
-        str_detect(term, "time_factor9") == TRUE ~ 9,
-        str_detect(term, "time_factor12") == TRUE ~ 12,
-        TRUE ~ 0
-      )) %>%
+  # "p=0.012", with † for the follow-up contrasts
+  p_value_labels <- function(effects, dagger = TRUE) {
+    effects %>%
+      mutate(time_linear = as.numeric(as.character(time_factor))) %>%
       mutate(p.value = round(p.value, 3)) %>%
       mutate(p_value_label = paste0("p=", p.value)) %>%
       mutate(p_value_label = ifelse(
-        time_linear == 0,
+        time_linear == 0 | !dagger,
         p_value_label,
         paste0(p_value_label, "†")
-      )) %>%
+      ))
+  }
+  model_means <- estimates$means %>%
+    mutate(time_linear = as.numeric(as.character(time_factor)))
+
+  if (is.null(interaction_variable)) {
+    p_values <- p_value_labels(estimates$within_levels) %>%
       select(time_linear, p_value_label)
 
-    # Cell means from model B. Terms read "me_factortime_<t>_studyarm_<a>":
-    # the extra NA allows for the underscore in "me_factor".
-    mixed_model_predictions <- mixed_model_b %>%
-      tidy(., conf.int = TRUE) %>%
-      select(term, estimate, conf.low, conf.high) %>%
-      filter(str_detect(term, "time")) %>%
-      separate(
-        term,
-        sep = "_",
-        into = c(NA, NA, "time_linear", NA, "studyarm")
-      ) %>%
-      mutate(time_factor = (as.factor(time_linear))) %>%
-      mutate(studyarm = as_factor(studyarm)) %>%
-      mutate(time_linear = as.numeric(time_linear)) %>%
-      mutate(time_linear_shifted = ifelse(
-        studyarm == "1",
-        time_linear + 0.25,
-        time_linear - 0.25
-      ))
-
-    # Number observed in each arm at each visit
+    # Number observed in each arm at each visit, with the model means
     mixed_model_predictions <- trial_data %>%
       filter(!is.na(.data[[outcome_of_interest]])) %>%
       group_by(time_linear, studyarm) %>%
       summarize(n_obs = n()) %>%
       left_join(
         .,
-        mixed_model_predictions,
+        model_means %>%
+          select(time_linear, studyarm, estimate, conf.low, conf.high),
         by = c("time_linear", "studyarm")
-      )
+      ) %>%
+      mutate(time_linear_shifted = ifelse(
+        studyarm == "1",
+        time_linear + 0.25,
+        time_linear - 0.25
+      ))
 
     # Spaghetti plot with model means over individual trajectories
     ggplot() +
@@ -173,7 +208,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       ) +
       geom_text(mapping = aes(x = -0.5, y = 1, label = "N")) +
       geom_text(
-        mixed_model_a_p_values,
+        p_values,
         mapping = aes(x = time_linear, y = y_max, label = p_value_label)
       ) +
       scale_x_continuous(
@@ -191,168 +226,31 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       theme(plot.caption = element_text(hjust = 0.0555)) +
       ggtitle(plot_title)
   } else {
-    # The interaction variable must be a two-level factor
     plot_labels <- trial_data %>%
       pull(interaction_variable) %>%
       levels()
-    y_max <- trial_data %>%
-      select(all_of(outcome_of_interest)) %>%
-      max(., na.rm = TRUE) + 3
 
+    # Levels are numbered 1, 2, ... in factor order; rows with a missing
+    # level are counted but never drawn
     data_for_function <- trial_data %>%
       mutate(interaction_variable_numeric = factor(
         as.numeric(.data[[interaction_variable]])
-      )) %>%
-      mutate(me_factor_interaction_variable = paste(
-        "time", time_linear, "studyarm", studyarm, interaction_variable,
-        interaction_variable_numeric,
-        sep = "__"
       ))
+    level_number <- function(level) {
+      factor(match(as.character(level), plot_labels))
+    }
 
-    # Formulas 1 and 2 are defined but not fitted
-    lmer_formula_1 <- paste0(
-      outcome_of_interest,
-      "~time_linear*studyarm*interaction_variable_numeric",
-      "+(1|study_id_screening)"
-    ) %>%
-      as.formula()
-    lmer_formula_2 <- paste0(
-      outcome_of_interest,
-      "~time_linear*studyarm*interaction_variable_numeric",
-      "+(time_linear|study_id_screening)"
-    ) %>%
-      as.formula()
-    lmer_formula_3 <- paste0(
-      outcome_of_interest,
-      "~time_factor*studyarm*interaction_variable_numeric",
-      "+(1|study_id_screening)"
-    ) %>%
-      as.formula()
-    lmer_formula_4 <- paste0(
-      outcome_of_interest,
-      " ~ me_factor_interaction_variable-1 + (1|study_id_screening)"
-    ) %>%
-      as.formula()
-    lmer_formula_5 <- paste0(
-      outcome_of_interest,
-      "~interaction_variable_numeric-1 + ",
-      "interaction_variable_numeric:time_factor + ",
-      "interaction_variable_numeric:studyarm + ",
-      "time_factor:studyarm:interaction_variable_numeric +",
-      "(1|study_id_screening)"
-    ) %>%
-      as.formula()
-
-    # Model A, time as a factor: p values for the difference in arm effect
-    # between levels of the interaction variable
-    mixed_model_a_interaction <- lmer(
-      lmer_formula_3,
-      data = data_for_function
-    )
-
-    mixed_model_a_heterogeneity <- mixed_model_a_interaction %>%
-      tidy(., conf.int = TRUE) %>%
-      filter(str_detect(term, "studyarm")) %>%
-      filter(str_detect(term, "interaction_variable_numeric")) %>%
-      mutate(time_linear = case_when(
-        str_detect(term, "time_factor2") == TRUE ~ 2,
-        str_detect(term, "time_factor4") == TRUE ~ 4,
-        str_detect(term, "time_factor6") == TRUE ~ 6,
-        str_detect(term, "time_factor9") == TRUE ~ 9,
-        str_detect(term, "time_factor12") == TRUE ~ 12,
-        TRUE ~ 0
-      )) %>%
-      mutate(p.value = round(p.value, 3)) %>%
-      mutate(p_value_label = paste0("p=", p.value)) %>%
-      select(time_linear, p_value_label)
-
-    # Model B, parameterized by cell: a mean and confidence interval for each
-    # visit, arm and level
-    mixed_model_b_interaction <- lmer(
-      lmer_formula_4,
-      data = data_for_function
-    )
-
-    # (In the original, a table of model B, printed inside the function and
-    # not returned)
-    mixed_model_b_interaction %>%
-      tidy(., conf.int = TRUE) %>%
-      flextable()
-
-    # Summary statistics confirm model B is the same model as A
-    glance(mixed_model_b_interaction)
-
-    # Model C, parameterized for the arm difference within each level
-    mixed_model_c_interaction <- lmer(
-      lmer_formula_5,
-      data = data_for_function
-    )
-
-    # (In the original, a table of model C, printed inside the function and
-    # not returned)
-    mixed_model_c_interaction %>%
-      tidy(., conf.int = TRUE) %>%
-      flextable()
-
-    # Summary statistics confirm model C is the same model as A
-    glance(mixed_model_c_interaction)
-
-    # P values from model C, nested by level
-    mixed_model_c_treatment_effect <- mixed_model_c_interaction %>%
-      tidy(., conf.int = TRUE) %>%
-      filter(str_detect(term, "studyarm")) %>%
-      mutate(interaction_variable = case_when(
-        str_detect(term, "interaction_variable_numeric1") == TRUE ~ 1,
-        str_detect(term, "interaction_variable_numeric2") == TRUE ~ 2
-      )) %>%
-      mutate(time_linear = case_when(
-        str_detect(term, "time_factor2") == TRUE ~ 2,
-        str_detect(term, "time_factor4") == TRUE ~ 4,
-        str_detect(term, "time_factor6") == TRUE ~ 6,
-        str_detect(term, "time_factor9") == TRUE ~ 9,
-        str_detect(term, "time_factor12") == TRUE ~ 12,
-        TRUE ~ 0
-      )) %>%
-      mutate(p.value = round(p.value, 3)) %>%
-      mutate(p_value_label = paste0("p=", p.value)) %>%
-      mutate(p_value_label = ifelse(
-        time_linear == 0,
-        p_value_label,
-        paste0(p_value_label, "†")
-      )) %>%
-      select(interaction_variable, time_linear, p_value_label) %>%
-      group_by(interaction_variable) %>%
-      nest()
-
-    # Cell means from model B
-    predictions_interaction <- mixed_model_b_interaction %>%
-      tidy(., conf.int = TRUE) %>%
-      select(term, estimate, conf.low, conf.high) %>%
-      filter(str_detect(term, "time")) %>%
-      separate(
-        term,
-        sep = "__",
-        into = c(NA, "time_linear", NA, "studyarm", NA, "interaction_term")
+    within_p_values <- p_value_labels(estimates$within_levels) %>%
+      mutate(
+        interaction_variable = level_number(.data[[interaction_variable]])
       ) %>%
-      mutate(time_factor = (as.factor(time_linear))) %>%
-      mutate(studyarm = as_factor(studyarm)) %>%
-      mutate(time_linear = as.numeric(time_linear)) %>%
-      mutate(time_linear_shifted_1 = case_when(
-        studyarm == "0" & interaction_term == "1" ~ time_linear - 0.5,
-        studyarm == "1" & interaction_term == "1" ~ time_linear - 0.25,
-        studyarm == "0" & interaction_term == "2" ~ time_linear + 0.25,
-        studyarm == "1" & interaction_term == "2" ~ time_linear + 0.5
-      )) %>%
-      mutate(time_linear_shifted_2 = case_when(
-        studyarm == "0" & interaction_term == "1" ~ time_linear - 0.25,
-        studyarm == "1" & interaction_term == "1" ~ time_linear + 0.25,
-        studyarm == "0" & interaction_term == "2" ~ time_linear - 0.25,
-        studyarm == "1" & interaction_term == "2" ~ time_linear + 0.25
-      )) %>%
-      mutate(interaction_variable = as.factor(interaction_term)) %>%
-      select(-interaction_term)
+      select(interaction_variable, time_linear, p_value_label)
+    between_p_values <- estimates$between_levels %>%
+      p_value_labels(dagger = FALSE) %>%
+      select(comparison, time_linear, p_value_label)
 
-    # Number observed in each arm and level at each visit
+    # Number observed in each arm and level at each visit, with the model
+    # means
     predictions_interaction <- data_for_function %>%
       filter(!is.na(.data[[outcome_of_interest]])) %>%
       group_by(time_linear, studyarm, interaction_variable_numeric) %>%
@@ -360,192 +258,134 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       rename(interaction_variable = interaction_variable_numeric) %>%
       left_join(
         .,
-        predictions_interaction,
+        model_means %>%
+          mutate(
+            interaction_variable = level_number(.data[[interaction_variable]])
+          ) %>%
+          select(time_linear, studyarm, interaction_variable, estimate,
+                 conf.low, conf.high),
         by = c("time_linear", "studyarm", "interaction_variable")
       ) %>%
+      mutate(time_linear_shifted_2 = ifelse(
+        studyarm == "1",
+        time_linear + 0.25,
+        time_linear - 0.25
+      )) %>%
       group_by(studyarm, interaction_variable) %>%
       mutate(gid = cur_group_id())
 
-    # Data and predictions nested by level
-    data_nested_interaction <- data_for_function %>%
-      group_by(interaction_variable_numeric) %>%
-      nest() %>%
-      rename(interaction_variable = interaction_variable_numeric)
+    # One panel per level, each drawing that level's participants (selected
+    # by level, not by position) and that level's estimates
+    plot_level <- function(k) {
+      level_data <- data_for_function %>%
+        filter(interaction_variable_numeric == k)
+      level_predictions <- predictions_interaction %>%
+        filter(interaction_variable == k)
 
-    predictions_nested_interaction <- predictions_interaction %>%
-      group_by(interaction_variable) %>%
-      nest()
+      ggplot() +
+        geom_point(
+          level_data,
+          mapping = aes(
+            x = time_linear_shifted, y = .data[[outcome_of_interest]],
+            color = studyarm, group = study_id_screening
+          ),
+          alpha = 0.2
+        ) +
+        geom_line(
+          level_data,
+          mapping = aes(
+            x = time_linear_shifted, y = .data[[outcome_of_interest]],
+            color = studyarm, group = study_id_screening
+          ),
+          alpha = 0.2
+        ) +
+        geom_point(
+          level_predictions,
+          mapping = aes(
+            x = time_linear_shifted_2, y = estimate, color = studyarm
+          ),
+          size = 2
+        ) +
+        geom_line(
+          level_predictions,
+          mapping = aes(
+            x = time_linear_shifted_2, y = estimate, color = studyarm,
+            group = gid
+          ),
+          linewidth = 2
+        ) +
+        theme_bw() +
+        geom_text(
+          filter(level_predictions, studyarm == 0),
+          mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)
+        ) +
+        geom_text(
+          filter(level_predictions, studyarm == 1),
+          mapping = aes(
+            x = time_linear, y = -1, label = n_obs, color = studyarm
+          )
+        ) +
+        geom_text(mapping = aes(x = -1, y = 1, label = "N")) +
+        geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[k])) +
+        geom_text(
+          filter(within_p_values, interaction_variable == k),
+          mapping = aes(x = time_linear, y = y_max, label = p_value_label)
+        ) +
+        geom_errorbar(
+          level_predictions,
+          mapping = aes(
+            x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,
+            color = studyarm
+          ),
+          linewidth = 1.5
+        ) +
+        scale_x_continuous(
+          breaks = NULL,
+          limits = c(-1, 12.5),
+          minor_breaks = 0:12
+        ) +
+        scale_y_continuous(limits = c(-3, y_max)) +
+        theme(axis.title.x = element_blank()) +
+        ylab(outcome_of_interest) +
+        scale_color_discrete(
+          name = "Study Arm",
+          labels = c("Control", "Treatment")
+        )
+    }
 
-    # (In the original, the predictions table, printed inside the function
-    # and not returned)
-    predictions_interaction %>% flextable()
+    # One row of p values for each level's difference from the first level,
+    # named when there is more than one row
+    plot_p_values <- function(level_comparison) {
+      p_value_row <- ggplot() +
+        geom_text(
+          data = filter(between_p_values, comparison == level_comparison),
+          mapping = aes(x = time_linear, y = 0, label = p_value_label)
+        ) +
+        theme_void() +
+        scale_x_continuous(limits = c(-1, 12.5))
+      if (length(comparisons) > 1) {
+        p_value_row <- p_value_row +
+          annotate("text", x = -1, y = 0, label = level_comparison, size = 3)
+      }
+      p_value_row
+    }
 
-    # Panel for the first level
-    plot_level_1 <- ggplot() +
-      geom_point(
-        data_nested_interaction$data[[1]],
-        mapping = aes(
-          x = time_linear_shifted, y = .data[[outcome_of_interest]],
-          color = studyarm, group = study_id_screening
-        ),
-        alpha = 0.2
-      ) +
-      geom_line(
-        data_nested_interaction$data[[1]],
-        mapping = aes(
-          x = time_linear_shifted, y = .data[[outcome_of_interest]],
-          color = studyarm, group = study_id_screening
-        ),
-        alpha = 0.2
-      ) +
-      geom_point(
-        predictions_nested_interaction$data[[1]],
-        mapping = aes(
-          x = time_linear_shifted_2, y = estimate, color = studyarm
-        ),
-        size = 2
-      ) +
-      geom_line(
-        predictions_nested_interaction$data[[1]],
-        mapping = aes(
-          x = time_linear_shifted_2, y = estimate, color = studyarm,
-          group = gid
-        ),
-        linewidth = 2
-      ) +
-      theme_bw() +
-      geom_text(
-        filter(
-          predictions_interaction,
-          studyarm == 0,
-          interaction_variable == 1
-        ),
-        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)
-      ) +
-      geom_text(
-        filter(
-          predictions_interaction,
-          studyarm == 1,
-          interaction_variable == 1
-        ),
-        mapping = aes(x = time_linear, y = -1, label = n_obs, color = studyarm)
-      ) +
-      geom_text(mapping = aes(x = -1, y = 1, label = "N")) +
-      geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[1])) +
-      geom_text(
-        mixed_model_c_treatment_effect$data[[1]],
-        mapping = aes(x = time_linear, y = y_max, label = p_value_label)
-      ) +
-      geom_errorbar(
-        predictions_nested_interaction$data[[1]],
-        mapping = aes(
-          x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,
-          color = studyarm
-        ),
-        linewidth = 1.5
-      ) +
-      scale_x_continuous(
-        breaks = NULL,
-        limits = c(-1, 12.5),
-        minor_breaks = 0:12
-      ) +
-      scale_y_continuous(limits = c(-3, y_max)) +
-      theme(axis.title.x = element_blank()) +
-      ylab(outcome_of_interest) +
-      scale_color_discrete(
-        name = "Study Arm",
-        labels = c("Control", "Treatment")
-      )
-
-    # Panel for the second level
-    plot_level_2 <- ggplot() +
-      geom_point(
-        data_nested_interaction$data[[2]],
-        mapping = aes(
-          x = time_linear_shifted, y = .data[[outcome_of_interest]],
-          color = studyarm, group = study_id_screening
-        ),
-        alpha = 0.2
-      ) +
-      geom_line(
-        data_nested_interaction$data[[2]],
-        mapping = aes(
-          x = time_linear_shifted, y = .data[[outcome_of_interest]],
-          color = studyarm, group = study_id_screening
-        ),
-        alpha = 0.2
-      ) +
-      geom_point(
-        predictions_nested_interaction$data[[2]],
-        mapping = aes(
-          x = time_linear_shifted_2, y = estimate, color = studyarm
-        ),
-        size = 2
-      ) +
-      geom_line(
-        predictions_nested_interaction$data[[2]],
-        mapping = aes(
-          x = time_linear_shifted_2, y = estimate, color = studyarm,
-          group = gid
-        ),
-        linewidth = 2
-      ) +
-      theme_bw() +
-      geom_text(
-        filter(
-          predictions_interaction,
-          studyarm == 0,
-          interaction_variable == 2
-        ),
-        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)
-      ) +
-      geom_text(
-        filter(
-          predictions_interaction,
-          studyarm == 1,
-          interaction_variable == 2
-        ),
-        mapping = aes(x = time_linear, y = -1, label = n_obs, color = studyarm)
-      ) +
-      geom_text(mapping = aes(x = -1, y = 1, label = "N")) +
-      geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[2])) +
-      geom_text(
-        mixed_model_c_treatment_effect$data[[2]],
-        mapping = aes(x = time_linear, y = y_max, label = p_value_label)
-      ) +
-      geom_errorbar(
-        predictions_nested_interaction$data[[2]],
-        mapping = aes(
-          x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,
-          color = studyarm
-        ),
-        linewidth = 1.5
-      ) +
-      scale_x_continuous(
-        breaks = NULL,
-        limits = c(-1, 12.5),
-        minor_breaks = 0:12
-      ) +
-      scale_y_continuous(limits = c(-3, y_max)) +
-      theme(axis.title.x = element_blank()) +
-      ylab(outcome_of_interest) +
-      scale_color_discrete(
-        name = "Study Arm",
-        labels = c("Control", "Treatment")
-      )
-
-    # Row of p values for the difference between levels
-    plot_p_values <- ggplot() +
-      geom_text(
-        data = mixed_model_a_heterogeneity,
-        mapping = aes(x = time_linear, y = 0, label = p_value_label)
-      ) +
-      theme_void() +
-      scale_x_continuous(limits = c(-1, 12.5))
+    n_levels <- length(plot_labels)
+    comparisons <- unique(as.character(between_p_values$comparison))
+    panels <- c(
+      lapply(seq_len(n_levels), plot_level),
+      lapply(comparisons, plot_p_values)
+    )
 
     # Combine the panels with patchwork
-    plot_level_1 / plot_level_2 / plot_p_values +
-      plot_layout(guides = "collect", heights = c(0.48, 0.48, 0.04)) +
+    wrap_plots(panels, ncol = 1) +
+      plot_layout(
+        guides = "collect",
+        heights = c(
+          rep(0.96 / n_levels, n_levels),
+          rep(0.04, length(comparisons))
+        )
+      ) +
       plot_annotation(
         title = plot_title,
         caption = "† adjusted for baseline differences",

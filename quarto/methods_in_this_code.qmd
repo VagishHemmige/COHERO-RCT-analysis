@@ -7,25 +7,25 @@ This page maps the ideas on the other methods pages to the analysis code, as it 
 
 Think of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.
 
-## Mixed-model tables: `create_me_table()`
+## Fitting and tables
 
-[`create_me_table()`](functions.qmd#create-me-table) fits `outcome ~ time_factor * studyarm + (1 | study_id_screening)`, or the three-way version with a subgroup, and returns the model's coefficients as a table. [5. Fit mixed models](05_fit_mixed_models.qmd) calls it 56 times: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations.
+[`fit_mixed_model()`](functions.qmd#fit-mixed-model) fits `outcome ~ time_factor * studyarm + (1 | study_id_screening)`, or the three-way version with a subgroup. [5. Fit mixed models](05_fit_mixed_models.qmd) fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.
 
-So the tables show the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. They don't show the arm effect in each subgroup level directly.
+[`tabulate_model_terms()`](functions.qmd#tabulate-model-terms) shows the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly.
 
-## Mixed-model plots: `create_me_plot()`
+## Estimates and plots
 
-[`create_me_plot()`](functions.qmd#create-me-plot) draws the same analyses, called from [Figures](figures.qmd) for the same 56 analyses. Inside, it refits the model in up to three codings, each chosen to make different numbers appear directly as coefficients:
+[`estimate_effects()`](functions.qmd#estimate-effects) takes everything the plot shows from that one fitted model, with emmeans [@lenth2026emmeans]:
 
-| Inside the function | Coding | What it's used for |
-|---|---|---|
-| Model A | `time_factor * studyarm` (times the subgroup) | The p-values printed above each visit: the change-from-baseline arm differences (marked †), or, with a subgroup, the differences between levels |
-| Model B | One coefficient per visit-by-arm cell (`me_factor - 1`) | Each cell's mean and confidence interval, the points and bars on the plot |
-| Model C, subgroups only | The arm effect nested within each level | The p-values printed in each level's panel: the baseline arm difference and the change-from-baseline arm differences within that level |
+| Estimate | What it's used for |
+|---|---|
+| Mean in each visit × arm cell (and subgroup level), with its 95% confidence interval | The points and bars on the plot |
+| Arm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level | The p-values printed above each visit, or in each level's panel |
+| Difference in that effect between each subgroup level and the first level | The row of p-values under the panels |
 
-These codings are intended to represent the same mean structure and random intercept. Equivalent estimates require the same analysis rows and an equivalent model specification. In the current subgroup code, a missing subgroup can become the text "NA" in a pasted cell label for model B, while A and C omit missing subgroup values. Equivalence therefore needs checking rather than assuming.
+Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)). Using one fit also means the means, the p-values and the table come from the same analysis rows.
 
-Model C uses nested terms to expose subgroup-specific arm comparisons; it does not literally relevel a factor. The panels show mean trajectories and p-values for within-subgroup contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
+[`plot_effect_trajectories()`](functions.qmd#plot-effect-trajectories) draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
 
 To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.
 
@@ -37,6 +37,5 @@ To read a plot, first identify the outcome, population, visit and subgroup. Then
 
 These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.
 
-- [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10): fit each model once and pass it to both the table and the plot, taking cell means and contrasts with emmeans instead of refitting in other codings.
 - [#8](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8): move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.
 - [#9](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9): the examples on [Effects behind an interaction](methods_stratified_effects.qmd), run on synthetic data where the true effects are known.

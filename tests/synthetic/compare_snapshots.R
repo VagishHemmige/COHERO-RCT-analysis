@@ -5,8 +5,10 @@
 #   that is not identical. An output whose values match once the columns of
 #   every data frame are sorted by name is reported as "reordered", not as
 #   "differs": ggplot2 versions can order built-plot columns differently for
-#   the same plot. Report only: it never fails the run, because a pull
-#   request may change outputs on purpose.
+#   the same plot. An output whose numbers agree to within 1e-6 (relative),
+#   with all text identical, is reported as "rounding": the same estimate
+#   reached by a different calculation. Report only: it never fails the run,
+#   because a pull request may change outputs on purpose.
 
 ## ---- read-snapshots
 args <- commandArgs(trailingOnly = TRUE)
@@ -44,6 +46,10 @@ status <- vapply(outputs, function(name) {
   } else if (identical(sort_columns(base[[name]]),
                        sort_columns(proposed[[name]]))) {
     "reordered"
+  } else if (isTRUE(all.equal(sort_columns(base[[name]]),
+                              sort_columns(proposed[[name]]),
+                              tolerance = 1e-6))) {
+    "rounding"
   } else {
     "differs"
   }
@@ -51,7 +57,8 @@ status <- vapply(outputs, function(name) {
 
 ## ---- report
 cat("Outputs compared:", length(outputs), "\n")
-for (s in c("identical", "reordered", "differs", "new", "removed")) {
+for (s in c("identical", "reordered", "rounding", "differs", "new",
+           "removed")) {
   cat(sprintf("  %-9s %d\n", s, sum(status == s)))
 }
 for (name in outputs[status != "identical"]) {

@@ -1,10 +1,11 @@
 # Purpose: build the figures: ACT by visit, count outcomes, rescue and
 #   controller use, and the mixed-model plots for every outcome and subgroup.
-# Needs: setup.R (count_outcomes, repeated_outcomes, mixed_subgroup_variables,
-#   child_adult_mixed_outcomes, population_labels); functions.R
-#   (create_me_plot()); 03_derive_medication_outcomes.R (clean_asthma_data_itt,
+# Needs: setup.R (count_outcomes, repeated_outcomes, population_labels);
+#   functions.R (plot_effect_trajectories());
+#   03_derive_medication_outcomes.R (clean_asthma_data_itt,
 #   clean_asthma_data_pp, rescue_medication_merged,
-#   controller_medication_merged); 05_fit_mixed_models.R (mixed_model_data).
+#   controller_medication_merged); 05_fit_mixed_models.R (mixed_model_data,
+#   mixed_model_estimates, subgroup_analyses).
 # Produces: act_plots, count_outcome_plots, medication_plots (named lists of
 #   ggplot objects); mixed_model_plots (named list indexed by population,
 #   outcome, then "overall" or the subgroup variable). Nothing is written to
@@ -138,7 +139,8 @@ medication_plots[["controller_pdc_pp"]] <- controller_medication_merged %>%
   theme_bw()
 
 ## ---- mixed-model-plots-overall
-# Outcome over time by arm, for each outcome
+# Outcome over time by arm, for each outcome, drawn from the estimates of the
+# models fitted in 05_fit_mixed_models.R
 mixed_model_plots <- list()
 
 for (population in names(mixed_model_data)) {
@@ -151,44 +153,33 @@ for (population in names(mixed_model_data)) {
 
     mixed_model_plots[[population]][[outcome]] <- list()
     mixed_model_plots[[population]][[outcome]][["overall"]] <-
-      mixed_model_data[[population]] %>%
-      create_me_plot(outcome_of_interest = outcome, plot_title = plot_title)
+      plot_effect_trajectories(
+        mixed_model_data[[population]],
+        mixed_model_estimates[[population]][[outcome]][["overall"]],
+        outcome_of_interest = outcome,
+        plot_title = plot_title
+      )
   }
 }
 
 ## ---- mixed-model-plots-subgroups
-# Outcome over time by arm, stratified by each subgroup
+# Outcome over time by arm, stratified by each subgroup; child or adult only
+# for outcomes measured in both groups (subgroup_analyses, from
+# 05_fit_mixed_models.R)
 for (population in names(mixed_model_data)) {
-  for (outcome in repeated_outcomes) {
-    for (subgroup in mixed_subgroup_variables) {
+  for (analysis in subgroup_analyses) {
+    outcome <- analysis$outcome
+
+    for (subgroup in analysis$subgroups) {
       plot_title <- paste(
         outcome, "vs. time, stratified by", subgroup, "in",
         population_labels[[population]]
       )
 
       mixed_model_plots[[population]][[outcome]][[subgroup]] <-
-        mixed_model_data[[population]] %>%
-        create_me_plot(
-          outcome_of_interest = outcome,
-          interaction_variable = subgroup,
-          plot_title = plot_title
-        )
-    }
-  }
-}
-
-# Child or adult, only for outcomes measured in both groups
-for (population in names(mixed_model_data)) {
-  for (outcome in child_adult_mixed_outcomes) {
-    for (subgroup in c("child_adult")) {
-      plot_title <- paste(
-        outcome, "vs. time, stratified by", subgroup, "in",
-        population_labels[[population]]
-      )
-
-      mixed_model_plots[[population]][[outcome]][[subgroup]] <-
-        mixed_model_data[[population]] %>%
-        create_me_plot(
+        plot_effect_trajectories(
+          mixed_model_data[[population]],
+          mixed_model_estimates[[population]][[outcome]][[subgroup]],
           outcome_of_interest = outcome,
           interaction_variable = subgroup,
           plot_title = plot_title
