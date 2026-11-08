@@ -1,0 +1,570 @@
+[
+  {
+    "objectID": "quarto/05_fit_mixed_models.html",
+    "href": "quarto/05_fit_mixed_models.html",
+    "title": "5. Fit mixed models",
+    "section": "",
+    "text": "Fit the linear mixed models for the repeated outcomes, overall and with subgroup interactions, in the ITT and per-protocol populations.",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "5. Fit mixed models"
+    ]
+  },
+  {
+    "objectID": "quarto/05_fit_mixed_models.html#mixed-model-data",
+    "href": "quarto/05_fit_mixed_models.html#mixed-model-data",
+    "title": "5. Fit mixed models",
+    "section": "Mixed model data",
+    "text": "Mixed model data\n\n\nClick to show/hide R Code\nmixed_model_data &lt;- list(\n  itt = clean_asthma_data_itt,\n  pp = clean_asthma_data_pp\n)\n\nmixed_model_tables &lt;- list()",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "5. Fit mixed models"
+    ]
+  },
+  {
+    "objectID": "quarto/05_fit_mixed_models.html#mixed-models-overall",
+    "href": "quarto/05_fit_mixed_models.html#mixed-models-overall",
+    "title": "5. Fit mixed models",
+    "section": "Mixed models overall",
+    "text": "Mixed models overall\n\n\nClick to show/hide R Code\n# Visit by arm, for each outcome\nfor (population in names(mixed_model_data)) {\n  mixed_model_tables[[population]] &lt;- list()\n\n  for (outcome in repeated_outcomes) {\n    mixed_model_tables[[population]][[outcome]] &lt;- list()\n\n    mixed_model_tables[[population]][[outcome]][[\"overall\"]] &lt;-\n      create_me_table(\n        mixed_model_data[[population]],\n        outcome_of_interest = outcome\n      )\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "5. Fit mixed models"
+    ]
+  },
+  {
+    "objectID": "quarto/05_fit_mixed_models.html#mixed-models-subgroups",
+    "href": "quarto/05_fit_mixed_models.html#mixed-models-subgroups",
+    "title": "5. Fit mixed models",
+    "section": "Mixed models subgroups",
+    "text": "Mixed models subgroups\n\n\nClick to show/hide R Code\n# Visit by arm by subgroup, for each outcome\nfor (population in names(mixed_model_data)) {\n  for (outcome in repeated_outcomes) {\n    for (subgroup in mixed_subgroup_variables) {\n      mixed_model_tables[[population]][[outcome]][[subgroup]] &lt;-\n        create_me_table(\n          mixed_model_data[[population]],\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup\n        )\n    }\n  }\n}\n\n# Child or adult, only for outcomes measured in both groups\nfor (population in names(mixed_model_data)) {\n  for (outcome in child_adult_mixed_outcomes) {\n    for (subgroup in c(\"child_adult\")) {\n      mixed_model_tables[[population]][[outcome]][[subgroup]] &lt;-\n        create_me_table(\n          mixed_model_data[[population]],\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup\n        )\n    }\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "5. Fit mixed models"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html",
+    "href": "quarto/setup.html",
+    "title": "Setup",
+    "section": "",
+    "text": "Attach packages and define constants shared by every script.",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html#load-packages",
+    "href": "quarto/setup.html#load-packages",
+    "title": "Setup",
+    "section": "Load packages",
+    "text": "Load packages\n\n\nClick to show/hide R Code\nlibrary(MASS)\nlibrary(tidyverse)\nlibrary(readr)\nlibrary(readxl)\nlibrary(ggbeeswarm)\nlibrary(plotly)\nlibrary(broom)\nlibrary(broom.mixed)\nlibrary(lme4)\nlibrary(lmerTest)\nlibrary(gganimate)\nlibrary(flextable)\nlibrary(gtsummary)\nlibrary(patchwork)",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html#data-paths",
+    "href": "quarto/setup.html#data-paths",
+    "title": "Setup",
+    "section": "Data paths",
+    "text": "Data paths\n\n\nClick to show/hide R Code\n# Restricted data are reached only through this folder, set outside the repo.\ndata_dir &lt;- Sys.getenv(\"COHERO_DATA_DIR\")\nif (data_dir == \"\") {\n  stop(\n    \"Set COHERO_DATA_DIR in your .Renviron to the folder holding the study data.\"\n  )\n}\n\nredcap_export_file &lt;- file.path(\n  data_dir,\n  \"EMASTHMA_DATA_All Data Export_deidentified.xlsx\"\n)\nbaseline_sex_file &lt;- file.path(\n  data_dir,\n  \"EMASTHMA_DATA_Baseline gender.xlsx\"\n)\npush_data_file &lt;- file.path(\n  data_dir,\n  \"EM-ASTHMA Aggregate COHERO Push Data 06.24.2020 GS Edits.xlsx\"\n)\ntimepoint_review_file &lt;- file.path(\n  data_dir,\n  \"COHERO Timepoint Review - Pre-Update Glitch Consideration 07.22.2020 GS.xlsx\"\n)",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html#define-constants",
+    "href": "quarto/setup.html#define-constants",
+    "title": "Setup",
+    "section": "Define constants",
+    "text": "Define constants\n\n\nClick to show/hide R Code\n# Observations after this date are excluded from the per-protocol analysis\n# (app update glitch). See analysis-plan.md.\nglitch_date &lt;- as.Date(\"2018-5-16\")\n\n# Items averaged into each scale score\naqlq_items &lt;- c(\n  \"short_of_breath_2weeks\",\n  \"avoid_dust_2weeks\",\n  \"frustrated_2weeks\",\n  \"bothered_by_cough_2weeks\",\n  \"fear_of_not_having_meds_2weeks\",\n  \"chest_tightness_2weeks\",\n  \"avoid_cigarette_smoke_2weeks\",\n  \"difficulty_sleep_2weeks\",\n  \"concerned_2weeks\",\n  \"wheeze_in_chest_2weeks\",\n  \"avoid_pollution_2weeks\",\n  \"limited_strenuous_activity_2weeks\",\n  \"limited_moderate_activity_2weeks\",\n  \"limited_social_activity_2weeks\",\n  \"limited_work_tasks_2weeks\"\n)\n\npacqlq_items &lt;- c(\n  \"caregiver_helplessness_1week\",\n  \"family_plans_change_1week\",\n  \"caregiver_frustration_1week\",\n  \"caregiver_work_interference_1week\",\n  \"caregiver_upset_1week\",\n  \"caregiver_sleepless_1week\",\n  \"caregiver_family_relations_1week\",\n  \"caregivier_nightime_awakening_1week\", # spelled as in the REDCap export\n  \"caregiver_angry_1week\",\n  \"caregiver_worry_child_daily_activities_1week\",\n  \"caregiver_worry_medications_1week\",\n  \"caregiver_worry_overprotective_1week\",\n  \"caregiver_worry_child_normalcy_1week\"\n)\n\nafs_items &lt;- c(\n  \"limitation_structured_physical_activities\",\n  \"limitation_sports\",\n  \"limitation_strenuous_activities\",\n  \"limitation_moderate_activities\",\n  \"limitation_mild_activities\"\n)\n\n# Variables that code missing as 999\nmissing_999_variables &lt;- c(\n  \"act_score\",\n  \"only_give_controller_medication_needed\",\n  \"only_give_controller_medication_breathless\",\n  \"give_controller_medication_regularly\",\n  \"try_to_avoid_controller_medication\",\n  \"forget_give_controller_medication\",\n  \"alter_change_dosage_controller_medication\",\n  \"stop_giving_controller_medication\",\n  \"reserve_controller_medication_if_treatment_not_work\",\n  \"give_controller_medication_child_does_breathless\",\n  \"give_controller_medication_as_label\"\n)\n\n# Baseline cut-offs for the binary subgroup variables. See analysis-plan.md.\nadherence_cutoff &lt;- 35 # self-reported adherence score &gt;= 35 is \"Adherent\"\nact_cutoff &lt;- 12 # ACT score &gt;= 12 is \"Controlled\"\n\n# Inhaler names used to relabel controller vs rescue medication\ncontroller_medication_names &lt;- c(\n  \"Advair\", \"Breo\", \"Dulera\", \"Flovent\", \"QVAR\", \"Symbicort\"\n)\nrescue_medication_names &lt;- c(\"Combivent\", \"ProAir\", \"Ventolin\", \"Proventil\")\n\n# Upper bound of the study ID range used to build the day grid; see #15\nn_subject_ids &lt;- 81\n\n# 12-month health care use outcomes\nhospital_count_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"hospitalization_number_times_12months\",\n  \"urgent_care_number_times_12months\"\n)\nhospital_binary_outcomes &lt;- c(\n  \"ed_visit_12months\",\n  \"hospitalization_asthma_12months\",\n  \"urgent_care_12months\"\n)\n\n# Count outcomes modelled with negative binomial regression\ncount_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"hospitalization_number_times_12months\",\n  \"urgent_care_number_times_12months\",\n  \"rescue_puffs_itt\",\n  \"rescue_days_itt\"\n)\n\n# Repeated-measures outcomes and subgroup variables for the mixed models\nrepeated_outcomes &lt;- c(\n  \"act_score\",\n  \"aqlq_score\",\n  \"pacqlq_score\",\n  \"afs_score\",\n  \"self_reported_adherence\"\n)\nsubgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"child_adult\",\n  \"participant_sex\",\n  \"self_reported_adherence_binary\",\n  \"act_binary\"\n)\n\n# Subgroup variables for the count-model interactions, and the count outcomes\n# fitted with the baseline asthma control subgroup (hospitalizations are left\n# out, as in the original analysis)\ncount_subgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"participant_sex\",\n  \"child_adult\",\n  \"self_reported_adherence_binary\"\n)\nact_subgroup_count_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"urgent_care_number_times_12months\",\n  \"rescue_puffs_itt\",\n  \"rescue_days_itt\"\n)\n\n# Subgroup variables for the mixed-model interactions, and the repeated\n# outcomes also fitted by child or adult (AQLQ and PACQLQ each apply to one\n# group only)\nmixed_subgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"participant_sex\",\n  \"self_reported_adherence_binary\",\n  \"act_binary\"\n)\nchild_adult_mixed_outcomes &lt;- c(\n  \"act_score\",\n  \"afs_score\",\n  \"self_reported_adherence\"\n)\n\n# Population names used in plot titles\npopulation_labels &lt;- c(\n  itt = \"ITT analysis\",\n  pp = \"per-protocol analysis\"\n)",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html#output-folders",
+    "href": "quarto/setup.html#output-folders",
+    "title": "Setup",
+    "section": "Output folders",
+    "text": "Output folders\n\n\nClick to show/hide R Code\ndir.create(\"figures\", showWarnings = FALSE)\ndir.create(\"tables\", showWarnings = FALSE)",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/02_build_visit_data.html",
+    "href": "quarto/02_build_visit_data.html",
+    "title": "2. Build visit data",
+    "section": "",
+    "text": "Build the visit-level analysis data for the ITT and per-protocol populations, with recodes and scale scores.",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "2. Build visit data"
+    ]
+  },
+  {
+    "objectID": "quarto/02_build_visit_data.html#build-visit-data",
+    "href": "quarto/02_build_visit_data.html#build-visit-data",
+    "title": "2. Build visit data",
+    "section": "Build visit data",
+    "text": "Build visit data\n\n\nClick to show/hide R Code\nclean_asthma_data_itt &lt;- clean_asthma_data %&gt;%\n  # Months since baseline for each REDCap event\n  mutate(time_linear = case_when(\n    redcap_event_name == \"baseline_arm_1\" ~ 0,\n    redcap_event_name == \"2month_followup_arm_1\" ~ 2,\n    redcap_event_name == \"4month_followup_arm_1\" ~ 4,\n    redcap_event_name == \"6month_followup_arm_1\" ~ 6,\n    redcap_event_name == \"9month_followup_arm_1\" ~ 9,\n    redcap_event_name == \"12month_followup_arm_1\" ~ 12\n  )) %&gt;%\n  # A preferred language of 999 is set to English. See issue #16.\n  mutate(prefer_language = ifelse(\n    prefer_language == 999,\n    1,\n    prefer_language\n  )) %&gt;%\n  # Visit time as a factor, for models that treat time as categorical\n  mutate(time_factor = as_factor(time_linear)) %&gt;%\n  mutate(studyarm = as.factor(studyarm)) %&gt;%\n  mutate(participant_sex = factor(\n    participant_sex,\n    levels = c(1, 2),\n    labels = c(\"Male\", \"Female\")\n  )) %&gt;%\n  mutate(child_adult = factor(\n    child_adult,\n    levels = c(1, 2),\n    labels = c(\"Child\", \"Adult\")\n  )) %&gt;%\n  mutate(prefer_language = factor(\n    prefer_language,\n    levels = c(1, 2),\n    labels = c(\"English\", \"Spanish\")\n  )) %&gt;%\n  # These are recorded only at baseline; carry them to every visit\n  group_by(study_id_screening) %&gt;%\n  fill(\n    studyarm, child_adult, prefer_language, consent_date,\n    follow_up_2_months, follow_up_4_months, follow_up_6_months,\n    follow_up_9_months, follow_up_12_month\n  ) %&gt;%\n  ungroup() %&gt;%\n  mutate(across(\n    all_of(c(aqlq_items, pacqlq_items, afs_items, missing_999_variables)),\n    ~ ifelse(.x == 999, NA, .x)\n  )) %&gt;%\n  # Date of each visit, from the consent and follow-up dates\n  mutate(date_of_observation = case_when(\n    redcap_event_name == \"baseline_arm_1\" ~ consent_date,\n    redcap_event_name == \"2month_followup_arm_1\" ~ follow_up_2_months,\n    redcap_event_name == \"4month_followup_arm_1\" ~ follow_up_4_months,\n    redcap_event_name == \"6month_followup_arm_1\" ~ follow_up_6_months,\n    redcap_event_name == \"9month_followup_arm_1\" ~ follow_up_9_months,\n    redcap_event_name == \"12month_followup_arm_1\" ~ follow_up_12_month\n  )) %&gt;%\n  # Visits after the app update glitch\n  mutate(post_glitch_date = (date_of_observation &gt; glitch_date)) %&gt;%\n  # Visit-by-arm cell label, and a time offset so arms do not overlap in plots\n  mutate(me_factor = paste(\n    \"time\", time_linear, \"studyarm\", studyarm,\n    sep = \"_\"\n  )) %&gt;%\n  mutate(time_linear_shifted = ifelse(\n    studyarm == 1,\n    time_linear + 0.1,\n    time_linear - 0.1\n  )) %&gt;%\n  # Self-reported controller adherence score. See analysis-plan.md.\n  mutate(self_reported_adherence = 32 -\n    only_give_controller_medication_needed -\n    only_give_controller_medication_breathless +\n    give_controller_medication_regularly -\n    try_to_avoid_controller_medication -\n    forget_give_controller_medication -\n    alter_change_dosage_controller_medication -\n    stop_giving_controller_medication -\n    reserve_controller_medication_if_treatment_not_work -\n    give_controller_medication_child_does_breathless +\n    give_controller_medication_as_label) %&gt;%\n  # Baseline adherence and asthma control groups, carried to every visit\n  mutate(self_reported_adherence_binary = case_when(\n    self_reported_adherence &gt;= adherence_cutoff &\n      time_factor == \"0\" ~ \"Adherent\",\n    self_reported_adherence &lt; adherence_cutoff &\n      time_factor == \"0\" ~ \"Non-adherent\"\n  )) %&gt;%\n  mutate(\n    self_reported_adherence_binary = as.factor(self_reported_adherence_binary)\n  ) %&gt;%\n  mutate(act_binary = case_when(\n    act_score &gt;= act_cutoff & time_factor == \"0\" ~ \"Controlled\",\n    act_score &lt; act_cutoff & time_factor == \"0\" ~ \"Uncontrolled\"\n  )) %&gt;%\n  mutate(act_binary = as.factor(act_binary)) %&gt;%\n  group_by(study_id_screening) %&gt;%\n  fill(self_reported_adherence_binary, act_binary) %&gt;%\n  ungroup() %&gt;%\n  # Each score is the mean of the items answered at that visit\n  mutate(aqlq_score = rowMeans(across(all_of(aqlq_items)), na.rm = TRUE)) %&gt;%\n  mutate(\n    pacqlq_score = rowMeans(across(all_of(pacqlq_items)), na.rm = TRUE)\n  ) %&gt;%\n  mutate(afs_score = rowMeans(across(all_of(afs_items)), na.rm = TRUE))",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "2. Build visit data"
+    ]
+  },
+  {
+    "objectID": "quarto/02_build_visit_data.html#per-protocol-population",
+    "href": "quarto/02_build_visit_data.html#per-protocol-population",
+    "title": "2. Build visit data",
+    "section": "Per protocol population",
+    "text": "Per protocol population\n\n\nClick to show/hide R Code\nclean_asthma_data_pp &lt;- clean_asthma_data_itt %&gt;%\n  filter(post_glitch_date == FALSE)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "2. Build visit data"
+    ]
+  },
+  {
+    "objectID": "quarto/02_build_visit_data.html#study-dates",
+    "href": "quarto/02_build_visit_data.html#study-dates",
+    "title": "2. Build visit data",
+    "section": "Study dates",
+    "text": "Study dates\n\n\nClick to show/hide R Code\n# One row per participant with consent and follow-up visit dates\nstudy_dates &lt;- clean_asthma_data_itt %&gt;%\n  filter(time_linear == 0) %&gt;%\n  select(\n    study_id_screening, consent_date, follow_up_2_months,\n    follow_up_4_months, follow_up_6_months, follow_up_9_months,\n    follow_up_12_month\n  )",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "2. Build visit data"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html",
+    "href": "quarto/figures.html",
+    "title": "Figures",
+    "section": "",
+    "text": "Build the figures: ACT by visit, count outcomes, rescue and controller use, and the mixed-model plots for every outcome and subgroup.",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#act-plots",
+    "href": "quarto/figures.html#act-plots",
+    "title": "Figures",
+    "section": "ACT plots",
+    "text": "ACT plots\n\n\nClick to show/hide R Code\nact_plots &lt;- list()\n\n# ACT at each visit by arm\nact_plots[[\"act_by_visit_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(~time_factor, nrow = 1) +\n  theme_bw()\n\nact_plots[[\"act_by_visit_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(~time_factor, nrow = 1) +\n  theme_bw()\n\n# Spaghetti plots of ACT\nact_plots[[\"act_spaghetti_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_bw()\n\nact_plots[[\"act_spaghetti_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_bw()\n\n# Self-reported adherence vs interval controller PDC\nact_plots[[\"adherence_vs_pdc_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_itt,\n    color = studyarm\n  ))\n\nact_plots[[\"adherence_vs_pdc_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_pp,\n    color = studyarm\n  ))",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#count-outcome-plots",
+    "href": "quarto/figures.html#count-outcome-plots",
+    "title": "Figures",
+    "section": "Count outcome plots",
+    "text": "Count outcome plots\n\n\nClick to show/hide R Code\n# Each count outcome by arm, to check that outliers have been dealt with\ncount_outcome_plots &lt;- list()\n\nfor (outcome in count_outcomes) {\n  count_outcome_plots[[outcome]] &lt;- rescue_medication_merged %&gt;%\n    ggplot() +\n    geom_quasirandom(mapping = aes_string(\n      x = \"studyarm\", y = outcome, color = \"studyarm\"\n    )) +\n    theme_bw()\n}",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#medication-plots",
+    "href": "quarto/figures.html#medication-plots",
+    "title": "Figures",
+    "section": "Medication plots",
+    "text": "Medication plots\n\n\nClick to show/hide R Code\nmedication_plots &lt;- list()\n\n# Rescue puffs, linear and log scale\nmedication_plots[[\"rescue_puffs\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"rescue_puffs_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_bw() +\n  scale_y_log10()\n\n# Rescue days, linear and log scale\nmedication_plots[[\"rescue_days\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"rescue_days_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_bw() +\n  scale_y_log10()\n\n# Controller PDC for the year\nmedication_plots[[\"controller_pdc_itt\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"controller_pdc_pp\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_pp, color = studyarm\n  )) +\n  theme_bw()",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#mixed-model-plots-overall",
+    "href": "quarto/figures.html#mixed-model-plots-overall",
+    "title": "Figures",
+    "section": "Mixed model plots overall",
+    "text": "Mixed model plots overall\n\n\nClick to show/hide R Code\n# Outcome over time by arm, for each outcome\nmixed_model_plots &lt;- list()\n\nfor (population in names(mixed_model_data)) {\n  mixed_model_plots[[population]] &lt;- list()\n\n  for (outcome in repeated_outcomes) {\n    plot_title &lt;- paste(\n      outcome, \"vs. time in\", population_labels[[population]]\n    )\n\n    mixed_model_plots[[population]][[outcome]] &lt;- list()\n    mixed_model_plots[[population]][[outcome]][[\"overall\"]] &lt;-\n      mixed_model_data[[population]] %&gt;%\n      create_me_plot(outcome_of_interest = outcome, plot_title = plot_title)\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#mixed-model-plots-subgroups",
+    "href": "quarto/figures.html#mixed-model-plots-subgroups",
+    "title": "Figures",
+    "section": "Mixed model plots subgroups",
+    "text": "Mixed model plots subgroups\n\n\nClick to show/hide R Code\n# Outcome over time by arm, stratified by each subgroup\nfor (population in names(mixed_model_data)) {\n  for (outcome in repeated_outcomes) {\n    for (subgroup in mixed_subgroup_variables) {\n      plot_title &lt;- paste(\n        outcome, \"vs. time, stratified by\", subgroup, \"in\",\n        population_labels[[population]]\n      )\n\n      mixed_model_plots[[population]][[outcome]][[subgroup]] &lt;-\n        mixed_model_data[[population]] %&gt;%\n        create_me_plot(\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup,\n          plot_title = plot_title\n        )\n    }\n  }\n}\n\n# Child or adult, only for outcomes measured in both groups\nfor (population in names(mixed_model_data)) {\n  for (outcome in child_adult_mixed_outcomes) {\n    for (subgroup in c(\"child_adult\")) {\n      plot_title &lt;- paste(\n        outcome, \"vs. time, stratified by\", subgroup, \"in\",\n        population_labels[[population]]\n      )\n\n      mixed_model_plots[[population]][[outcome]][[subgroup]] &lt;-\n        mixed_model_data[[population]] %&gt;%\n        create_me_plot(\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup,\n          plot_title = plot_title\n        )\n    }\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/04_fit_count_models.html",
+    "href": "quarto/04_fit_count_models.html",
+    "title": "4. Fit count models",
+    "section": "",
+    "text": "Fit the negative binomial models for the count outcomes (12-month health care use and rescue inhaler use), overall and with subgroup interactions, and compare controller PDC between arms.",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "4. Fit count models"
+    ]
+  },
+  {
+    "objectID": "quarto/04_fit_count_models.html#count-models",
+    "href": "quarto/04_fit_count_models.html#count-models",
+    "title": "4. Fit count models",
+    "section": "Count models",
+    "text": "Count models\n\n\nClick to show/hide R Code\n# Negative binomial regression of each count on arm, with log follow-up time\n# as an offset; incidence rate ratios, one row per outcome\ncount_model_table &lt;- NULL\n\nfor (outcome in count_outcomes) {\n  outcome_formula &lt;- paste0(\n    outcome, \" ~ \", \"studyarm + offset(log(followup_time_itt))\"\n  ) %&gt;%\n    as.formula()\n\n  outcome_table &lt;- glm.nb(outcome_formula, data = rescue_medication_merged) %&gt;%\n    tbl_regression(\n      exp = TRUE,\n      show_single_row = \"studyarm\",\n      label = list(studyarm ~ outcome)\n    ) %&gt;%\n    modify_header(update = list(label ~ \"**Outcome**\"))\n\n  if (is.null(count_model_table)) {\n    count_model_table &lt;- outcome_table\n  } else {\n    count_model_table &lt;- tbl_stack(list(count_model_table, outcome_table))\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "4. Fit count models"
+    ]
+  },
+  {
+    "objectID": "quarto/04_fit_count_models.html#count-interaction-models",
+    "href": "quarto/04_fit_count_models.html#count-interaction-models",
+    "title": "4. Fit count models",
+    "section": "Count interaction models",
+    "text": "Count interaction models\n\n\nClick to show/hide R Code\n# Arm-by-subgroup interactions for each count outcome\ncount_interaction_tables &lt;- list()\n\nfor (outcome in count_outcomes) {\n  count_interaction_tables[[outcome]] &lt;- list()\n\n  for (subgroup in count_subgroup_variables) {\n    outcome_formula &lt;- paste0(\n      outcome, \" ~ \", \"studyarm*\", subgroup,\n      \" + offset(log(followup_time_itt))\"\n    ) %&gt;%\n      as.formula()\n\n    count_interaction_tables[[outcome]][[subgroup]] &lt;-\n      glm.nb(outcome_formula, data = rescue_medication_merged) %&gt;%\n      tbl_regression(exp = TRUE)\n  }\n}\n\n# Baseline asthma control, not fitted for hospitalizations\nfor (outcome in act_subgroup_count_outcomes) {\n  for (subgroup in c(\"act_binary\")) {\n    outcome_formula &lt;- paste0(\n      outcome, \" ~ \", \"studyarm*\", subgroup,\n      \" + offset(log(followup_time_itt))\"\n    ) %&gt;%\n      as.formula()\n\n    count_interaction_tables[[outcome]][[subgroup]] &lt;-\n      glm.nb(outcome_formula, data = rescue_medication_merged) %&gt;%\n      tbl_regression(exp = TRUE) %&gt;%\n      modify_caption(paste0(\"**\", outcome, \"**\"))\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "4. Fit count models"
+    ]
+  },
+  {
+    "objectID": "quarto/04_fit_count_models.html#rescue-models-alternative",
+    "href": "quarto/04_fit_count_models.html#rescue-models-alternative",
+    "title": "4. Fit count models",
+    "section": "Rescue models alternative",
+    "text": "Rescue models alternative\n\n\nClick to show/hide R Code\n# A second fit of the rescue models from the RMD's medication chunk. As\n# written, log(offset(...)) enters follow-up time as a covariate, not an\n# offset. See issue #1.\nrescue_puffs_model_alt_table &lt;- glm.nb(\n  rescue_puffs_itt ~ studyarm + log(offset(followup_time_itt)),\n  data = rescue_medication_merged\n) %&gt;%\n  tidy(., conf.int = TRUE, exp = TRUE) %&gt;%\n  flextable()\n\nrescue_days_model_alt_table &lt;- glm.nb(\n  rescue_days_itt ~ studyarm + log(offset(followup_time_itt)),\n  data = rescue_medication_merged\n) %&gt;%\n  tidy(., conf.int = TRUE, exp = TRUE) %&gt;%\n  flextable()",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "4. Fit count models"
+    ]
+  },
+  {
+    "objectID": "quarto/04_fit_count_models.html#controller-pdc-comparison",
+    "href": "quarto/04_fit_count_models.html#controller-pdc-comparison",
+    "title": "4. Fit count models",
+    "section": "Controller PDC comparison",
+    "text": "Controller PDC comparison\n\n\nClick to show/hide R Code\n# Controller PDC for the year by arm, with gtsummary's default test\ncontroller_pdc_comparison &lt;- controller_medication_merged %&gt;%\n  select(controller_pdc_pp, controller_pdc_itt, studyarm) %&gt;%\n  tbl_summary(by = studyarm) %&gt;%\n  add_p()",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "4. Fit count models"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Overview",
+    "section": "",
+    "text": "This site shows the code for the analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. The analysis looks at asthma control, quality of life, activity limitation, controller adherence, app-recorded inhaler use and 12-month health care use, in intention-to-treat and per-protocol populations. It uses the trial’s REDCap export and the data recorded by the COHERO app, which are not part of this site or its repository.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#what-this-analysis-does",
+    "href": "index.html#what-this-analysis-does",
+    "title": "Overview",
+    "section": "",
+    "text": "This site shows the code for the analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. The analysis looks at asthma control, quality of life, activity limitation, controller adherence, app-recorded inhaler use and 12-month health care use, in intention-to-treat and per-protocol populations. It uses the trial’s REDCap export and the data recorded by the COHERO app, which are not part of this site or its repository.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#how-to-read-this-site",
+    "href": "index.html#how-to-read-this-site",
+    "title": "Overview",
+    "section": "How to read this site",
+    "text": "How to read this site\nEach page under Code shows one script, in the order R/main.R runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the analysis plan, a retrospective record written after the results were seen.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#status",
+    "href": "index.html#status",
+    "title": "Overview",
+    "section": "Status",
+    "text": "Status\nIn progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository’s Issues. Pages explaining the background, the study design and the methods will be added later.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html",
+    "href": "quarto/tables.html",
+    "title": "Tables",
+    "section": "",
+    "text": "Build Table 1 and the count-outcome summary.",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html#table-1",
+    "href": "quarto/tables.html#table-1",
+    "title": "Tables",
+    "section": "Table 1",
+    "text": "Table 1\n\n\nClick to show/hide R Code\n# Baseline characteristics by arm, ITT population\ntable_1 &lt;- clean_asthma_data_itt %&gt;%\n  filter(time_factor == \"0\") %&gt;%\n  select(\n    studyarm, participant_sex, child_adult, prefer_language, age_screening,\n    act_score, aqlq_score, pacqlq_score, afs_score, self_reported_adherence\n  ) %&gt;%\n  mutate(studyarm = factor(\n    studyarm,\n    levels = c(0, 1),\n    labels = c(\"Control\", \"Intervention\")\n  )) %&gt;%\n  tbl_summary(\n    by = studyarm,\n    label = list(\n      participant_sex ~ \"Sex\",\n      child_adult ~ \"Child or adult\",\n      prefer_language ~ \"Preferred language\",\n      age_screening ~ \"Age at screening (years)\",\n      act_score ~ \"Baseline ACT\",\n      aqlq_score ~ \"Baseline AQLQ score (adults)\",\n      pacqlq_score ~ \"Baseline PACQLQ score (children)\",\n      afs_score ~ \"Baseline AFS score\",\n      self_reported_adherence ~ \"Baseline self-reported adherence score\"\n    )\n  ) %&gt;%\n  bold_labels() %&gt;%\n  modify_caption(\"**Patient Characteristics** (N = {N})\") %&gt;%\n  as_flex_table()",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html#count-outcome-summary",
+    "href": "quarto/tables.html#count-outcome-summary",
+    "title": "Tables",
+    "section": "Count outcome summary",
+    "text": "Count outcome summary\n\n\nClick to show/hide R Code\n# Count outcomes by arm\ncount_outcome_summary &lt;- rescue_medication_merged %&gt;%\n  select(all_of(count_outcomes), studyarm) %&gt;%\n  tbl_summary(by = studyarm)",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html",
+    "href": "quarto/functions.html",
+    "title": "Functions",
+    "section": "",
+    "text": "Reusable helper functions. Each takes its inputs as arguments.",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#create-me-table",
+    "href": "quarto/functions.html#create-me-table",
+    "title": "Functions",
+    "section": "Create ME table",
+    "text": "Create ME table\n\n\nClick to show/hide R Code\n# Mixed model of an outcome on visit (factor) by arm, with a random intercept\n# for participant, returned as a flextable of the tidied coefficients. With\n# an interaction variable, the model is visit by arm by that variable.\ncreate_me_table &lt;- function(trial_data, outcome_of_interest,\n                            interaction_variable = NULL) {\n  # Primary analysis without interactions if interaction_variable is NULL\n  if (is.null(interaction_variable)) {\n    lmer(\n      get(outcome_of_interest) ~ time_factor * studyarm +\n        (1 | study_id_screening),\n      data = trial_data\n    ) %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      flextable() %&gt;%\n      set_caption(paste0(outcome_of_interest, \" vs. time\")) %&gt;%\n      return()\n  } else {\n    lmer_formula &lt;- paste0(\n      outcome_of_interest, \"~time_factor*studyarm*\", interaction_variable,\n      \"+(1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n\n    lmer(lmer_formula, data = trial_data) %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      flextable() %&gt;%\n      set_caption(paste0(\n        outcome_of_interest, \" vs. time * \", interaction_variable\n      )) %&gt;%\n      return()\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#create-me-plot",
+    "href": "quarto/functions.html#create-me-plot",
+    "title": "Functions",
+    "section": "Create ME plot",
+    "text": "Create ME plot\n\n\nClick to show/hide R Code\n# Spaghetti plot of an outcome over time by arm: individual trajectories,\n# model-estimated means with 95% confidence intervals, numbers observed, and\n# p values for the arm difference at each visit. With an interaction\n# variable (a two-level factor), one panel per level plus a row of p values\n# for the difference between levels, combined with patchwork. The function\n# refits its own models; see the efficiency issue.\ncreate_me_plot &lt;- function(trial_data, outcome_of_interest,\n                           interaction_variable = NULL,\n                           plot_title = \"Plot\") {\n  if (is.null(interaction_variable)) {\n    # Top of the plot\n    y_max &lt;- trial_data %&gt;%\n      select(all_of(outcome_of_interest)) %&gt;%\n      max(., na.rm = TRUE) + 3\n\n    lmer_formula_1 &lt;- paste0(\n      outcome_of_interest, \"~time_factor*studyarm+(1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n    lmer_formula_2 &lt;- paste0(\n      outcome_of_interest, \"~ me_factor-1 + (1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n\n    # Mixed model with time as a factor: p values for the arm difference\n    mixed_model_a &lt;- lmer(lmer_formula_1, data = trial_data)\n\n    # Same model, parameterized by visit-by-arm cell: no p values for the\n    # arm difference, but a mean and confidence interval for each cell\n    mixed_model_b &lt;- lmer(lmer_formula_2, data = trial_data)\n\n    mixed_model_a_p_values &lt;- mixed_model_a %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      filter(str_detect(term, \"studyarm\")) %&gt;%\n      mutate(time_linear = case_when(\n        str_detect(term, \"time_factor2\") == TRUE ~ 2,\n        str_detect(term, \"time_factor4\") == TRUE ~ 4,\n        str_detect(term, \"time_factor6\") == TRUE ~ 6,\n        str_detect(term, \"time_factor9\") == TRUE ~ 9,\n        str_detect(term, \"time_factor12\") == TRUE ~ 12,\n        TRUE ~ 0\n      )) %&gt;%\n      mutate(p.value = round(p.value, 3)) %&gt;%\n      mutate(p_value_label = paste0(\"p=\", p.value)) %&gt;%\n      mutate(p_value_label = ifelse(\n        time_linear == 0,\n        p_value_label,\n        paste0(p_value_label, \"†\")\n      )) %&gt;%\n      select(time_linear, p_value_label)\n\n    # Cell means from model B. Terms read \"me_factortime_&lt;t&gt;_studyarm_&lt;a&gt;\":\n    # the extra NA allows for the underscore in \"me_factor\".\n    mixed_model_predictions &lt;- mixed_model_b %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      select(term, estimate, conf.low, conf.high) %&gt;%\n      filter(str_detect(term, \"time\")) %&gt;%\n      separate(\n        term,\n        sep = \"_\",\n        into = c(NA, NA, \"time_linear\", NA, \"studyarm\")\n      ) %&gt;%\n      mutate(time_factor = (as.factor(time_linear))) %&gt;%\n      mutate(studyarm = as_factor(studyarm)) %&gt;%\n      mutate(time_linear = as.numeric(time_linear)) %&gt;%\n      mutate(time_linear_shifted = ifelse(\n        studyarm == \"1\",\n        time_linear + 0.25,\n        time_linear - 0.25\n      ))\n\n    # Number observed in each arm at each visit\n    mixed_model_predictions &lt;- trial_data %&gt;%\n      filter(!is.na(get(outcome_of_interest))) %&gt;%\n      group_by(time_linear, studyarm) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      left_join(\n        .,\n        mixed_model_predictions,\n        by = c(\"time_linear\", \"studyarm\")\n      )\n\n    # Spaghetti plot with model means over individual trajectories\n    ggplot() +\n      geom_point(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_line(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_point(\n        mixed_model_predictions,\n        mapping = aes(x = time_linear_shifted, y = estimate, color = studyarm),\n        size = 2\n      ) +\n      geom_line(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, y = estimate, color = studyarm,\n          group = studyarm\n        ),\n        size = 2\n      ) +\n      geom_errorbar(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, ymin = conf.low, ymax = conf.high,\n          color = studyarm\n        ),\n        size = 1.5\n      ) +\n      theme_bw() +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 1),\n        mapping = aes(x = time_linear, y = 0, label = n_obs, color = studyarm)\n      ) +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 0),\n        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(mapping = aes(x = -0.5, y = 1, label = \"N\")) +\n      geom_text(\n        mixed_model_a_p_values,\n        mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n      ) +\n      scale_x_continuous(\n        breaks = c(0, 2, 4, 6, 9, 12),\n        limits = c(-0.5, 12.5),\n        minor_breaks = 0:12\n      ) +\n      ylab(outcome_of_interest) +\n      xlab(\"Time (months)\") +\n      scale_color_discrete(\n        name = \"Study Arm\",\n        labels = c(\"Control\", \"Treatment\")\n      ) +\n      labs(caption = \"† adjusted for baseline differences\") +\n      theme(plot.caption = element_text(hjust = 0.0555)) +\n      ggtitle(plot_title)\n  } else {\n    # The interaction variable must be a two-level factor\n    plot_labels &lt;- trial_data %&gt;%\n      pull(interaction_variable) %&gt;%\n      levels()\n    y_max &lt;- trial_data %&gt;%\n      select(all_of(outcome_of_interest)) %&gt;%\n      max(., na.rm = TRUE) + 3\n\n    data_for_function &lt;- trial_data %&gt;%\n      mutate(interaction_variable_numeric = factor(\n        as.numeric(get(interaction_variable))\n      )) %&gt;%\n      mutate(me_factor_interaction_variable = paste(\n        \"time\", time_linear, \"studyarm\", studyarm, interaction_variable,\n        interaction_variable_numeric,\n        sep = \"__\"\n      ))\n\n    # Formulas 1 and 2 are defined but not fitted\n    lmer_formula_1 &lt;- paste0(\n      outcome_of_interest,\n      \"~time_linear*studyarm*interaction_variable_numeric\",\n      \"+(1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n    lmer_formula_2 &lt;- paste0(\n      outcome_of_interest,\n      \"~time_linear*studyarm*interaction_variable_numeric\",\n      \"+(time_linear|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n    lmer_formula_3 &lt;- paste0(\n      outcome_of_interest,\n      \"~time_factor*studyarm*interaction_variable_numeric\",\n      \"+(1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n    lmer_formula_4 &lt;- paste0(\n      outcome_of_interest,\n      \" ~ me_factor_interaction_variable-1 + (1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n    lmer_formula_5 &lt;- paste0(\n      outcome_of_interest,\n      \"~interaction_variable_numeric-1 + \",\n      \"interaction_variable_numeric:time_factor + \",\n      \"interaction_variable_numeric:studyarm + \",\n      \"time_factor:studyarm:interaction_variable_numeric +\",\n      \"(1|study_id_screening)\"\n    ) %&gt;%\n      as.formula()\n\n    # Model A, time as a factor: p values for the difference in arm effect\n    # between levels of the interaction variable\n    mixed_model_a_interaction &lt;- lmer(\n      lmer_formula_3,\n      data = data_for_function\n    )\n\n    mixed_model_a_heterogeneity &lt;- mixed_model_a_interaction %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      filter(str_detect(term, \"studyarm\")) %&gt;%\n      filter(str_detect(term, \"interaction_variable_numeric\")) %&gt;%\n      mutate(time_linear = case_when(\n        str_detect(term, \"time_factor2\") == TRUE ~ 2,\n        str_detect(term, \"time_factor4\") == TRUE ~ 4,\n        str_detect(term, \"time_factor6\") == TRUE ~ 6,\n        str_detect(term, \"time_factor9\") == TRUE ~ 9,\n        str_detect(term, \"time_factor12\") == TRUE ~ 12,\n        TRUE ~ 0\n      )) %&gt;%\n      mutate(p.value = round(p.value, 3)) %&gt;%\n      mutate(p_value_label = paste0(\"p=\", p.value)) %&gt;%\n      select(time_linear, p_value_label)\n\n    # Model B, parameterized by cell: a mean and confidence interval for each\n    # visit, arm and level\n    mixed_model_b_interaction &lt;- lmer(\n      lmer_formula_4,\n      data = data_for_function\n    )\n\n    # (In the original, a table of model B, printed inside the function and\n    # not returned)\n    mixed_model_b_interaction %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      flextable()\n\n    # Summary statistics confirm model B is the same model as A\n    glance(mixed_model_b_interaction)\n\n    # Model C, parameterized for the arm difference within each level\n    mixed_model_c_interaction &lt;- lmer(\n      lmer_formula_5,\n      data = data_for_function\n    )\n\n    # (In the original, a table of model C, printed inside the function and\n    # not returned)\n    mixed_model_c_interaction %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      flextable()\n\n    # Summary statistics confirm model C is the same model as A\n    glance(mixed_model_c_interaction)\n\n    # P values from model C, nested by level\n    mixed_model_c_treatment_effect &lt;- mixed_model_c_interaction %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      filter(str_detect(term, \"studyarm\")) %&gt;%\n      mutate(interaction_variable = case_when(\n        str_detect(term, \"interaction_variable_numeric1\") == TRUE ~ 1,\n        str_detect(term, \"interaction_variable_numeric2\") == TRUE ~ 2\n      )) %&gt;%\n      mutate(time_linear = case_when(\n        str_detect(term, \"time_factor2\") == TRUE ~ 2,\n        str_detect(term, \"time_factor4\") == TRUE ~ 4,\n        str_detect(term, \"time_factor6\") == TRUE ~ 6,\n        str_detect(term, \"time_factor9\") == TRUE ~ 9,\n        str_detect(term, \"time_factor12\") == TRUE ~ 12,\n        TRUE ~ 0\n      )) %&gt;%\n      mutate(p.value = round(p.value, 3)) %&gt;%\n      mutate(p_value_label = paste0(\"p=\", p.value)) %&gt;%\n      mutate(p_value_label = ifelse(\n        time_linear == 0,\n        p_value_label,\n        paste0(p_value_label, \"†\")\n      )) %&gt;%\n      select(interaction_variable, time_linear, p_value_label) %&gt;%\n      group_by(interaction_variable) %&gt;%\n      nest()\n\n    # Cell means from model B\n    predictions_interaction &lt;- mixed_model_b_interaction %&gt;%\n      tidy(., conf.int = TRUE) %&gt;%\n      select(term, estimate, conf.low, conf.high) %&gt;%\n      filter(str_detect(term, \"time\")) %&gt;%\n      separate(\n        term,\n        sep = \"__\",\n        into = c(NA, \"time_linear\", NA, \"studyarm\", NA, \"interaction_term\")\n      ) %&gt;%\n      mutate(time_factor = (as.factor(time_linear))) %&gt;%\n      mutate(studyarm = as_factor(studyarm)) %&gt;%\n      mutate(time_linear = as.numeric(time_linear)) %&gt;%\n      mutate(time_linear_shifted_1 = case_when(\n        studyarm == \"0\" & interaction_term == \"1\" ~ time_linear - 0.5,\n        studyarm == \"1\" & interaction_term == \"1\" ~ time_linear - 0.25,\n        studyarm == \"0\" & interaction_term == \"2\" ~ time_linear + 0.25,\n        studyarm == \"1\" & interaction_term == \"2\" ~ time_linear + 0.5\n      )) %&gt;%\n      mutate(time_linear_shifted_2 = case_when(\n        studyarm == \"0\" & interaction_term == \"1\" ~ time_linear - 0.25,\n        studyarm == \"1\" & interaction_term == \"1\" ~ time_linear + 0.25,\n        studyarm == \"0\" & interaction_term == \"2\" ~ time_linear - 0.25,\n        studyarm == \"1\" & interaction_term == \"2\" ~ time_linear + 0.25\n      )) %&gt;%\n      mutate(interaction_variable = as.factor(interaction_term)) %&gt;%\n      select(-interaction_term)\n\n    # Number observed in each arm and level at each visit\n    predictions_interaction &lt;- data_for_function %&gt;%\n      filter(!is.na(get(outcome_of_interest))) %&gt;%\n      group_by(time_linear, studyarm, interaction_variable_numeric) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      rename(interaction_variable = interaction_variable_numeric) %&gt;%\n      left_join(\n        .,\n        predictions_interaction,\n        by = c(\"time_linear\", \"studyarm\", \"interaction_variable\")\n      ) %&gt;%\n      group_by(studyarm, interaction_variable) %&gt;%\n      mutate(gid = cur_group_id())\n\n    # Data and predictions nested by level\n    data_nested_interaction &lt;- data_for_function %&gt;%\n      group_by(interaction_variable_numeric) %&gt;%\n      nest() %&gt;%\n      rename(interaction_variable = interaction_variable_numeric)\n\n    predictions_nested_interaction &lt;- predictions_interaction %&gt;%\n      group_by(interaction_variable) %&gt;%\n      nest()\n\n    # (In the original, the predictions table, printed inside the function\n    # and not returned)\n    predictions_interaction %&gt;% flextable()\n\n    # Panel for the first level\n    plot_level_1 &lt;- ggplot() +\n      geom_point(\n        data_nested_interaction$data[[1]],\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_line(\n        data_nested_interaction$data[[1]],\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_point(\n        predictions_nested_interaction$data[[1]],\n        mapping = aes(\n          x = time_linear_shifted_2, y = estimate, color = studyarm\n        ),\n        size = 2\n      ) +\n      geom_line(\n        predictions_nested_interaction$data[[1]],\n        mapping = aes(\n          x = time_linear_shifted_2, y = estimate, color = studyarm,\n          group = gid\n        ),\n        size = 2\n      ) +\n      theme_bw() +\n      geom_text(\n        filter(\n          predictions_interaction,\n          studyarm == 0,\n          interaction_variable == 1\n        ),\n        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(\n        filter(\n          predictions_interaction,\n          studyarm == 1,\n          interaction_variable == 1\n        ),\n        mapping = aes(x = time_linear, y = -1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(mapping = aes(x = -1, y = 1, label = \"N\")) +\n      geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[1])) +\n      geom_text(\n        mixed_model_c_treatment_effect$data[[1]],\n        mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n      ) +\n      geom_errorbar(\n        predictions_nested_interaction$data[[1]],\n        mapping = aes(\n          x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,\n          color = studyarm\n        ),\n        size = 1.5\n      ) +\n      scale_x_continuous(\n        breaks = NULL,\n        limits = c(-1, 12.5),\n        minor_breaks = 0:12\n      ) +\n      scale_y_continuous(limits = c(-3, y_max)) +\n      theme(axis.title.x = element_blank()) +\n      ylab(outcome_of_interest) +\n      scale_color_discrete(\n        name = \"Study Arm\",\n        labels = c(\"Control\", \"Treatment\")\n      )\n\n    # Panel for the second level\n    plot_level_2 &lt;- ggplot() +\n      geom_point(\n        data_nested_interaction$data[[2]],\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_line(\n        data_nested_interaction$data[[2]],\n        mapping = aes(\n          x = time_linear_shifted, y = get(outcome_of_interest),\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_point(\n        predictions_nested_interaction$data[[2]],\n        mapping = aes(\n          x = time_linear_shifted_2, y = estimate, color = studyarm\n        ),\n        size = 2\n      ) +\n      geom_line(\n        predictions_nested_interaction$data[[2]],\n        mapping = aes(\n          x = time_linear_shifted_2, y = estimate, color = studyarm,\n          group = gid\n        ),\n        size = 2\n      ) +\n      theme_bw() +\n      geom_text(\n        filter(\n          predictions_interaction,\n          studyarm == 0,\n          interaction_variable == 2\n        ),\n        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(\n        filter(\n          predictions_interaction,\n          studyarm == 1,\n          interaction_variable == 2\n        ),\n        mapping = aes(x = time_linear, y = -1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(mapping = aes(x = -1, y = 1, label = \"N\")) +\n      geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[2])) +\n      geom_text(\n        mixed_model_c_treatment_effect$data[[2]],\n        mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n      ) +\n      geom_errorbar(\n        predictions_nested_interaction$data[[2]],\n        mapping = aes(\n          x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,\n          color = studyarm\n        ),\n        size = 1.5\n      ) +\n      scale_x_continuous(\n        breaks = NULL,\n        limits = c(-1, 12.5),\n        minor_breaks = 0:12\n      ) +\n      scale_y_continuous(limits = c(-3, y_max)) +\n      theme(axis.title.x = element_blank()) +\n      ylab(outcome_of_interest) +\n      scale_color_discrete(\n        name = \"Study Arm\",\n        labels = c(\"Control\", \"Treatment\")\n      )\n\n    # Row of p values for the difference between levels\n    plot_p_values &lt;- ggplot() +\n      geom_text(\n        data = mixed_model_a_heterogeneity,\n        mapping = aes(x = time_linear, y = 0, label = p_value_label)\n      ) +\n      theme_void() +\n      scale_x_continuous(limits = c(-1, 12.5))\n\n    # Combine the panels with patchwork\n    plot_level_1 / plot_level_2 / plot_p_values +\n      plot_layout(guides = \"collect\", heights = c(0.48, 0.48, 0.04)) +\n      plot_annotation(\n        title = plot_title,\n        caption = \"† adjusted for baseline differences\",\n        theme = theme(plot.caption = element_text(hjust = 0.0555))\n      )\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html",
+    "href": "quarto/03_derive_medication_outcomes.html",
+    "title": "3. Derive medication outcomes",
+    "section": "",
+    "text": "Clean the app-recorded inhaler data, count rescue use, compute controller proportion of days covered (PDC), and build the participant-level data for the count models.",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#clean-medication-records",
+    "href": "quarto/03_derive_medication_outcomes.html#clean-medication-records",
+    "title": "3. Derive medication outcomes",
+    "section": "Clean medication records",
+    "text": "Clean medication records\n\n\nClick to show/hide R Code\n# Records with no study ID are not participants and are excluded from all\n# analyses (study team decision). Records are relabelled controller or rescue\n# by medication name where the app's own label is not Control or Rescue.\nmedication_data_clean &lt;- raw_medications %&gt;%\n  filter(!is.na(SUBJECTID)) %&gt;%\n  mutate(med_type_clean = case_when(\n    Med.Type == \"Control\" ~ \"Control\",\n    Med.Type == \"Rescue\" ~ \"Rescue\",\n    str_detect(Medication, paste(controller_medication_names, collapse = \"|\")) ~\n      \"Control\",\n    str_detect(Medication, paste(rescue_medication_names, collapse = \"|\")) ~\n      \"Rescue\"\n  )) %&gt;%\n  left_join(study_dates, by = c(\"SUBJECTID\" = \"study_id_screening\")) %&gt;%\n  # Drop records after the 12-month visit. See issue #3 for the lower bound.\n  filter(PuffDate &lt;= follow_up_12_month)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#count-rescue-use",
+    "href": "quarto/03_derive_medication_outcomes.html#count-rescue-use",
+    "title": "3. Derive medication outcomes",
+    "section": "Count rescue use",
+    "text": "Count rescue use\n\n\nClick to show/hide R Code\nrescue_medication &lt;- medication_data_clean %&gt;%\n  filter(med_type_clean == \"Rescue\") %&gt;%\n  select(SUBJECTID, StudyPeriod, Medication, PuffDate, `Puff(EST)`)\n\n# One row per participant: rescue puffs and rescue days, ITT\ntotal_rescue_medication_uses &lt;- rescue_medication %&gt;%\n  group_by(SUBJECTID) %&gt;%\n  summarize(\n    rescue_puffs_itt = n(),\n    rescue_days_itt = n_distinct(PuffDate)\n  ) %&gt;%\n  ungroup() %&gt;%\n  select(SUBJECTID, rescue_puffs_itt, rescue_days_itt)\n\n# Add the per-protocol counts (records on or before the glitch date)\ntotal_rescue_medication_uses &lt;- rescue_medication %&gt;%\n  filter(PuffDate &lt;= glitch_date) %&gt;%\n  group_by(SUBJECTID) %&gt;%\n  summarize(\n    rescue_puffs_pp = n(),\n    rescue_days_pp = n_distinct(PuffDate)\n  ) %&gt;%\n  ungroup() %&gt;%\n  select(SUBJECTID, rescue_puffs_pp, rescue_days_pp) %&gt;%\n  right_join(total_rescue_medication_uses)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#count-controller-use",
+    "href": "quarto/03_derive_medication_outcomes.html#count-controller-use",
+    "title": "3. Derive medication outcomes",
+    "section": "Count controller use",
+    "text": "Count controller use\n\n\nClick to show/hide R Code\n# Controller puffs and uses per participant per day\ncontrol_medication &lt;- medication_data_clean %&gt;%\n  filter(med_type_clean == \"Control\") %&gt;%\n  select(SUBJECTID, StudyPeriod, Medication, PuffDate, `Puff(EST)`) %&gt;%\n  group_by(SUBJECTID, StudyPeriod, PuffDate) %&gt;%\n  mutate(control_puffs = n()) %&gt;%\n  mutate(control_uses = n_distinct(`Puff(EST)`)) %&gt;%\n  select(SUBJECTID, StudyPeriod, control_puffs, control_uses, PuffDate) %&gt;%\n  distinct()",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#controller-day-grid",
+    "href": "quarto/03_derive_medication_outcomes.html#controller-day-grid",
+    "title": "3. Derive medication outcomes",
+    "section": "Controller day grid",
+    "text": "Controller day grid\n\n\nClick to show/hide R Code\n# Every participant-day from consent to the 12-month visit, with the visit\n# interval it falls in. See issues #4 and #15.\nfull_date_grid &lt;- expand.grid(\n  seq(1, n_subject_ids, 1),\n  unique(medication_data_clean$StudyPeriod)\n) %&gt;%\n  rename(SUBJECTID = Var1, StudyPeriod = Var2) %&gt;%\n  left_join(study_dates, by = c(\"SUBJECTID\" = \"study_id_screening\")) %&gt;%\n  arrange(SUBJECTID, StudyPeriod) %&gt;%\n  mutate(consent_date = as.Date(consent_date)) %&gt;%\n  mutate(PuffDate = consent_date + StudyPeriod) %&gt;%\n  filter(PuffDate &lt;= follow_up_12_month) %&gt;%\n  mutate(quarter = case_when(\n    (PuffDate &gt;= consent_date) & (PuffDate &lt; follow_up_2_months) ~\n      \"0-2 months\",\n    (PuffDate &gt;= follow_up_2_months) & (PuffDate &lt; follow_up_4_months) ~\n      \"2-4 months\",\n    (PuffDate &gt;= follow_up_4_months) & (PuffDate &lt; follow_up_6_months) ~\n      \"4-6 months\",\n    (PuffDate &gt;= follow_up_6_months) & (PuffDate &lt; follow_up_9_months) ~\n      \"6-9 months\",\n    (PuffDate &gt;= follow_up_9_months) & (PuffDate &lt;= follow_up_12_month) ~\n      \"9-12 months\"\n  )) %&gt;%\n  # Interval controller PDC is attached to the visit that closes the interval\n  mutate(time_factor = case_when(\n    (PuffDate &gt;= consent_date) & (PuffDate &lt; follow_up_2_months) ~ \"2\",\n    (PuffDate &gt;= follow_up_2_months) & (PuffDate &lt; follow_up_4_months) ~ \"4\",\n    (PuffDate &gt;= follow_up_4_months) & (PuffDate &lt; follow_up_6_months) ~ \"6\",\n    (PuffDate &gt;= follow_up_6_months) & (PuffDate &lt; follow_up_9_months) ~ \"9\",\n    (PuffDate &gt;= follow_up_9_months) & (PuffDate &lt;= follow_up_12_month) ~ \"12\"\n  )) %&gt;%\n  mutate(time_factor = as.factor(time_factor)) %&gt;%\n  select(SUBJECTID, StudyPeriod, PuffDate, quarter, time_factor)\n\n# Days with no controller record get zero puffs and uses\ncontrol_medication &lt;- right_join(control_medication, full_date_grid) %&gt;%\n  mutate(control_puffs = ifelse(is.na(control_puffs), 0, control_puffs)) %&gt;%\n  mutate(control_uses = ifelse(is.na(control_uses), 0, control_uses)) %&gt;%\n  arrange(SUBJECTID, StudyPeriod)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#controller-pdc",
+    "href": "quarto/03_derive_medication_outcomes.html#controller-pdc",
+    "title": "3. Derive medication outcomes",
+    "section": "Controller PDC",
+    "text": "Controller PDC\n\n\nClick to show/hide R Code\n# Proportion of days with at least one controller puff, for the year\ncontroller_pdc &lt;- control_medication %&gt;%\n  mutate(day_is_covered = ifelse(control_puffs &gt; 0, 1, 0)) %&gt;%\n  group_by(SUBJECTID) %&gt;%\n  summarize(controller_pdc_itt = mean(day_is_covered)) %&gt;%\n  ungroup()\n\ncontroller_pdc &lt;- control_medication %&gt;%\n  mutate(day_is_covered = ifelse(control_puffs &gt; 0, 1, 0)) %&gt;%\n  filter(PuffDate &lt;= glitch_date) %&gt;%\n  group_by(SUBJECTID) %&gt;%\n  summarize(controller_pdc_pp = mean(day_is_covered)) %&gt;%\n  ungroup() %&gt;%\n  right_join(controller_pdc)\n\n# The same, within each visit interval\ncontroller_pdc_quarter &lt;- control_medication %&gt;%\n  mutate(day_is_covered = ifelse(control_puffs &gt; 0, 1, 0)) %&gt;%\n  group_by(SUBJECTID, time_factor) %&gt;%\n  summarize(controller_pdc_quarter_itt = mean(day_is_covered)) %&gt;%\n  rename(study_id_screening = SUBJECTID) %&gt;%\n  ungroup()\n\ncontroller_pdc_quarter &lt;- control_medication %&gt;%\n  mutate(day_is_covered = ifelse(control_puffs &gt; 0, 1, 0)) %&gt;%\n  filter(PuffDate &lt;= glitch_date) %&gt;%\n  group_by(SUBJECTID, time_factor) %&gt;%\n  summarize(controller_pdc_quarter_pp = mean(day_is_covered)) %&gt;%\n  rename(study_id_screening = SUBJECTID) %&gt;%\n  ungroup() %&gt;%\n  right_join(controller_pdc_quarter)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#baseline-count-data",
+    "href": "quarto/03_derive_medication_outcomes.html#baseline-count-data",
+    "title": "3. Derive medication outcomes",
+    "section": "Baseline count data",
+    "text": "Baseline count data\n\n\nClick to show/hide R Code\n# One row per participant: baseline values and 12-month health care use\nbaseline_clean_data &lt;- clean_asthma_data_itt %&gt;%\n  filter(time_linear == 0) %&gt;%\n  # A missing count is set to 0\n  mutate(across(\n    .cols = all_of(hospital_count_outcomes),\n    .fns = ~ ifelse(is.na(.x), 0, .x)\n  )) %&gt;%\n  # A count of 999 is set to missing\n  mutate(across(\n    .cols = all_of(hospital_count_outcomes),\n    .fns = ~ ifelse(.x == 999, NA, .x)\n  )) %&gt;%\n  mutate(followup_time_itt = as.numeric(\n    difftime(follow_up_12_month, consent_date, units = \"days\")\n  )) %&gt;%\n  # See issue #2: min() returns one value for everyone\n  mutate(followup_time_pp = min(\n    as.numeric(difftime(follow_up_12_month, consent_date, units = \"days\")),\n    as.numeric(difftime(glitch_date, consent_date, units = \"days\"))\n  ))",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#merge-medication-summaries",
+    "href": "quarto/03_derive_medication_outcomes.html#merge-medication-summaries",
+    "title": "3. Derive medication outcomes",
+    "section": "Merge medication summaries",
+    "text": "Merge medication summaries\n\n\nClick to show/hide R Code\n# Participants with no rescue records have zero rescue use\nrescue_medication_merged &lt;- left_join(\n  baseline_clean_data,\n  total_rescue_medication_uses,\n  by = c(\"study_id_screening\" = \"SUBJECTID\")\n) %&gt;%\n  mutate(rescue_puffs_itt = ifelse(\n    is.na(rescue_puffs_itt), 0, rescue_puffs_itt\n  )) %&gt;%\n  mutate(rescue_days_itt = ifelse(\n    is.na(rescue_days_itt), 0, rescue_days_itt\n  )) %&gt;%\n  mutate(rescue_puffs_pp = ifelse(\n    is.na(rescue_puffs_pp), 0, rescue_puffs_pp\n  )) %&gt;%\n  mutate(rescue_days_pp = ifelse(\n    is.na(rescue_days_pp), 0, rescue_days_pp\n  ))\n\ncontroller_medication_merged &lt;- left_join(\n  baseline_clean_data,\n  controller_pdc,\n  by = c(\"study_id_screening\" = \"SUBJECTID\")\n)\n\n# Interval controller PDC joined to the visit data\nclean_asthma_data_itt &lt;- clean_asthma_data_itt %&gt;%\n  left_join(controller_pdc_quarter) %&gt;%\n  select(-controller_pdc_quarter_pp)\n\nclean_asthma_data_pp &lt;- clean_asthma_data_pp %&gt;%\n  left_join(controller_pdc_quarter) %&gt;%\n  select(-controller_pdc_quarter_itt)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/03_derive_medication_outcomes.html#medication-by-interval",
+    "href": "quarto/03_derive_medication_outcomes.html#medication-by-interval",
+    "title": "3. Derive medication outcomes",
+    "section": "Medication by interval",
+    "text": "Medication by interval\n\n\nClick to show/hide R Code\n# Puff and day counts by visit interval and inhaler type. See issue #4.\nmedication_data_quarter &lt;- medication_data_clean %&gt;%\n  mutate(quarter = case_when(\n    (PuffDate &gt;= consent_date) & (PuffDate &lt; follow_up_2_months) ~\n      \"0-2 months\",\n    (PuffDate &gt;= follow_up_2_months) & (PuffDate &lt; follow_up_4_months) ~\n      \"2-4 months\",\n    (PuffDate &gt;= follow_up_4_months) & (PuffDate &lt; follow_up_6_months) ~\n      \"4-6 months\",\n    (PuffDate &gt;= follow_up_6_months) & (PuffDate &lt; follow_up_9_months) ~\n      \"6-9 months\",\n    (PuffDate &gt;= follow_up_9_months) & (PuffDate &lt; follow_up_12_month) ~\n      \"9-12 months\"\n  )) %&gt;%\n  mutate(quarter_number_days = case_when(\n    (PuffDate &gt;= consent_date) & (PuffDate &lt; follow_up_2_months) ~\n      difftime(follow_up_2_months, consent_date, units = \"days\"),\n    (PuffDate &gt;= follow_up_2_months) & (PuffDate &lt; follow_up_4_months) ~\n      difftime(follow_up_4_months, follow_up_2_months, units = \"days\"),\n    (PuffDate &gt;= follow_up_4_months) & (PuffDate &lt; follow_up_6_months) ~\n      difftime(follow_up_6_months, follow_up_4_months, units = \"days\"),\n    (PuffDate &gt;= follow_up_6_months) & (PuffDate &lt; follow_up_9_months) ~\n      difftime(follow_up_9_months, follow_up_6_months, units = \"days\"),\n    (PuffDate &gt;= follow_up_9_months) & (PuffDate &lt; follow_up_12_month) ~\n      difftime(follow_up_12_month, follow_up_9_months, units = \"days\"),\n  ))\n\nmedication_quarter_counts &lt;- medication_data_quarter %&gt;%\n  filter(!is.na(quarter)) %&gt;%\n  filter(!is.na(med_type_clean)) %&gt;%\n  group_by(SUBJECTID, quarter, med_type_clean) %&gt;%\n  mutate(number_puffs = n()) %&gt;%\n  mutate(number_days = n_distinct(PuffDate)) %&gt;%\n  ungroup() %&gt;%\n  select(\n    SUBJECTID, quarter, quarter_number_days, med_type_clean,\n    number_puffs, number_days\n  ) %&gt;%\n  distinct() %&gt;%\n  complete(SUBJECTID, quarter, med_type_clean) %&gt;%\n  mutate(number_puffs = ifelse(is.na(number_puffs), 0, number_puffs)) %&gt;%\n  mutate(number_days = ifelse(is.na(number_days), 0, number_days))",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "3. Derive medication outcomes"
+    ]
+  },
+  {
+    "objectID": "quarto/01_import_data.html",
+    "href": "quarto/01_import_data.html",
+    "title": "1. Import data",
+    "section": "",
+    "text": "Read the four study files and tidy their column names.",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "1. Import data"
+    ]
+  },
+  {
+    "objectID": "quarto/01_import_data.html#import-redcap",
+    "href": "quarto/01_import_data.html#import-redcap",
+    "title": "1. Import data",
+    "section": "Import REDCap",
+    "text": "Import REDCap\n\n\nClick to show/hide R Code\n# Raw data export from REDCap\nraw_asthma_data &lt;- read_excel(redcap_export_file)\n\n# Sex is in a separate file\nbaseline_sex &lt;- read_excel(baseline_sex_file) %&gt;%\n  select(study_id_screening, participant_sex)\n\n# Merge sex into the REDCap export\nclean_asthma_data &lt;- left_join(\n  raw_asthma_data,\n  baseline_sex,\n  by = \"study_id_screening\"\n)",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "1. Import data"
+    ]
+  },
+  {
+    "objectID": "quarto/01_import_data.html#import-notifications",
+    "href": "quarto/01_import_data.html#import-notifications",
+    "title": "1. Import data",
+    "section": "Import notifications",
+    "text": "Import notifications\n\n\nClick to show/hide R Code\nraw_notifications &lt;- read_excel(\n  push_data_file,\n  sheet = \"Notifications\",\n  col_types = c(\n    \"numeric\", \"numeric\", \"text\", \"date\", \"skip\",\n    \"numeric\", \"text\", \"date\", \"skip\", \"skip\"\n  )\n)\n\n# Remove spaces from names\nnames(raw_notifications) &lt;- names(raw_notifications) %&gt;%\n  str_replace_all(fixed(\" \"), \"\")",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "1. Import data"
+    ]
+  },
+  {
+    "objectID": "quarto/01_import_data.html#import-medications",
+    "href": "quarto/01_import_data.html#import-medications",
+    "title": "1. Import data",
+    "section": "Import medications",
+    "text": "Import medications\n\n\nClick to show/hide R Code\n# suppressWarnings avoids one warning per missing cell\nraw_medications &lt;- read_excel(\n  push_data_file,\n  sheet = \"Medication Usage\",\n  col_types = c(\n    \"numeric\", \"date\", \"numeric\", \"numeric\", \"numeric\", \"text\", \"date\",\n    \"numeric\", \"text\", \"text\", \"text\", \"text\", \"text\", \"text\", \"text\",\n    \"numeric\", \"numeric\", \"date\", \"date\", \"date\", \"date\", \"date\"\n  )\n) %&gt;%\n  suppressWarnings()\n\n# Remove spaces from names\nnames(raw_medications) &lt;- names(raw_medications) %&gt;%\n  str_replace_all(fixed(\" \"), \"\")",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "1. Import data"
+    ]
+  },
+  {
+    "objectID": "quarto/01_import_data.html#import-followup-dates",
+    "href": "quarto/01_import_data.html#import-followup-dates",
+    "title": "1. Import data",
+    "section": "Import followup dates",
+    "text": "Import followup dates\n\n\nClick to show/hide R Code\n# suppressWarnings avoids one warning per missing cell\nraw_followup_dates &lt;- read_excel(\n  timepoint_review_file,\n  col_types = c(\"numeric\", \"date\", \"date\", \"date\", \"date\", \"date\", \"date\")\n) %&gt;%\n  suppressWarnings()\n\n# Remove spaces and other troublesome characters from names\nnames(raw_followup_dates) &lt;- names(raw_followup_dates) %&gt;%\n  str_replace_all(fixed(\" \"), \"\") %&gt;%\n  str_replace_all(fixed(\"#\"), \"\") %&gt;%\n  str_replace_all(fixed(\"-\"), \"\")",
+    "crumbs": [
+      "Code",
+      "Data processing and analysis",
+      "1. Import data"
+    ]
+  }
+]
