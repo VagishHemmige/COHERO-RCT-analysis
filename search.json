@@ -103,6 +103,17 @@
     ]
   },
   {
+    "objectID": "quarto/methods_longitudinal.html#other-models-for-the-same-question",
+    "href": "quarto/methods_longitudinal.html#other-models-for-the-same-question",
+    "title": "Longitudinal data and mixed models",
+    "section": "Other models for the same question",
+    "text": "Other models for the same question\nThe random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.\n\n\n\n\n\n\n\n\n\n\nLinear mixed model (used here)\nMixed model for repeated measures (MMRM)\nGeneralized estimating equations (GEE)\n\n\n\n\nHow it handles a person’s repeated visits\nA random intercept per participant\nNo random effects; models the correlation between visits directly\nNo random effects; a “working” guess at the correlation\n\n\nCorrelation between visits\nImplied: the same for any two visits\nEstimated freely for every pair of visits (unstructured)\nTreated as a nuisance; the standard errors are robust to a wrong guess\n\n\nHow it is fitted\nLikelihood\nLikelihood\nEstimating equations, with no full distributional assumption\n\n\nMissed visits\nValid if missing at random (see above)\nValid if missing at random\nValid only if missing completely at random, unless weighted\n\n\nMain cost\nThe equal-correlation assumption\nMany correlation parameters: 21 for six visits\nWeaker missing-data protection; robust standard errors are too small in small samples\n\n\n\nMMRM is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits (Mallinckrodt et al. 2008). Its unstructured correlation avoids assuming that a person’s visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit (Coffman et al. 2016). That is a different question, not just a different method.\nGEE describe the average outcome in each group without modelling individuals (Liang and Zeger 1986). Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it (Robins et al. 1995). With few participants, robust standard errors are biased downwards and need a small-sample correction (Mancl and DeRouen 2001).\nFor a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.",
+    "crumbs": [
+      "Methods",
+      "Longitudinal data and mixed models"
+    ]
+  },
+  {
     "objectID": "quarto/methods_longitudinal.html#count-outcomes-are-different",
     "href": "quarto/methods_longitudinal.html#count-outcomes-are-different",
     "title": "Longitudinal data and mixed models",

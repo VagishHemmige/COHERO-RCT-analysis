@@ -142,17 +142,6 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
   content: '⏳';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -162,6 +151,17 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 </style>
@@ -384,6 +384,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   <ul class="collapse">
   <li><a href="#what-multiple-imputation-adds" id="toc-what-multiple-imputation-adds" class="nav-link" data-scroll-target="#what-multiple-imputation-adds">What multiple imputation adds</a></li>
   </ul></li>
+  <li><a href="#other-models-for-the-same-question" id="toc-other-models-for-the-same-question" class="nav-link" data-scroll-target="#other-models-for-the-same-question">Other models for the same question</a></li>
   <li><a href="#count-outcomes-are-different" id="toc-count-outcomes-are-different" class="nav-link" data-scroll-target="#count-outcomes-are-different">Count outcomes are different</a>
   <ul class="collapse">
   <li><a href="#counts-rates-and-the-offset" id="toc-counts-rates-and-the-offset" class="nav-link" data-scroll-target="#counts-rates-and-the-offset">Counts, rates and the offset</a></li>
@@ -549,6 +550,61 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <p>For an accessible introduction, see Box 1 and the practical discussion in <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC2714692/">Sterne and colleagues’ BMJ article</a> <span class="citation" data-cites="sterne2009missing">(<a href="#ref-sterne2009missing" role="doc-biblioref">Sterne et al. 2009</a>)</span>.</p>
 </section>
 </section>
+<section id="other-models-for-the-same-question" class="level2">
+<h2 class="anchored" data-anchor-id="other-models-for-the-same-question">Other models for the same question</h2>
+<p>The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Linear mixed model (used here)</th>
+<th>Mixed model for repeated measures (MMRM)</th>
+<th>Generalized estimating equations (GEE)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>How it handles a person’s repeated visits</td>
+<td>A random intercept per participant</td>
+<td>No random effects; models the correlation between visits directly</td>
+<td>No random effects; a “working” guess at the correlation</td>
+</tr>
+<tr class="even">
+<td>Correlation between visits</td>
+<td>Implied: the same for any two visits</td>
+<td>Estimated freely for every pair of visits (unstructured)</td>
+<td>Treated as a nuisance; the standard errors are robust to a wrong guess</td>
+</tr>
+<tr class="odd">
+<td>How it is fitted</td>
+<td>Likelihood</td>
+<td>Likelihood</td>
+<td>Estimating equations, with no full distributional assumption</td>
+</tr>
+<tr class="even">
+<td>Missed visits</td>
+<td>Valid if missing at random (see above)</td>
+<td>Valid if missing at random</td>
+<td>Valid only if missing completely at random, unless weighted</td>
+</tr>
+<tr class="odd">
+<td>Main cost</td>
+<td>The equal-correlation assumption</td>
+<td>Many correlation parameters: 21 for six visits</td>
+<td>Weaker missing-data protection; robust standard errors are too small in small samples</td>
+</tr>
+</tbody>
+</table>
+<p><strong>MMRM</strong> is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="citation" data-cites="mallinckrodt2008mmrm">(<a href="#ref-mallinckrodt2008mmrm" role="doc-biblioref">Mallinckrodt et al. 2008</a>)</span>. Its unstructured correlation avoids assuming that a person’s visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="citation" data-cites="coffman2016clda">(<a href="#ref-coffman2016clda" role="doc-biblioref">Coffman et al. 2016</a>)</span>. That is a different question, not just a different method.</p>
+<p><strong>GEE</strong> describe the average outcome in each group without modelling individuals <span class="citation" data-cites="liang1986gee">(<a href="#ref-liang1986gee" role="doc-biblioref">Liang and Zeger 1986</a>)</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="citation" data-cites="robins1995weighted">(<a href="#ref-robins1995weighted" role="doc-biblioref">Robins et al. 1995</a>)</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="citation" data-cites="mancl2001gee">(<a href="#ref-mancl2001gee" role="doc-biblioref">Mancl and DeRouen 2001</a>)</span>.</p>
+<p>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</p>
+</section>
 <section id="count-outcomes-are-different" class="level2">
 <h2 class="anchored" data-anchor-id="count-outcomes-are-different">Count outcomes are different</h2>
 <p>The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don’t need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person’s follow-up time as an <strong>offset</strong>, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are <strong>incidence rate ratios</strong>: an arm effect of 0.8 means the intervention arm’s rate is 80% of the control arm’s.</p>
@@ -569,8 +625,23 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <div id="ref-bates2015lme4" class="csl-entry" role="listitem">
 Bates, Douglas, Martin Mächler, Ben Bolker, and Steve Walker. 2015. <span>“Fitting Linear Mixed-Effects Models Using <span class="nocase">lme4</span>.”</span> <em>Journal of Statistical Software</em> 67 (1): 1–48. <a href="https://doi.org/10.18637/jss.v067.i01">https://doi.org/10.18637/jss.v067.i01</a>.
 </div>
+<div id="ref-coffman2016clda" class="csl-entry" role="listitem">
+Coffman, Cynthia J., David Edelman, and Robert F. Woolson. 2016. <span>“To Condition or Not Condition? Analysing ’Change’ in Longitudinal Randomised Controlled Trials.”</span> <em>BMJ Open</em> 6 (12): e013096. <a href="https://doi.org/10.1136/bmjopen-2016-013096">https://doi.org/10.1136/bmjopen-2016-013096</a>.
+</div>
+<div id="ref-liang1986gee" class="csl-entry" role="listitem">
+Liang, Kung-Yee, and Scott L. Zeger. 1986. <span>“Longitudinal Data Analysis Using Generalized Linear Models.”</span> <em>Biometrika</em> 73 (1): 13–22. <a href="https://doi.org/10.1093/biomet/73.1.13">https://doi.org/10.1093/biomet/73.1.13</a>.
+</div>
+<div id="ref-mallinckrodt2008mmrm" class="csl-entry" role="listitem">
+Mallinckrodt, Craig H., Peter W. Lane, Dan Schnell, Yahong Peng, and James P. Mancuso. 2008. <span>“Recommendations for the Primary Analysis of Continuous Endpoints in Longitudinal Clinical Trials.”</span> <em>Drug Information Journal</em> 42 (4): 303–19. <a href="https://doi.org/10.1177/009286150804200402">https://doi.org/10.1177/009286150804200402</a>.
+</div>
+<div id="ref-mancl2001gee" class="csl-entry" role="listitem">
+Mancl, Lloyd A., and Timothy A. DeRouen. 2001. <span>“A Covariance Estimator for <span>GEE</span> with Improved Small-Sample Properties.”</span> <em>Biometrics</em> 57 (1): 126–34. <a href="https://doi.org/10.1111/j.0006-341X.2001.00126.x">https://doi.org/10.1111/j.0006-341X.2001.00126.x</a>.
+</div>
 <div id="ref-massglmnb" class="csl-entry" role="listitem">
 MASS authors. n.d. <em>Fit a Negative Binomial Generalized Linear Model</em>. Accessed November 8, 2026. <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html">https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html</a>.
+</div>
+<div id="ref-robins1995weighted" class="csl-entry" role="listitem">
+Robins, James M., Andrea Rotnitzky, and Lue Ping Zhao. 1995. <span>“Analysis of Semiparametric Regression Models for Repeated Outcomes in the Presence of Missing Data.”</span> <em>Journal of the American Statistical Association</em> 90 (429): 106–21. <a href="https://doi.org/10.1080/01621459.1995.10476493">https://doi.org/10.1080/01621459.1995.10476493</a>.
 </div>
 <div id="ref-sterne2009missing" class="csl-entry" role="listitem">
 Sterne, Jonathan A. C., Ian R. White, John B. Carlin, et al. 2009. <span>“Multiple Imputation for Missing Data in Epidemiological and Clinical Research: Potential and Pitfalls.”</span> <em>BMJ</em> 338: b2393. <a href="https://doi.org/10.1136/bmj.b2393">https://doi.org/10.1136/bmj.b2393</a>.
@@ -1126,18 +1197,36 @@ Vickers, Andrew J., and Douglas G. Altman. 2001. <span>“Analysing Controlled T
 <span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>For an accessible introduction, see Box 1 and the practical discussion in <span class="co">[</span><span class="ot">Sterne and colleagues' BMJ article</span><span class="co">](https://pmc.ncbi.nlm.nih.gov/articles/PMC2714692/)</span> <span class="co">[</span><span class="ot">@sterne2009missing</span><span class="co">]</span>.</span>
 <span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcomes are different</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Other models for the same question</span></span>
 <span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don't need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person's follow-up time as an **offset**, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are **incidence rate ratios**: an arm effect of 0.8 means the intervention arm's rate is 80% of the control arm's.</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</span>
 <span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="fu">### Counts, rates and the offset</span></span>
-<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>In an invented example, 6 events over 60 days and 3 events over 30 days have the same rate: 0.1 events per day. Comparing the counts alone would miss that equality. The **offset** supplies the exposure duration with its coefficient fixed, so the model compares rates. Negative binomial regression additionally allows counts to vary more than a Poisson model assumes. Neither choice repairs incorrectly defined event counts or follow-up windows.</span>
-<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>An IRR of 1 means equal modeled rates; an IRR below 1 means a lower rate in the intervention arm, with the direction reversed above 1. A 95% confidence interval crossing 1 includes equal rates among the values compatible with the data and model at that confidence level; it does not prove equivalence.</span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>For technical depth after the examples, <span class="co">[</span><span class="ot">Bates and colleagues</span><span class="co">](https://www.jstatsoft.org/article/view/v067i01)</span> explain the mixed-model implementation <span class="co">[</span><span class="ot">@bates2015lme4</span><span class="co">]</span>. The <span class="co">[</span><span class="ot">MASS reference</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html)</span> documents the negative binomial function <span class="co">[</span><span class="ot">@massglmnb</span><span class="co">]</span>.</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Linear mixed model (used here) <span class="pp">|</span> Mixed model for repeated measures (MMRM) <span class="pp">|</span> Generalized estimating equations (GEE) <span class="pp">|</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> How it handles a person's repeated visits <span class="pp">|</span> A random intercept per participant <span class="pp">|</span> No random effects; models the correlation between visits directly <span class="pp">|</span> No random effects; a "working" guess at the correlation <span class="pp">|</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correlation between visits <span class="pp">|</span> Implied: the same for any two visits <span class="pp">|</span> Estimated freely for every pair of visits (unstructured) <span class="pp">|</span> Treated as a nuisance; the standard errors are robust to a wrong guess <span class="pp">|</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> How it is fitted <span class="pp">|</span> Likelihood <span class="pp">|</span> Likelihood <span class="pp">|</span> Estimating equations, with no full distributional assumption <span class="pp">|</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Missed visits <span class="pp">|</span> Valid if missing at random (see above) <span class="pp">|</span> Valid if missing at random <span class="pp">|</span> Valid only if missing completely at random, unless weighted <span class="pp">|</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Main cost <span class="pp">|</span> The equal-correlation assumption <span class="pp">|</span> Many correlation parameters: 21 for six visits <span class="pp">|</span> Weaker missing-data protection; robust standard errors are too small in small samples <span class="pp">|</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>**MMRM** is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="co">[</span><span class="ot">@mallinckrodt2008mmrm</span><span class="co">]</span>. Its unstructured correlation avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="co">[</span><span class="ot">@coffman2016clda</span><span class="co">]</span>. That is a different question, not just a different method.</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>**GEE** describe the average outcome in each group without modelling individuals <span class="co">[</span><span class="ot">@liang1986gee</span><span class="co">]</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="co">[</span><span class="ot">@robins1995weighted</span><span class="co">]</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="co">[</span><span class="ot">@mancl2001gee</span><span class="co">]</span>.</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcomes are different</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don't need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person's follow-up time as an **offset**, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are **incidence rate ratios**: an arm effect of 0.8 means the intervention arm's rate is 80% of the control arm's.</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a><span class="fu">### Counts, rates and the offset</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>In an invented example, 6 events over 60 days and 3 events over 30 days have the same rate: 0.1 events per day. Comparing the counts alone would miss that equality. The **offset** supplies the exposure duration with its coefficient fixed, so the model compares rates. Negative binomial regression additionally allows counts to vary more than a Poisson model assumes. Neither choice repairs incorrectly defined event counts or follow-up windows.</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>An IRR of 1 means equal modeled rates; an IRR below 1 means a lower rate in the intervention arm, with the direction reversed above 1. A 95% confidence interval crossing 1 includes equal rates among the values compatible with the data and model at that confidence level; it does not prove equivalence.</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>For technical depth after the examples, <span class="co">[</span><span class="ot">Bates and colleagues</span><span class="co">](https://www.jstatsoft.org/article/view/v067i01)</span> explain the mixed-model implementation <span class="co">[</span><span class="ot">@bates2015lme4</span><span class="co">]</span>. The <span class="co">[</span><span class="ot">MASS reference</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html)</span> documents the negative binomial function <span class="co">[</span><span class="ot">@massglmnb</span><span class="co">]</span>.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
