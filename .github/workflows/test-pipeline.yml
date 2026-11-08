@@ -37,10 +37,11 @@ jobs:
 
       # The packages R/setup.R attaches, plus writexl for the synthetic files
       # and broom.helpers, which gtsummary's tbl_regression() needs but only
-      # suggests
+      # suggests. Quarto is not installed: this job renders nothing.
       - name: Install the R packages the analysis uses
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
+          install-quarto: false
           packages: |
             any::tidyverse
             any::readxl
