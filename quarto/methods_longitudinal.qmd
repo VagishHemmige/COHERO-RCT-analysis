@@ -82,6 +82,24 @@ Ordinary MAR-based imputation does not solve missingness that depends on unobser
 
 For an accessible introduction, see Box 1 and the practical discussion in [Sterne and colleagues' BMJ article](https://pmc.ncbi.nlm.nih.gov/articles/PMC2714692/) [@sterne2009missing].
 
+## Other models for the same question
+
+The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.
+
+| | Linear mixed model (used here) | Mixed model for repeated measures (MMRM) | Generalized estimating equations (GEE) |
+|---|---|---|---|
+| How it handles a person's repeated visits | A random intercept per participant | No random effects; models the correlation between visits directly | No random effects; a "working" guess at the correlation |
+| Correlation between visits | Implied: the same for any two visits | Estimated freely for every pair of visits (unstructured) | Treated as a nuisance; the standard errors are robust to a wrong guess |
+| How it is fitted | Likelihood | Likelihood | Estimating equations, with no full distributional assumption |
+| Missed visits | Valid if missing at random (see above) | Valid if missing at random | Valid only if missing completely at random, unless weighted |
+| Main cost | The equal-correlation assumption | Many correlation parameters: 21 for six visits | Weaker missing-data protection; robust standard errors are too small in small samples |
+
+**MMRM** is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits [@mallinckrodt2008mmrm]. Its unstructured correlation avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit [@coffman2016clda]. That is a different question, not just a different method.
+
+**GEE** describe the average outcome in each group without modelling individuals [@liang1986gee]. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it [@robins1995weighted]. With few participants, robust standard errors are biased downwards and need a small-sample correction [@mancl2001gee].
+
+For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.
+
 ## Count outcomes are different
 
 The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don't need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person's follow-up time as an **offset**, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are **incidence rate ratios**: an arm effect of 0.8 means the intervention arm's rate is 80% of the control arm's.
