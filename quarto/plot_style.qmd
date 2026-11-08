@@ -3,7 +3,7 @@ title: "Plot style"
 format: html
 ---
 
-The house style for figures: one theme with its colours, shapes and line types, readable labels, and one way to save a figure at its printed size.
+The house style for figures: one theme with its colors, shapes and line types, readable labels, and one way to save a figure at its printed size.
 
 ::: {.Rcode title="Source code"}
 The full R script is available at:
@@ -35,7 +35,7 @@ The theme relies on features added in ggplot2 4.0.0: a theme can carry the palet
 
 ## Palettes
 
-A palette is the ordered set of colours (or shapes, or line types) given to the groups in a figure. The colours are the Okabe-Ito set, chosen to stay distinguishable for people with the common kinds of colour-vision deficiency, with a neutral dark grey first so the control arm recedes and the intervention arm stands out. Groups also differ by point shape and line type, so a figure still works in greyscale and never relies on colour alone.
+A palette is the ordered set of colors (or shapes, or line types) given to the groups in a figure. The colors are the Okabe-Ito set, chosen to stay distinguishable for people with the common kinds of color-vision deficiency, with a neutral dark gray first so the control arm recedes and the intervention arm stands out. Groups also differ by point shape and line type, so a figure still works in grayscale and never relies on color alone.
 
 ```{r}
 #| label: publication-palettes
@@ -44,7 +44,7 @@ A palette is the ordered set of colours (or shapes, or line types) given to the 
 
 ## The publication theme
 
-A theme controls everything in a figure that is not data: background, gridlines, text sizes, legend position. `theme_publication()` keeps only what helps a reader: light horizontal gridlines to read values against, thin axis lines, no panel border. It also carries the palettes above, so a figure needs no colour settings of its own. Text sizes are set for the printed figure (9 points by default), so a figure should be saved at the size it will be printed.
+A theme controls everything in a figure that is not data: background, gridlines, text sizes, legend position. `theme_publication()` keeps only what helps a reader: light horizontal gridlines to read values against, thin axis lines, no panel border. It also carries the palettes above, so a figure needs no color settings of its own. Text sizes are set for the printed figure (9 points by default), so a figure should be saved at the size it will be printed.
 
 ```{r}
 #| label: theme-publication
@@ -78,4 +78,4 @@ Setting the theme once makes it the starting point for every figure, including q
 #| eval: false
 ```
 
-For more on themes and on choosing colours, see [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/) by Claus Wilke.
+For more on themes and on choosing colors, see [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/) by Claus Wilke.

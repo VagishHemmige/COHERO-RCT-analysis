@@ -25,7 +25,7 @@ website:
   repo-actions: [edit, issue]
   page-navigation: true
 
-  # Each kind of page has one icon, coloured in styles.css: laptop = R code.
+  # Each kind of page has one icon, colored in styles.css: laptop = R code.
   sidebar:
     style: docked
     collapse-level: 3

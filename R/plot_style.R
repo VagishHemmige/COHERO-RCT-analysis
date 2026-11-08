@@ -1,11 +1,11 @@
-# Purpose: the house style for figures: a publication theme with its colour,
+# Purpose: the house style for figures: a publication theme with its color,
 #   shape and line-type palettes, readable labels for variables, and one way
 #   to save a figure at print size. Applied to every figure by setting the
 #   theme once.
 # Needs: setup.R (packages, figure_labels). ggplot2 4.0.0 or later, for
 #   palettes carried by the theme and labels by dictionary.
 # Produces: theme_publication(), label_figure(), figure_label(),
-#   save_figure(), publication_colours; sets theme_publication() as the
+#   save_figure(), publication_colors; sets theme_publication() as the
 #   default theme.
 
 ## ---- check-ggplot2-version
@@ -17,13 +17,13 @@ if (utils::packageVersion("ggplot2") < "4.0.0") {
 }
 
 ## ---- publication-palettes
-# Okabe-Ito colours (safe for the common kinds of colour-vision deficiency),
-# with a neutral dark grey first: the first group of any factor, such as the
-# control arm or a reference level, is drawn in grey and the second in blue
+# Okabe-Ito colors (safe for the common kinds of color-vision deficiency),
+# with a neutral dark gray first: the first group of any factor, such as the
+# control arm or a reference level, is drawn in gray and the second in blue
 okabe_ito <- unname(grDevices::palette.colors(palette = "Okabe-Ito"))
-publication_colours <- c("#555555", okabe_ito[c(6, 7, 4, 2, 8, 3, 5)])
+publication_colors <- c("#555555", okabe_ito[c(6, 7, 4, 2, 8, 3, 5)])
 
-# Shapes and line types differ too, so groups never rely on colour alone.
+# Shapes and line types differ too, so groups never rely on color alone.
 # Filled shapes 21-25 take a white fill, so overlapping points stay visible.
 publication_shapes <- c(21, 24, 22, 23, 25)
 publication_linetypes <- c("22", "solid", "42", "12", "4212")
@@ -43,21 +43,21 @@ theme_publication <- function(base_size = 9, base_family = "",
       panel.grid.minor = ggplot2::element_blank(),
       panel.grid.major.x = ggplot2::element_blank(),
       panel.grid.major.y = ggplot2::element_line(
-        colour = "grey90", linewidth = 0.3
+        color = "gray90", linewidth = 0.3
       ),
-      axis.line.x = ggplot2::element_line(colour = "grey30", linewidth = 0.3),
-      axis.ticks.x = ggplot2::element_line(colour = "grey30", linewidth = 0.3),
-      axis.title = ggplot2::element_text(colour = "grey20"),
-      axis.text = ggplot2::element_text(colour = "grey30"),
+      axis.line.x = ggplot2::element_line(color = "gray30", linewidth = 0.3),
+      axis.ticks.x = ggplot2::element_line(color = "gray30", linewidth = 0.3),
+      axis.title = ggplot2::element_text(color = "gray20"),
+      axis.text = ggplot2::element_text(color = "gray30"),
       strip.text = ggplot2::element_text(face = "bold", hjust = 0),
       plot.title = ggplot2::element_text(face = "bold"),
       plot.title.position = "plot",
-      plot.caption = ggplot2::element_text(colour = "grey35", hjust = 0),
+      plot.caption = ggplot2::element_text(color = "gray35", hjust = 0),
       plot.caption.position = "plot",
       legend.position = "top",
       legend.justification = "left",
-      palette.colour.discrete = publication_colours,
-      palette.fill.discrete = publication_colours,
+      palette.color.discrete = publication_colors,
+      palette.fill.discrete = publication_colors,
       palette.shape.discrete = scales::pal_manual(publication_shapes),
       palette.linetype.discrete = publication_linetypes
     )
@@ -70,7 +70,7 @@ theme_publication <- function(base_size = 9, base_family = "",
 label_figure <- function(arm_axis = FALSE) {
   layers <- list(
     ggplot2::labs(dictionary = figure_labels),
-    ggplot2::scale_colour_discrete(labels = arm_labels)
+    ggplot2::scale_color_discrete(labels = arm_labels)
   )
   if (arm_axis) {
     layers <- c(layers, list(ggplot2::scale_x_discrete(labels = arm_labels)))

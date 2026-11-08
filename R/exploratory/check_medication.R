@@ -18,7 +18,7 @@ raw_medications %>%
   flextable()
 
 ## ---- check-medication-labels
-# Are controller and rescue inhalers labelled correctly in the app export?
+# Are controller and rescue inhalers labeled correctly in the app export?
 raw_medications %>%
   group_by(Medication, Med.Type) %>%
   filter(!is.na(SUBJECTID)) %>%
@@ -26,8 +26,8 @@ raw_medications %>%
   arrange(Med.Type) %>%
   flextable()
 
-## ---- check-relabelled-medications
-# After relabelling by medication name
+## ---- check-relabeled-medications
+# After relabeling by medication name
 medication_data_clean %>%
   group_by(Medication, med_type_clean) %>%
   count() %>%

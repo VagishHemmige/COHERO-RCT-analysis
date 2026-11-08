@@ -136,7 +136,7 @@ hospital_binary_outcomes <- c(
   "urgent_care_12months"
 )
 
-# Count outcomes modelled with negative binomial regression
+# Count outcomes modeled with negative binomial regression
 count_outcomes <- c(
   "ed_visit_number_times_12months",
   "hospitalization_number_times_12months",

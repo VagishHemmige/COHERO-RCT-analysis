@@ -84,7 +84,7 @@ For an accessible introduction, see Box 1 and the practical discussion in [Stern
 
 ## Other models for the same question
 
-The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.
+The random-intercept mixed model is one of several reasonable ways to analyze repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.
 
 | | Linear mixed model (used here) | Mixed model for repeated measures (MMRM) | Generalized estimating equations (GEE) |
 |---|---|---|---|
@@ -96,7 +96,7 @@ The random-intercept mixed model is one of several reasonable ways to analyse re
 
 **MMRM** is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits [@mallinckrodt2008mmrm]. Its unstructured correlation avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit [@coffman2016clda]. That is a different question, not just a different method.
 
-**GEE** describe the average outcome in each group without modelling individuals [@liang1986gee]. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it [@robins1995weighted]. With few participants, robust standard errors are biased downwards and need a small-sample correction [@mancl2001gee].
+**GEE** describe the average outcome in each group without modeling individuals [@liang1986gee]. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it [@robins1995weighted]. With few participants, robust standard errors are biased downwards and need a small-sample correction [@mancl2001gee].
 
 For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.
 

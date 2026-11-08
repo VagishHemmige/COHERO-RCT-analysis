@@ -77,7 +77,7 @@ The figure is built from small parts, each returning an ordinary ggplot, and one
 
 ### Means
 
-`plot_means()` draws each arm's model-estimated mean and 95% confidence interval at each visit, optionally over the individual trajectories. The arms differ by colour, point shape and line type, and are named at the end of their lines rather than in a legend.
+`plot_means()` draws each arm's model-estimated mean and 95% confidence interval at each visit, optionally over the individual trajectories. The arms differ by color, point shape and line type, and are named at the end of their lines rather than in a legend.
 
 ```{r}
 #| label: plot-means

@@ -41,7 +41,7 @@ To allow more for a source, a person changes its row through a pull request, nam
 
 ## Exploration and definitive analysis
 
-Exploration is welcome on branches or forks, and in `R/exploratory/`. Experimental scripts need not be sourced from `R/main.R`, and their findings are labelled preliminary. A script becomes part of the definitive analysis when it is sourced from `R/main.R`; from then on every rule below applies to it.
+Exploration is welcome on branches or forks, and in `R/exploratory/`. Experimental scripts need not be sourced from `R/main.R`, and their findings are labeled preliminary. A script becomes part of the definitive analysis when it is sourced from `R/main.R`; from then on every rule below applies to it.
 
 **The port.** The scripts are first ported faithfully from `MR_SJ_asthma_pilot_2023-9-15.Rmd` (kept privately, never committed), so their output matches the original. Suspected defects found during the port are opened as issues and fixed in their own pull requests, each showing what changes. Code that does not yet meet the conventions below is brought into line in style-only pull requests.
 
@@ -57,7 +57,7 @@ Exploration is welcome on branches or forks, and in `R/exploratory/`. Experiment
 
 ## Chunk labels
 
-Scripts are divided into labelled sections so a future Quarto site can show the code without copying it:
+Scripts are divided into labeled sections so a future Quarto site can show the code without copying it:
 
 ```r
 ## ---- <step-name>
@@ -77,7 +77,7 @@ Home, a Methods section on the techniques the code uses (in general terms, with 
 
 - **Publishing:** the GitHub Actions workflow `.github/workflows/publish.yml` renders the site on every pull request (as a check) and publishes it to the `gh-pages` branch on every push to `main`. `docs/` is not committed.
 - **The site never runs the analysis.** Global `eval: false`; the only chunks that run are the hidden `knitr::read_chunk()` imports, which read the scripts as text. No page reads data or outputs.
-- **A script page** imports its labelled sections with `read_chunk()`. When a script joins `main.R`, its page and sidebar entry are added in the same pull request; when a chunk label changes, the page changes with it.
+- **A script page** imports its labeled sections with `read_chunk()`. When a script joins `main.R`, its page and sidebar entry are added in the same pull request; when a chunk label changes, the page changes with it.
 - **The custom-callout extension** is committed in `_extensions/coatless-quarto/`, copied from Cryptococcus-cost-analysis.
 
 ## Outputs
@@ -92,13 +92,13 @@ The **Access** column of "Data sources" says which sources are restricted. All f
 
 - **Never commit data**, extracts, or saved objects or outputs derived from participant-level records. Keep data outside the repository, and check `.gitignore` before adding a new output type.
 - **AI agents never read restricted data.** Anything an agent opens, prints, or summarizes is sent to the model provider. Agents do not open data files or participant-level objects, print rows, or display identifiers, participant-level dates, or study IDs linked to data. Agents also do not open outputs from restricted data that are not yet cleared for release (`tables/`, `figures/`, animations, and anything knitted from the original RMD). Agents write code, review it, and run it on **synthetic data**; results on real data are produced by an authorized person. The only exception is what the Data sources table explicitly allows for a source, and only within those words.
-- **Synthetic data** are built in code, labelled as synthetic, and never derived from real records.
+- **Synthetic data** are built in code, labeled as synthetic, and never derived from real records.
 - **Disclosure.** The small-cell and publication rules of the governing protocol are still to be named. Until then, treat every count, table, figure and quoted number from the real data as not cleared. Check every output before it leaves the approved environment, including scripts, comments, commit messages, issues, pull-request text and review reports (see R scripts).
 - **Credentials.** Never commit keys, tokens, or `.Renviron`.
 
 ## Coding conventions
 
-- **Participant flow.** When the cleaning code is rewritten after the port, the CONSORT flow diagram and the analysis populations come from the same code, using the `flowchart` package: every exclusion goes through `fc_filter()`, in the plan's order, and flowchart labels are built from constants in `setup.R`. Record-level processing (relabelling inhaler records, choosing among a participant's records) is fine outside the flowchart.
+- **Participant flow.** When the cleaning code is rewritten after the port, the CONSORT flow diagram and the analysis populations come from the same code, using the `flowchart` package: every exclusion goes through `fc_filter()`, in the plan's order, and flowchart labels are built from constants in `setup.R`. Record-level processing (relabeling inhaler records, choosing among a participant's records) is fine outside the flowchart.
 - **Code lists** (scale items, inhaler names) carry their source. Check each against the data dictionary or instrument. Never invent codes, variables, files, or definitions.
 - **Joins** use `join_by()` with an explicit `relationship` where possible. After every join of records to participants, assert that rows did not multiply, and decide deliberately what happens to unmatched rows.
 - **Dates and windows** are written as inclusive intervals matching the plan, and the edges are tested on synthetic data.
