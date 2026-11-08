@@ -81,8 +81,8 @@ count_outcome_plots <- list()
 for (outcome in count_outcomes) {
   count_outcome_plots[[outcome]] <- rescue_medication_merged %>%
     ggplot() +
-    geom_quasirandom(mapping = aes_string(
-      x = "studyarm", y = outcome, color = "studyarm"
+    geom_quasirandom(mapping = aes(
+      x = studyarm, y = .data[[outcome]], color = studyarm
     )) +
     theme_bw()
 }
