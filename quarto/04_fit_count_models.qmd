@@ -27,12 +27,16 @@ knitr::read_chunk("../R/04_fit_count_models.R")
 
 ## Count models
 
+Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in [Longitudinal data and mixed models](methods_longitudinal.qmd#count-outcomes-are-different).
+
 ```{r}
 #| label: count-models
 #| eval: false
 ```
 
 ## Count interaction models
+
+What each coefficient of an arm × subgroup model means is in [Interactions](methods_interactions.qmd#reading-the-coefficients-count-models), what the interaction p-value tests in [What a p-value for interaction means](methods_interaction_p_values.qmd), and how to get the IRR in each subgroup level in [Effects behind an interaction](methods_stratified_effects.qmd).
 
 ```{r}
 #| label: count-interaction-models

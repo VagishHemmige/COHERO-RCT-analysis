@@ -34,12 +34,16 @@ knitr::read_chunk("../R/05_fit_mixed_models.R")
 
 ## Mixed models overall
 
+The model and what its coefficients mean are explained in [Longitudinal data and mixed models](methods_longitudinal.qmd).
+
 ```{r}
 #| label: mixed-models-overall
 #| eval: false
 ```
 
 ## Mixed models subgroups
+
+Reading the three-way visit × arm × subgroup terms is covered in [Interactions](methods_interactions.qmd#reading-the-coefficients-linear-mixed-models), and the meaning of their p-values in [What a p-value for interaction means](methods_interaction_p_values.qmd).
 
 ```{r}
 #| label: mixed-models-subgroups

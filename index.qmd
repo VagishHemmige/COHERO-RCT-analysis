@@ -9,8 +9,8 @@ This site shows the code for the analysis of the EM-ASTHMA pilot randomized tria
 
 ## How to read this site
 
-Each page under **Code** shows one script, in the order `R/main.R` runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md), a retrospective record written after the results were seen.
+The **Methods** pages explain, in general terms, the techniques the code uses: mixed models for repeated measures, interactions, what a p-value for interaction means, and how to get the effect within each subgroup and visit with emmeans. They end with how this code does each of these. Each page under **Code** shows one script, in the order `R/main.R` runs them, with its code imported directly from the repository. The authoritative description of what the analysis does is the [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md), a retrospective record written after the results were seen.
 
 ## Status
 
-In progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository's [Issues](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues). Pages explaining the background, the study design and the methods will be added later.
+In progress. The code is a port of an earlier R Markdown analysis into plain R scripts and has not yet been run in this form. Known defects, open decisions and planned changes are tracked in the repository's [Issues](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues). Pages on the clinical background and the study design will be added later.

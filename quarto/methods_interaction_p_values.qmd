@@ -1,0 +1,32 @@
+---
+title: "What a p-value for interaction means"
+format: html
+---
+
+This page explains what the p-value of an interaction term tests, and what it doesn't. It uses no results from this trial.
+
+## It tests a difference between effects
+
+The p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in every level of the subgroup**. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.
+
+Altman and Bland make the general point: to compare two estimates, test their difference directly; don't compare their separate p-values [@altman2003interaction].
+
+## "Significant in one subgroup and not the other" is not evidence of a difference
+
+A common mistake is to fit the model in each subgroup separately, find p < 0.05 in one and p > 0.05 in the other, and conclude the intervention works only in the first. Two estimates can be almost identical while one crosses 0.05 and the other doesn't, especially when the subgroups differ in size. Brookes and colleagues showed by simulation how often subgroup-specific tests produce this pattern when the true effect is the same in both groups, and that the interaction test is the right comparison [@brookes2004subgroup].
+
+## It has low power
+
+A trial sized to detect the overall effect has far less power to detect an interaction of the same size. In Brookes and colleagues' simulations, a trial with 80% power for the overall effect had only about 29% power for an interaction of that magnitude, and roughly four times the sample size was needed to match [@brookes2004subgroup]. In a pilot trial this matters even more: a large p-value for interaction is weak evidence that the effects are the same.
+
+## It depends on the scale
+
+As the [Interactions](methods_interactions.qmd) page explains, an interaction is measured on a scale. A test on the ratio scale (count models) and a test on the difference scale (mixed models) are answering different questions, and can disagree on the same data.
+
+## Many tests
+
+Each subgroup variable, outcome, population and visit adds tests. With several subgroups, several outcomes, two populations and an interaction p-value at every visit, some small p-values are expected by chance alone. Wang and colleagues' guidance on reporting subgroup analyses asks that the number of subgroup analyses be stated, that prespecified and post hoc analyses be distinguished, and that interaction tests rather than subgroup-specific tests be the basis for claims of different effects [@wang2007subgroup]. In this analysis every subgroup analysis is post hoc and none is adjusted for multiplicity (see the [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)).
+
+## Report the effects, not only the p-value
+
+Because the interaction p-value says nothing about the size of the effect in each group, it's best reported alongside the effect within each subgroup level, with its confidence interval [@knol2012presenting]. [Effects behind an interaction](methods_stratified_effects.qmd) shows how to get those.

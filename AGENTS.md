@@ -73,7 +73,7 @@ Label analysis variables with human-readable descriptions (for example `labelled
 
 ## Quarto website
 
-A stub site: Home and one page per definitive script under Code. Background, study design and methods, project-document and About pages come later. It follows the r-analysis-workflow Quarto guidance.
+Home, a Methods section on the techniques the code uses (in general terms, with code shown but not run, and nothing about the trial's results), and one page per definitive script under Code. Clinical background, study design, project-document and About pages come later. It follows the r-analysis-workflow Quarto guidance.
 
 - **Publishing:** the GitHub Actions workflow `.github/workflows/publish.yml` renders the site on every pull request (as a check) and publishes it to the `gh-pages` branch on every push to `main`. `docs/` is not committed.
 - **The site never runs the analysis.** Global `eval: false`; the only chunks that run are the hidden `knitr::read_chunk()` imports, which read the scripts as text. No page reads data or outputs.
