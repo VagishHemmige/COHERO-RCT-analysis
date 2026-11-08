@@ -12,11 +12,13 @@ create_me_table <- function(trial_data, outcome_of_interest,
                             interaction_variable = NULL) {
   # Primary analysis without interactions if interaction_variable is NULL
   if (is.null(interaction_variable)) {
-    lmer(
-      get(outcome_of_interest) ~ time_factor * studyarm +
-        (1 | study_id_screening),
-      data = trial_data
+    lmer_formula <- paste0(
+      outcome_of_interest,
+      " ~ time_factor * studyarm + (1 | study_id_screening)"
     ) %>%
+      as.formula()
+
+    lmer(lmer_formula, data = trial_data) %>%
       tidy(., conf.int = TRUE) %>%
       flextable() %>%
       set_caption(paste0(outcome_of_interest, " vs. time")) %>%
@@ -112,7 +114,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
 
     # Number observed in each arm at each visit
     mixed_model_predictions <- trial_data %>%
-      filter(!is.na(get(outcome_of_interest))) %>%
+      filter(!is.na(.data[[outcome_of_interest]])) %>%
       group_by(time_linear, studyarm) %>%
       summarize(n_obs = n()) %>%
       left_join(
@@ -126,7 +128,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_point(
         trial_data,
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -134,7 +136,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_line(
         trial_data,
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -150,7 +152,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted, y = estimate, color = studyarm,
           group = studyarm
         ),
-        size = 2
+        linewidth = 2
       ) +
       geom_errorbar(
         mixed_model_predictions,
@@ -158,7 +160,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted, ymin = conf.low, ymax = conf.high,
           color = studyarm
         ),
-        size = 1.5
+        linewidth = 1.5
       ) +
       theme_bw() +
       geom_text(
@@ -199,7 +201,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
 
     data_for_function <- trial_data %>%
       mutate(interaction_variable_numeric = factor(
-        as.numeric(get(interaction_variable))
+        as.numeric(.data[[interaction_variable]])
       )) %>%
       mutate(me_factor_interaction_variable = paste(
         "time", time_linear, "studyarm", studyarm, interaction_variable,
@@ -352,7 +354,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
 
     # Number observed in each arm and level at each visit
     predictions_interaction <- data_for_function %>%
-      filter(!is.na(get(outcome_of_interest))) %>%
+      filter(!is.na(.data[[outcome_of_interest]])) %>%
       group_by(time_linear, studyarm, interaction_variable_numeric) %>%
       summarize(n_obs = n()) %>%
       rename(interaction_variable = interaction_variable_numeric) %>%
@@ -383,7 +385,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_point(
         data_nested_interaction$data[[1]],
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -391,7 +393,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_line(
         data_nested_interaction$data[[1]],
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -409,7 +411,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted_2, y = estimate, color = studyarm,
           group = gid
         ),
-        size = 2
+        linewidth = 2
       ) +
       theme_bw() +
       geom_text(
@@ -440,7 +442,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,
           color = studyarm
         ),
-        size = 1.5
+        linewidth = 1.5
       ) +
       scale_x_continuous(
         breaks = NULL,
@@ -460,7 +462,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_point(
         data_nested_interaction$data[[2]],
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -468,7 +470,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
       geom_line(
         data_nested_interaction$data[[2]],
         mapping = aes(
-          x = time_linear_shifted, y = get(outcome_of_interest),
+          x = time_linear_shifted, y = .data[[outcome_of_interest]],
           color = studyarm, group = study_id_screening
         ),
         alpha = 0.2
@@ -486,7 +488,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted_2, y = estimate, color = studyarm,
           group = gid
         ),
-        size = 2
+        linewidth = 2
       ) +
       theme_bw() +
       geom_text(
@@ -517,7 +519,7 @@ create_me_plot <- function(trial_data, outcome_of_interest,
           x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,
           color = studyarm
         ),
-        size = 1.5
+        linewidth = 1.5
       ) +
       scale_x_continuous(
         breaks = NULL,
