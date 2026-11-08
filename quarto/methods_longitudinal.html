@@ -131,6 +131,17 @@ div.csl-indent {
   }
 }</script>
 <style>
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
+  background-image: none;
+}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -151,17 +162,6 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
-  background-image: none;
-}
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
   background-image: none;
 }
 </style>
@@ -566,7 +566,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="other-models-for-the-same-question" class="level2">
 <h2 class="anchored" data-anchor-id="other-models-for-the-same-question">Other models for the same question</h2>
-<p>The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</p>
+<p>The random-intercept mixed model is one of several reasonable ways to analyze repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -616,7 +616,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </tbody>
 </table>
 <p><strong>MMRM</strong> is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="citation" data-cites="mallinckrodt2008mmrm">(<a href="#ref-mallinckrodt2008mmrm" role="doc-biblioref">Mallinckrodt et al. 2008</a>)</span>. Its unstructured correlation avoids assuming that a person’s visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="citation" data-cites="coffman2016clda">(<a href="#ref-coffman2016clda" role="doc-biblioref">Coffman et al. 2016</a>)</span>. That is a different question, not just a different method.</p>
-<p><strong>GEE</strong> describe the average outcome in each group without modelling individuals <span class="citation" data-cites="liang1986gee">(<a href="#ref-liang1986gee" role="doc-biblioref">Liang and Zeger 1986</a>)</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="citation" data-cites="robins1995weighted">(<a href="#ref-robins1995weighted" role="doc-biblioref">Robins et al. 1995</a>)</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="citation" data-cites="mancl2001gee">(<a href="#ref-mancl2001gee" role="doc-biblioref">Mancl and DeRouen 2001</a>)</span>.</p>
+<p><strong>GEE</strong> describe the average outcome in each group without modeling individuals <span class="citation" data-cites="liang1986gee">(<a href="#ref-liang1986gee" role="doc-biblioref">Liang and Zeger 1986</a>)</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="citation" data-cites="robins1995weighted">(<a href="#ref-robins1995weighted" role="doc-biblioref">Robins et al. 1995</a>)</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="citation" data-cites="mancl2001gee">(<a href="#ref-mancl2001gee" role="doc-biblioref">Mancl and DeRouen 2001</a>)</span>.</p>
 <p>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</p>
 </section>
 <section id="count-outcomes-are-different" class="level2">
@@ -1213,7 +1213,7 @@ Vickers, Andrew J., and Douglas G. Altman. 2001. <span>“Analysing Controlled T
 <span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="fu">## Other models for the same question</span></span>
 <span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The random-intercept mixed model is one of several reasonable ways to analyse repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>The random-intercept mixed model is one of several reasonable ways to analyze repeated measures in a trial. Two common alternatives are worth knowing, because readers will meet them in other trials and because each makes a different trade-off. This trial uses neither; the comparison is here to explain the choice.</span>
 <span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Linear mixed model (used here) <span class="pp">|</span> Mixed model for repeated measures (MMRM) <span class="pp">|</span> Generalized estimating equations (GEE) <span class="pp">|</span></span>
 <span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
@@ -1225,7 +1225,7 @@ Vickers, Andrew J., and Douglas G. Altman. 2001. <span>“Analysing Controlled T
 <span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>**MMRM** is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="co">[</span><span class="ot">@mallinckrodt2008mmrm</span><span class="co">]</span>. Its unstructured correlation avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="co">[</span><span class="ot">@coffman2016clda</span><span class="co">]</span>. That is a different question, not just a different method.</span>
 <span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>**GEE** describe the average outcome in each group without modelling individuals <span class="co">[</span><span class="ot">@liang1986gee</span><span class="co">]</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="co">[</span><span class="ot">@robins1995weighted</span><span class="co">]</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="co">[</span><span class="ot">@mancl2001gee</span><span class="co">]</span>.</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>**GEE** describe the average outcome in each group without modeling individuals <span class="co">[</span><span class="ot">@liang1986gee</span><span class="co">]</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="co">[</span><span class="ot">@robins1995weighted</span><span class="co">]</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="co">[</span><span class="ot">@mancl2001gee</span><span class="co">]</span>.</span>
 <span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</span>
 <span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>

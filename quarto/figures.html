@@ -130,17 +130,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
-  background-image: none;
-}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -161,6 +150,17 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
+  background-image: none;
+}
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 </style>
@@ -535,7 +535,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="count-outcome-plots" class="level2">
 <h2 class="anchored" data-anchor-id="count-outcome-plots">Count outcome plots</h2>
-<p>The loop creates one plot per count outcome and saves it under that outcome’s name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <code>aes()</code> maps variables to positions and colours, while <code>geom_*()</code> chooses marks. The <a href="https://ggplot2.tidyverse.org/articles/ggplot2.html">ggplot2 introduction</a> explains this layering <span class="citation" data-cites="ggplotintro">(<a href="#ref-ggplotintro" role="doc-biblioref"><span class="nocase">ggplot2 authors</span>, n.d.</a>)</span>.</p>
+<p>The loop creates one plot per count outcome and saves it under that outcome’s name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <code>aes()</code> maps variables to positions and colors, while <code>geom_*()</code> chooses marks. The <a href="https://ggplot2.tidyverse.org/articles/ggplot2.html">ggplot2 introduction</a> explains this layering <span class="citation" data-cites="ggplotintro">(<a href="#ref-ggplotintro" role="doc-biblioref"><span class="nocase">ggplot2 authors</span>, n.d.</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1194,7 +1194,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcome plots</span></span>
 <span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <span class="in">`aes()`</span> maps variables to positions and colours, while <span class="in">`geom_*()`</span> chooses marks. The <span class="co">[</span><span class="ot">ggplot2 introduction</span><span class="co">](https://ggplot2.tidyverse.org/articles/ggplot2.html)</span> explains this layering <span class="co">[</span><span class="ot">@ggplotintro</span><span class="co">]</span>.</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. <span class="in">`aes()`</span> maps variables to positions and colors, while <span class="in">`geom_*()`</span> chooses marks. The <span class="co">[</span><span class="ot">ggplot2 introduction</span><span class="co">](https://ggplot2.tidyverse.org/articles/ggplot2.html)</span> explains this layering <span class="co">[</span><span class="ot">@ggplotintro</span><span class="co">]</span>.</span>
 <span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-outcome-plots</span></span>
