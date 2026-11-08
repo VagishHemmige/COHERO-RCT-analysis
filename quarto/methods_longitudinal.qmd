@@ -38,9 +38,25 @@ The last row matters most. Each visit-by-arm term is a **difference in change fr
 
 The arm difference at a given visit itself, with no baseline subtraction, is not one coefficient: it's `studyarm1` plus that visit's interaction term. Adding a subgroup to this model is covered in [Interactions](methods_interactions.qmd). Getting such combinations, with their confidence intervals, is the subject of [Effects behind an interaction](methods_stratified_effects.qmd).
 
-## Missed visits
+## Missed visits and missing at random
 
-A mixed model uses every visit a participant attended, even if they missed others. That's a real advantage over analyses that keep only people with complete data. The estimates are unbiased if missing visits are **missing at random**: whether a visit is missed may depend on the person's earlier, observed values, but not on the value that would have been measured. If people tended to miss visits because they were doing badly at that moment, the model can't detect it, and the estimates would be biased.
+A participant who misses a visit can still contribute their other observed measurements to a mixed model. This does not require filling in a score for the missed visit. Observations with missing model predictors, such as a subgroup classification, are a separate problem.
+
+**Missing at random (MAR)** means that, after accounting for relevant information already recorded—such as treatment group and earlier asthma scores—whether someone misses a visit does not additionally depend on the asthma score we would have measured at that visit. "At random" does not mean that visits were missed without a reason [@sterne2009missing].
+
+For example, missed visits related to previously recorded poor asthma control can be compatible with MAR. Missed visits related to unrecorded worsening symptoms may violate it, if that relationship remains after accounting for the observed information. These are hypothetical examples, not explanations established for this trial.
+
+Likelihood-based mixed models can support valid inference under MAR when the outcome model is correctly specified and represents the relevant observed information. Choosing a mixed model does not establish MAR, and observed data alone cannot distinguish MAR from missingness that still depends on unobserved outcomes [@sterne2009missing].
+
+### What multiple imputation adds
+
+Multiple imputation creates several plausible versions of the missing values, analyzes each completed dataset, and pools the estimates while accounting for uncertainty about the missing values. It does not recover the actual missed measurements [@sterne2009missing].
+
+It is not automatically necessary just because outcome visits were missed: the mixed model already uses incomplete outcome trajectories under MAR. Imputation may add value when model predictors are missing or when other recorded variables help predict missingness and missing outcomes. For longitudinal analyses, the imputation model must respect repeated observations within participants and the interactions used in the analysis.
+
+Ordinary MAR-based imputation does not solve missingness that depends on unobserved outcomes. Sensitivity analyses instead examine how conclusions change under explicitly different assumptions. Whether to add imputation or such analyses here remains a scientific decision; this explanation does not change the analysis.
+
+For an accessible introduction, see Box 1 and the practical discussion in [Sterne and colleagues' BMJ article](https://pmc.ncbi.nlm.nih.gov/articles/PMC2714692/) [@sterne2009missing].
 
 ## Count outcomes are different
 
