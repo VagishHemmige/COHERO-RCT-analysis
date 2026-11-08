@@ -42,10 +42,18 @@ tabulate_model_terms <- function(fit, caption, labels = NULL) {
   model_variables <- all.vars(formula(fit, fixed.only = TRUE))[-1]
   variable_labels <- as.list(labels[intersect(names(labels), model_variables)])
   standard_deviations <- as.data.frame(VarCorr(fit))
+  participant_sd <-
+    standard_deviations$sdcor[standard_deviations$grp != "Residual"][1]
+  residual_sd <- standard_deviations$sdcor[standard_deviations$grp == "Residual"]
+  # Intraclass correlation: the share of the variance that lies between
+  # participants rather than between one participant's visits
+  intraclass_correlation <- participant_sd^2 / (participant_sd^2 + residual_sd^2)
   sd_note <- sprintf(
-    "Participant SD %.2f; residual SD %.2f (random intercept for each participant).",
-    standard_deviations$sdcor[standard_deviations$grp != "Residual"][1],
-    standard_deviations$sdcor[standard_deviations$grp == "Residual"]
+    paste(
+      "Participant SD %.2f; residual SD %.2f; intraclass correlation %.2f",
+      "(random intercept for each participant)."
+    ),
+    participant_sd, residual_sd, intraclass_correlation
   )
 
   tbl_regression(fit, label = variable_labels) %>%

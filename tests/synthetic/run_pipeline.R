@@ -127,7 +127,7 @@ figures_pass <- !is.null(figure_results) &&
 ## ---- check-tables
 # Every number in the mixed-model tables matches its source (issue #8): the
 # model-term tables match broom.mixed::tidy() of each fit, with its two
-# standard deviations in the note under the table, and the effects
+# standard deviations and intraclass correlation in the note under the table, and the effects
 # tables match estimate_effects(). Compared as sorted sets of values, so the
 # check does not depend on how the table lays them out. FALSE, not an error,
 # when the code under test predates these tables.
@@ -157,6 +157,8 @@ model_terms_match <- tryCatch(all(unlist(lapply(
           filter(is.na(reference_row) | !reference_row)
         # The note under the table states the fit's two standard deviations
         standard_deviations <- broom.mixed::tidy(fit, effects = "ran_pars")$estimate
+        intraclass_correlation <- standard_deviations[1]^2 /
+          sum(standard_deviations^2)
         note <- mixed_model_tables[[population]][[outcome]][[analysis]]$
           table_styling$source_note$source_note
         all(vapply(
@@ -165,7 +167,7 @@ model_terms_match <- tryCatch(all(unlist(lapply(
           logical(1)
         )) &&
           all(vapply(
-            sprintf("%.2f", standard_deviations),
+            sprintf("%.2f", c(standard_deviations, intraclass_correlation)),
             function(value) any(grepl(value, note, fixed = TRUE)),
             logical(1)
           ))
