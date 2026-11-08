@@ -91,7 +91,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
-<link href="../quarto/01_import_data.html" rel="next">
+<link href="../quarto/plot_style.html" rel="next">
 <link href="../quarto/setup.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
@@ -131,15 +131,15 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
 }
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
 }
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 div.callout-Rcode.callout {
@@ -153,15 +153,15 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
   content: '💻';
   background-image: none;
 }
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
+div.callout-Results.callout {
+  border-left-color: #198754;
 }
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
 }
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -287,6 +287,13 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
   <a href="../quarto/functions.html" class="sidebar-item-text sidebar-link active"><i class="bi bi-laptop" role="img">
 </i> 
  <span class="menu-text">Functions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../quarto/plot_style.html" class="sidebar-item-text sidebar-link"><i class="bi bi-laptop" role="img">
+</i> 
+ <span class="menu-text">Plot style</span></a>
   </div>
 </li>
       </ul>
@@ -645,7 +652,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a>        ),</span>
 <span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a>        <span class="at">linewidth =</span> <span class="fl">1.5</span></span>
 <span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme_publication</span>() <span class="sc">+</span></span>
 <span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_text</span>(</span>
 <span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(mixed_model_predictions, studyarm <span class="sc">==</span> <span class="dv">1</span>),</span>
 <span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a>        <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> time_linear, <span class="at">y =</span> <span class="dv">0</span>, <span class="at">label =</span> n_obs, <span class="at">color =</span> studyarm)</span>
@@ -664,11 +671,11 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a>        <span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>, <span class="fl">12.5</span>),</span>
 <span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a>        <span class="at">minor_breaks =</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">12</span></span>
 <span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ylab</span>(outcome_of_interest) <span class="sc">+</span></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>      <span class="fu">xlab</span>(<span class="st">"Time (months)"</span>) <span class="sc">+</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_color_discrete</span>(</span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="st">"Study Arm"</span>,</span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>        <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Treatment"</span>)</span>
+<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a>      <span class="fu">ylab</span>(<span class="fu">figure_label</span>(outcome_of_interest)) <span class="sc">+</span></span>
+<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a>      <span class="fu">xlab</span>(<span class="fu">figure_label</span>(<span class="st">"time_linear"</span>)) <span class="sc">+</span></span>
+<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a>      <span class="fu">scale_colour_discrete</span>(</span>
+<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a>        <span class="at">name =</span> <span class="fu">figure_label</span>(<span class="st">"studyarm"</span>),</span>
+<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>        <span class="at">labels =</span> arm_labels</span>
 <span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">+</span></span>
 <span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">caption =</span> <span class="st">"† adjusted for baseline differences"</span>) <span class="sc">+</span></span>
 <span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a>      <span class="fu">theme</span>(<span class="at">plot.caption =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.0555</span>)) <span class="sc">+</span></span>
@@ -762,7 +769,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a>          ),</span>
 <span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a>          <span class="at">linewidth =</span> <span class="dv">2</span></span>
 <span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
-<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme_publication</span>() <span class="sc">+</span></span>
 <span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a>        <span class="fu">geom_text</span>(</span>
 <span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(level_predictions, studyarm <span class="sc">==</span> <span class="dv">0</span>),</span>
 <span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a>          <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> time_linear, <span class="at">y =</span> <span class="dv">1</span>, <span class="at">label =</span> n_obs, <span class="at">color =</span> studyarm)</span>
@@ -794,10 +801,10 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">+</span></span>
 <span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">3</span>, y_max)) <span class="sc">+</span></span>
 <span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_blank</span>()) <span class="sc">+</span></span>
-<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ylab</span>(outcome_of_interest) <span class="sc">+</span></span>
-<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_color_discrete</span>(</span>
-<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a>          <span class="at">name =</span> <span class="st">"Study Arm"</span>,</span>
-<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a>          <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Control"</span>, <span class="st">"Treatment"</span>)</span>
+<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="fu">figure_label</span>(outcome_of_interest)) <span class="sc">+</span></span>
+<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a>        <span class="fu">scale_colour_discrete</span>(</span>
+<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a>          <span class="at">name =</span> <span class="fu">figure_label</span>(<span class="st">"studyarm"</span>),</span>
+<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a>          <span class="at">labels =</span> arm_labels</span>
 <span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a>        )</span>
 <span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a>    }</span>
 <span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a></span>
@@ -1313,8 +1320,8 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
       </a>          
   </div>
   <div class="nav-page nav-page-next">
-      <a href="../quarto/01_import_data.html" class="pagination-link" aria-label="1. Import data">
-        <span class="nav-page-text">1. Import data</span> <i class="bi bi-arrow-right-short"></i>
+      <a href="../quarto/plot_style.html" class="pagination-link" aria-label="Plot style">
+        <span class="nav-page-text">Plot style</span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">

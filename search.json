@@ -321,214 +321,174 @@
     ]
   },
   {
-    "objectID": "quarto/functions.html",
-    "href": "quarto/functions.html",
-    "title": "Functions",
+    "objectID": "quarto/methods_stratified_effects.html",
+    "href": "quarto/methods_stratified_effects.html",
+    "title": "Effects behind an interaction",
     "section": "",
-    "text": "Reusable helper functions. Each takes its inputs as arguments.\nEach repeated-outcome analysis runs in three steps: fit the model once, estimate effects from it, then report them as a table and a plot. The names are general (an exposure, a time variable and an optional modifier), so the same functions serve any exposure-by-time analysis, with or without a subgroup.",
+    "text": "The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model’s printed coefficient table may not answer that directly. A contrast is a requested comparison of model estimates, such as intervention minus control within a subgroup.\nIn the invented interaction example, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.\nThe code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.",
     "crumbs": [
-      "Code",
-      "Setup and helper functions",
-      "Functions"
+      "Methods",
+      "Effects behind an interaction"
     ]
   },
   {
-    "objectID": "quarto/functions.html#fit-mixed-model",
-    "href": "quarto/functions.html#fit-mixed-model",
-    "title": "Functions",
-    "section": "Fit mixed model",
-    "text": "Fit mixed model\nfit_mixed_model() accepts a visit dataset, the outcome column’s name and an optional modifier (subgroup) name. Without a modifier it fits visit × arm with a random intercept for each participant; with one, visit × arm × modifier. It returns the fitted model, which the next three functions all use.\nWhat the model’s coefficients mean is explained in Longitudinal data and mixed models and Interactions.\n\n\nClick to show/hide R Code\n# Linear mixed model of an outcome on time (as a factor) by exposure, with a\n# random intercept for each participant. With a modifier, the model is time\n# by exposure by modifier.\nfit_mixed_model &lt;- function(data, outcome, modifier = NULL,\n                            exposure = \"studyarm\", time = \"time_factor\",\n                            id = \"study_id_screening\") {\n  fixed_effects &lt;- paste(c(time, exposure, modifier), collapse = \" * \")\n  model_formula &lt;- paste0(\n    outcome, \" ~ \", fixed_effects, \" + (1 | \", id, \")\"\n  ) %&gt;%\n    as.formula()\n\n  lmer(model_formula, data = data)\n}",
+    "objectID": "quarto/methods_stratified_effects.html#with-emmeans",
+    "href": "quarto/methods_stratified_effects.html#with-emmeans",
+    "title": "Effects behind an interaction",
+    "section": "With emmeans",
+    "text": "With emmeans\nemmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand (Lenth and Piaskowski 2026). For the count model:\n\n\nClick to show/hide R Code\nlibrary(emmeans)\n\nemmeans(fit, ~ studyarm | prefer_language, type = \"response\") %&gt;%\n  contrast(\"revpairwise\") %&gt;%\n  confint()\n\n\nThis gives one row per language: the intervention-vs-control IRR (a ratio column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.\nFor the mixed model, the arm difference at each visit within each subgroup level:\n\n\nClick to show/hide R Code\nemmeans(fit_lmer, ~ studyarm | time_factor * prefer_language) %&gt;%\n  contrast(\"revpairwise\") %&gt;%\n  confint()\n\n\nThese are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model’s interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:\n\n\nClick to show/hide R Code\nemmeans(fit_lmer, ~ studyarm * time_factor | prefer_language) %&gt;%\n  contrast(interaction = c(\"revpairwise\", \"trt.vs.ctrl\")) %&gt;%\n  confint()\n\n\nFor lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.\nRead ~ studyarm | prefer_language as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an lmer() formula. revpairwise reverses the usual pairwise direction so the stated factor order gives intervention versus control. confint() explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.\nFor a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score’s units. An interval for a mean or contrast is not the range of scores expected for individual participants.\nStart with the package’s quick-start guide. The interval and summary reference explains confint(), scales and inference options (Lenth and Piaskowski 2026). These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.",
     "crumbs": [
-      "Code",
-      "Setup and helper functions",
-      "Functions"
+      "Methods",
+      "Effects behind an interaction"
     ]
   },
   {
-    "objectID": "quarto/functions.html#tabulate-model-terms",
-    "href": "quarto/functions.html#tabulate-model-terms",
-    "title": "Functions",
-    "section": "Tabulate model terms",
-    "text": "Tabulate model terms\ntabulate_model_terms() turns a fitted model into a table of its coefficients. tidy() makes the model output table-shaped, and flextable() formats it. How this code does it describes what this table shows and doesn’t.\n\n\nClick to show/hide R Code\n# The fitted model's coefficients as a flextable: the baseline exposure\n# difference, the time-by-exposure interaction terms and, with a modifier,\n# the three-way terms\ntabulate_model_terms &lt;- function(fit, caption) {\n  fit %&gt;%\n    tidy(conf.int = TRUE) %&gt;%\n    flextable() %&gt;%\n    set_caption(caption)\n}",
+    "objectID": "quarto/methods_stratified_effects.html#by-refitting-with-a-different-reference-level",
+    "href": "quarto/methods_stratified_effects.html#by-refitting-with-a-different-reference-level",
+    "title": "Effects behind an interaction",
+    "section": "By refitting with a different reference level",
+    "text": "By refitting with a different reference level\nThe coefficient for studyarm1 is the arm effect in the reference level, so making the other level the reference gives its effect directly:\n\n\nClick to show/hide R Code\nparticipants_spanish_ref &lt;- participants %&gt;%\n  mutate(prefer_language = relevel(prefer_language, ref = \"Spanish\"))\n\nfit_spanish_ref &lt;- glm.nb(\n  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),\n  data = participants_spanish_ref\n)\n# exp(coef(fit_spanish_ref)[\"studyarm1\"]) is now the IRR in Spanish speakers\n\n\nThis is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see How this code does it).\n\n\n\n\n\n\nNoteOptional: where the interval comes from\n\n\n\n\n\nBy hand from the coefficients\nThe arm effect in a non-reference level is a sum of coefficients, so its variance is a sum of variances and covariances. For the count model rescue_puffs_itt ~ studyarm * prefer_language + offset(...):\n\\[\n\\log \\text{IRR}_{\\text{Spanish}} = \\beta_{\\text{arm}} + \\beta_{\\text{arm} \\times \\text{Spanish}}\n\\]\n\\[\n\\text{Var} = \\text{Var}(\\beta_{\\text{arm}}) + \\text{Var}(\\beta_{\\text{arm} \\times \\text{Spanish}}) + 2\\,\\text{Cov}(\\beta_{\\text{arm}}, \\beta_{\\text{arm} \\times \\text{Spanish}})\n\\]\n\n\nClick to show/hide R Code\nb &lt;- coef(fit)\nv &lt;- vcov(fit)\nterms &lt;- c(\"studyarm1\", \"studyarm1:prefer_languageSpanish\")\n\nlog_irr &lt;- sum(b[terms])\nse &lt;- sqrt(sum(v[terms, terms]))     # the sum of the 2 x 2 block\n\nexp(log_irr)                          # IRR in Spanish speakers\nexp(log_irr + c(-1, 1) * qnorm(0.975) * se)\n\n\nThe same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.\nHere coef() extracts coefficient estimates and vcov() extracts their variance–covariance matrix. The covariance matters because terms from the same model are estimated together. The square root of the combined variance gives a standard error. The displayed hand calculation uses a normal approximation; it is not a universal replacement for the degrees-of-freedom or interval method used by a mixed-model package.",
     "crumbs": [
-      "Code",
-      "Setup and helper functions",
-      "Functions"
+      "Methods",
+      "Effects behind an interaction"
     ]
   },
   {
-    "objectID": "quarto/functions.html#estimate-effects",
-    "href": "quarto/functions.html#estimate-effects",
-    "title": "Functions",
-    "section": "Estimate effects",
-    "text": "Estimate effects\nestimate_effects() asks emmeans for the numbers the plot needs, from the fitted model and without refitting: the mean in each visit × arm cell (and subgroup level), the arm effect at each visit within each level, and, with a subgroup, how that effect differs between levels. It returns them as tidy tables. Effects behind an interaction explains the method.\n\n\nClick to show/hide R Code\n# Estimates from a fitted model, with emmeans: the mean in each time x\n# exposure (x modifier level) cell, and for each modifier level the exposure\n# effect at each time. At the first (baseline) time the effect is the\n# exposure difference; at later times it is the time-by-exposure interaction,\n# the change from baseline in the exposed group minus that in the reference\n# group. With a modifier, the difference in that effect between each level\n# and the first level. Degrees of freedom are Satterthwaite's, as in the\n# model table, and p values are not adjusted for multiplicity.\nestimate_effects &lt;- function(fit, exposure = \"studyarm\",\n                             time = \"time_factor\", modifier = NULL) {\n  emm &lt;- function(specs, by = NULL) {\n    emmeans(fit, specs = specs, by = by,\n            lmer.df = \"satterthwaite\", lmerTest.limit = Inf)\n  }\n  tidy_emm &lt;- function(x) {\n    as_tibble(as.data.frame(summary(x, infer = TRUE, adjust = \"none\")))\n  }\n  first &lt;- \"trt.vs.ctrl1\"\n  baseline &lt;- ref_grid(fit)@levels[[time]][1]\n  # The later time in a \"t - baseline\" interaction contrast\n  contrast_time &lt;- function(x) str_remove(x, \" - .*$\")\n\n  means &lt;- emm(exposure, by = c(time, modifier)) %&gt;%\n    tidy_emm() %&gt;%\n    rename(estimate = emmean, conf.low = lower.CL, conf.high = upper.CL)\n\n  at_baseline &lt;- emm(exposure, by = c(time, modifier)) %&gt;%\n    contrast(first) %&gt;%\n    tidy_emm() %&gt;%\n    filter(.data[[time]] == baseline)\n  over_time &lt;- emm(c(exposure, time), by = modifier) %&gt;%\n    contrast(interaction = c(first, first)) %&gt;%\n    tidy_emm() %&gt;%\n    mutate(!!time := contrast_time(.data[[paste0(time, \"_\", first)]]))\n  within_levels &lt;- bind_rows(at_baseline, over_time) %&gt;%\n    select(any_of(c(modifier, time)), estimate, conf.low = lower.CL,\n           conf.high = upper.CL, p.value)\n\n  between_levels &lt;- NULL\n  if (!is.null(modifier)) {\n    between_at_baseline &lt;- emm(c(exposure, modifier), by = time) %&gt;%\n      contrast(interaction = c(first, first)) %&gt;%\n      tidy_emm() %&gt;%\n      filter(.data[[time]] == baseline)\n    between_over_time &lt;- emm(c(exposure, time, modifier)) %&gt;%\n      contrast(interaction = c(first, first, first)) %&gt;%\n      tidy_emm() %&gt;%\n      mutate(!!time := contrast_time(.data[[paste0(time, \"_\", first)]]))\n    between_levels &lt;- bind_rows(between_at_baseline, between_over_time) %&gt;%\n      mutate(\n        comparison = .data[[paste0(modifier, \"_\", first)]],\n        .before = 1\n      ) %&gt;%\n      select(comparison, all_of(time), estimate, conf.low = lower.CL,\n             conf.high = upper.CL, p.value)\n  }\n\n  list(\n    means = means %&gt;%\n      select(\n        all_of(c(time, exposure, modifier)), estimate, conf.low, conf.high\n      ),\n    within_levels = within_levels,\n    between_levels = between_levels\n  )\n}",
+    "objectID": "quarto/methods_stratified_effects.html#check-that-the-methods-agree",
+    "href": "quarto/methods_stratified_effects.html#check-that-the-methods-agree",
+    "title": "Effects behind an interaction",
+    "section": "Check that the methods agree",
+    "text": "Check that the methods agree\nEquivalent contrasts from the same fitted model should agree when they use the same rows, coding, scale, degrees of freedom and interval method. Refitting can obscure those requirements, especially if missing predictors change the rows used. On synthetic data, compare the estimates and intervals explicitly before adopting a new reporting route. That validation is tracked in #9.",
     "crumbs": [
-      "Code",
-      "Setup and helper functions",
-      "Functions"
+      "Methods",
+      "Effects behind an interaction"
     ]
   },
   {
-    "objectID": "quarto/functions.html#plot-effect-trajectories",
-    "href": "quarto/functions.html#plot-effect-trajectories",
-    "title": "Functions",
-    "section": "Plot effect trajectories",
-    "text": "Plot effect trajectories\nplot_effect_trajectories() draws the data and those estimates: individual trajectories, estimated means, confidence intervals, numbers observed and p-value annotations. It fits nothing. With a subgroup, it draws one panel per level, each with that level’s participants, and a row of p values for the difference between levels. Read it in that order: p-value labels, counts joined to the means, then the drawing layers. For general guidance on writing and reading reusable recipes, see the Functions chapter in R for Data Science (Wickham et al. 2023).\n\n\nClick to show/hide R Code\n# Spaghetti plot of an outcome over time by arm: individual trajectories,\n# model-estimated means with 95% confidence intervals, numbers observed, and\n# p values for the arm effect at each visit (at baseline the arm difference;\n# at follow-up, marked †, the difference in change from baseline). With a\n# modifier, one panel per level plus a row of p values for the difference in\n# that effect between levels, combined with patchwork. Takes the estimates\n# from estimate_effects(); it fits nothing.\nplot_effect_trajectories &lt;- function(trial_data, estimates, outcome_of_interest,\n                                     interaction_variable = NULL,\n                                     plot_title = \"Plot\") {\n  # Top of the plot\n  y_max &lt;- trial_data %&gt;%\n    select(all_of(outcome_of_interest)) %&gt;%\n    max(., na.rm = TRUE) + 3\n\n  # \"p=0.012\", with † for the follow-up contrasts\n  p_value_labels &lt;- function(effects, dagger = TRUE) {\n    effects %&gt;%\n      mutate(time_linear = as.numeric(as.character(time_factor))) %&gt;%\n      mutate(p.value = round(p.value, 3)) %&gt;%\n      mutate(p_value_label = paste0(\"p=\", p.value)) %&gt;%\n      mutate(p_value_label = ifelse(\n        time_linear == 0 | !dagger,\n        p_value_label,\n        paste0(p_value_label, \"†\")\n      ))\n  }\n  model_means &lt;- estimates$means %&gt;%\n    mutate(time_linear = as.numeric(as.character(time_factor)))\n\n  if (is.null(interaction_variable)) {\n    p_values &lt;- p_value_labels(estimates$within_levels) %&gt;%\n      select(time_linear, p_value_label)\n\n    # Number observed in each arm at each visit, with the model means\n    mixed_model_predictions &lt;- trial_data %&gt;%\n      filter(!is.na(.data[[outcome_of_interest]])) %&gt;%\n      group_by(time_linear, studyarm) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      left_join(\n        .,\n        model_means %&gt;%\n          select(time_linear, studyarm, estimate, conf.low, conf.high),\n        by = c(\"time_linear\", \"studyarm\")\n      ) %&gt;%\n      mutate(time_linear_shifted = ifelse(\n        studyarm == \"1\",\n        time_linear + 0.25,\n        time_linear - 0.25\n      ))\n\n    # Spaghetti plot with model means over individual trajectories\n    ggplot() +\n      geom_point(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = .data[[outcome_of_interest]],\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_line(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = .data[[outcome_of_interest]],\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_point(\n        mixed_model_predictions,\n        mapping = aes(x = time_linear_shifted, y = estimate, color = studyarm),\n        size = 2\n      ) +\n      geom_line(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, y = estimate, color = studyarm,\n          group = studyarm\n        ),\n        linewidth = 2\n      ) +\n      geom_errorbar(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, ymin = conf.low, ymax = conf.high,\n          color = studyarm\n        ),\n        linewidth = 1.5\n      ) +\n      theme_bw() +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 1),\n        mapping = aes(x = time_linear, y = 0, label = n_obs, color = studyarm)\n      ) +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 0),\n        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(mapping = aes(x = -0.5, y = 1, label = \"N\")) +\n      geom_text(\n        p_values,\n        mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n      ) +\n      scale_x_continuous(\n        breaks = c(0, 2, 4, 6, 9, 12),\n        limits = c(-0.5, 12.5),\n        minor_breaks = 0:12\n      ) +\n      ylab(outcome_of_interest) +\n      xlab(\"Time (months)\") +\n      scale_color_discrete(\n        name = \"Study Arm\",\n        labels = c(\"Control\", \"Treatment\")\n      ) +\n      labs(caption = \"† adjusted for baseline differences\") +\n      theme(plot.caption = element_text(hjust = 0.0555)) +\n      ggtitle(plot_title)\n  } else {\n    plot_labels &lt;- trial_data %&gt;%\n      pull(interaction_variable) %&gt;%\n      levels()\n\n    # Levels are numbered 1, 2, ... in factor order; rows with a missing\n    # level are counted but never drawn\n    data_for_function &lt;- trial_data %&gt;%\n      mutate(interaction_variable_numeric = factor(\n        as.numeric(.data[[interaction_variable]])\n      ))\n    level_number &lt;- function(level) {\n      factor(match(as.character(level), plot_labels))\n    }\n\n    within_p_values &lt;- p_value_labels(estimates$within_levels) %&gt;%\n      mutate(\n        interaction_variable = level_number(.data[[interaction_variable]])\n      ) %&gt;%\n      select(interaction_variable, time_linear, p_value_label)\n    between_p_values &lt;- estimates$between_levels %&gt;%\n      p_value_labels(dagger = FALSE) %&gt;%\n      select(comparison, time_linear, p_value_label)\n\n    # Number observed in each arm and level at each visit, with the model\n    # means\n    predictions_interaction &lt;- data_for_function %&gt;%\n      filter(!is.na(.data[[outcome_of_interest]])) %&gt;%\n      group_by(time_linear, studyarm, interaction_variable_numeric) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      rename(interaction_variable = interaction_variable_numeric) %&gt;%\n      left_join(\n        .,\n        model_means %&gt;%\n          mutate(\n            interaction_variable = level_number(.data[[interaction_variable]])\n          ) %&gt;%\n          select(time_linear, studyarm, interaction_variable, estimate,\n                 conf.low, conf.high),\n        by = c(\"time_linear\", \"studyarm\", \"interaction_variable\")\n      ) %&gt;%\n      mutate(time_linear_shifted_2 = ifelse(\n        studyarm == \"1\",\n        time_linear + 0.25,\n        time_linear - 0.25\n      )) %&gt;%\n      group_by(studyarm, interaction_variable) %&gt;%\n      mutate(gid = cur_group_id())\n\n    # One panel per level, each drawing that level's participants (selected\n    # by level, not by position) and that level's estimates\n    plot_level &lt;- function(k) {\n      level_data &lt;- data_for_function %&gt;%\n        filter(interaction_variable_numeric == k)\n      level_predictions &lt;- predictions_interaction %&gt;%\n        filter(interaction_variable == k)\n\n      ggplot() +\n        geom_point(\n          level_data,\n          mapping = aes(\n            x = time_linear_shifted, y = .data[[outcome_of_interest]],\n            color = studyarm, group = study_id_screening\n          ),\n          alpha = 0.2\n        ) +\n        geom_line(\n          level_data,\n          mapping = aes(\n            x = time_linear_shifted, y = .data[[outcome_of_interest]],\n            color = studyarm, group = study_id_screening\n          ),\n          alpha = 0.2\n        ) +\n        geom_point(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, y = estimate, color = studyarm\n          ),\n          size = 2\n        ) +\n        geom_line(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, y = estimate, color = studyarm,\n            group = gid\n          ),\n          linewidth = 2\n        ) +\n        theme_bw() +\n        geom_text(\n          filter(level_predictions, studyarm == 0),\n          mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n        ) +\n        geom_text(\n          filter(level_predictions, studyarm == 1),\n          mapping = aes(\n            x = time_linear, y = -1, label = n_obs, color = studyarm\n          )\n        ) +\n        geom_text(mapping = aes(x = -1, y = 1, label = \"N\")) +\n        geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[k])) +\n        geom_text(\n          filter(within_p_values, interaction_variable == k),\n          mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n        ) +\n        geom_errorbar(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,\n            color = studyarm\n          ),\n          linewidth = 1.5\n        ) +\n        scale_x_continuous(\n          breaks = NULL,\n          limits = c(-1, 12.5),\n          minor_breaks = 0:12\n        ) +\n        scale_y_continuous(limits = c(-3, y_max)) +\n        theme(axis.title.x = element_blank()) +\n        ylab(outcome_of_interest) +\n        scale_color_discrete(\n          name = \"Study Arm\",\n          labels = c(\"Control\", \"Treatment\")\n        )\n    }\n\n    # One row of p values for each level's difference from the first level,\n    # named when there is more than one row\n    plot_p_values &lt;- function(level_comparison) {\n      p_value_row &lt;- ggplot() +\n        geom_text(\n          data = filter(between_p_values, comparison == level_comparison),\n          mapping = aes(x = time_linear, y = 0, label = p_value_label)\n        ) +\n        theme_void() +\n        scale_x_continuous(limits = c(-1, 12.5))\n      if (length(comparisons) &gt; 1) {\n        p_value_row &lt;- p_value_row +\n          annotate(\"text\", x = -1, y = 0, label = level_comparison, size = 3)\n      }\n      p_value_row\n    }\n\n    n_levels &lt;- length(plot_labels)\n    comparisons &lt;- unique(as.character(between_p_values$comparison))\n    panels &lt;- c(\n      lapply(seq_len(n_levels), plot_level),\n      lapply(comparisons, plot_p_values)\n    )\n\n    # Combine the panels with patchwork\n    wrap_plots(panels, ncol = 1) +\n      plot_layout(\n        guides = \"collect\",\n        heights = c(\n          rep(0.96 / n_levels, n_levels),\n          rep(0.04, length(comparisons))\n        )\n      ) +\n      plot_annotation(\n        title = plot_title,\n        caption = \"† adjusted for baseline differences\",\n        theme = theme(plot.caption = element_text(hjust = 0.0555))\n      )\n  }\n}",
-    "crumbs": [
-      "Code",
-      "Setup and helper functions",
-      "Functions"
-    ]
-  },
-  {
-    "objectID": "quarto/tables.html",
-    "href": "quarto/tables.html",
-    "title": "Tables",
+    "objectID": "quarto/figures.html",
+    "href": "quarto/figures.html",
+    "title": "Figures",
     "section": "",
-    "text": "Build Table 1 and the count-outcome summary.",
+    "text": "Build the figures: ACT by visit, count outcomes, rescue and controller use, and the mixed-model plots for every outcome and subgroup.",
     "crumbs": [
       "Code",
       "Tables and figures",
-      "Tables"
+      "Figures"
     ]
   },
   {
-    "objectID": "quarto/tables.html#table-1",
-    "href": "quarto/tables.html#table-1",
-    "title": "Tables",
-    "section": "Table 1",
-    "text": "Table 1\nThe baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. select() chooses the characteristics to describe and tbl_summary(by = studyarm) puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.\nbold_labels(), captions and as_flex_table() change presentation. The gtsummary tutorial shows how to read and customize the defaults (gtsummary authors, n.d.). The current script creates table_1 in memory; it does not export it.\n\n\nClick to show/hide R Code\n# Baseline characteristics by arm, ITT population\ntable_1 &lt;- clean_asthma_data_itt %&gt;%\n  filter(time_factor == \"0\") %&gt;%\n  select(\n    studyarm, participant_sex, child_adult, prefer_language, age_screening,\n    act_score, aqlq_score, pacqlq_score, afs_score, self_reported_adherence\n  ) %&gt;%\n  mutate(studyarm = factor(\n    studyarm,\n    levels = c(0, 1),\n    labels = c(\"Control\", \"Intervention\")\n  )) %&gt;%\n  tbl_summary(\n    by = studyarm,\n    label = list(\n      participant_sex ~ \"Sex\",\n      child_adult ~ \"Child or adult\",\n      prefer_language ~ \"Preferred language\",\n      age_screening ~ \"Age at screening (years)\",\n      act_score ~ \"Baseline ACT\",\n      aqlq_score ~ \"Baseline AQLQ score (adults)\",\n      pacqlq_score ~ \"Baseline PACQLQ score (children)\",\n      afs_score ~ \"Baseline AFS score\",\n      self_reported_adherence ~ \"Baseline self-reported adherence score\"\n    )\n  ) %&gt;%\n  bold_labels() %&gt;%\n  modify_caption(\"**Patient Characteristics** (N = {N})\") %&gt;%\n  as_flex_table()",
+    "objectID": "quarto/figures.html#act-plots",
+    "href": "quarto/figures.html#act-plots",
+    "title": "Figures",
+    "section": "ACT plots",
+    "text": "ACT plots\nACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant’s recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.\n\n\nClick to show/hide R Code\nact_plots &lt;- list()\n\n# ACT at each visit by arm\nact_plots[[\"act_by_visit_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(\n    ~time_factor, nrow = 1,\n    labeller = labeller(time_factor = function(month) paste(\"Month\", month))\n  ) +\n  theme_publication() +\n  label_figure() +\n  # The legend names the arms; six narrow panels leave no room on the axis\n  theme(axis.text.x = element_blank(), axis.title.x = element_blank())\n\nact_plots[[\"act_by_visit_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(\n    ~time_factor, nrow = 1,\n    labeller = labeller(time_factor = function(month) paste(\"Month\", month))\n  ) +\n  theme_publication() +\n  label_figure() +\n  # The legend names the arms; six narrow panels leave no room on the axis\n  theme(axis.text.x = element_blank(), axis.title.x = element_blank())\n\n# Spaghetti plots of ACT\nact_plots[[\"act_spaghetti_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_publication() +\n  label_figure()\n\nact_plots[[\"act_spaghetti_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_publication() +\n  label_figure()\n\n# Self-reported adherence vs interval controller PDC\nact_plots[[\"adherence_vs_pdc_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_itt,\n    color = studyarm\n  )) +\n  theme_publication() +\n  label_figure()\n\nact_plots[[\"adherence_vs_pdc_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_pp,\n    color = studyarm\n  )) +\n  theme_publication() +\n  label_figure()",
     "crumbs": [
       "Code",
       "Tables and figures",
-      "Tables"
+      "Figures"
     ]
   },
   {
-    "objectID": "quarto/tables.html#count-outcome-summary",
-    "href": "quarto/tables.html#count-outcome-summary",
-    "title": "Tables",
-    "section": "Count outcome summary",
-    "text": "Count outcome summary\nThis describes the distribution of participant-level counts by arm and stores it as count_outcome_summary. Raw counts can differ because follow-up durations differ. Use the count-model page to understand the separate rate comparison that accounts for duration. Model tables are produced by the model scripts, not this descriptive block.\n\n\nClick to show/hide R Code\n# Count outcomes by arm\ncount_outcome_summary &lt;- rescue_medication_merged %&gt;%\n  select(all_of(count_outcomes), studyarm) %&gt;%\n  tbl_summary(by = studyarm)",
+    "objectID": "quarto/figures.html#count-outcome-plots",
+    "href": "quarto/figures.html#count-outcome-plots",
+    "title": "Figures",
+    "section": "Count outcome plots",
+    "text": "Count outcome plots\nThe loop creates one plot per count outcome and saves it under that outcome’s name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. aes() maps variables to positions and colours, while geom_*() chooses marks. The ggplot2 introduction explains this layering (ggplot2 authors, n.d.).\n\n\nClick to show/hide R Code\n# Each count outcome by arm, to check that outliers have been dealt with\ncount_outcome_plots &lt;- list()\n\nfor (outcome in count_outcomes) {\n  count_outcome_plots[[outcome]] &lt;- rescue_medication_merged %&gt;%\n    ggplot() +\n    geom_quasirandom(mapping = aes(\n      x = studyarm, y = .data[[outcome]], color = studyarm\n    )) +\n    theme_publication() +\n    label_figure(arm_axis = TRUE)\n}",
     "crumbs": [
       "Code",
       "Tables and figures",
-      "Tables"
+      "Figures"
     ]
   },
   {
-    "objectID": "quarto/methods_in_this_code.html",
-    "href": "quarto/methods_in_this_code.html",
-    "title": "How this code does it",
+    "objectID": "quarto/figures.html#medication-plots",
+    "href": "quarto/figures.html#medication-plots",
+    "title": "Figures",
+    "section": "Medication plots",
+    "text": "Medication plots\nRescue counts are shown on ordinary and logarithmic scales. A log scale makes multiplicative differences easier to see, but zero cannot be shown on that scale and may be omitted with a warning. Compare it with the ordinary-scale plot before interpreting the distribution. Controller PDC plots show participant proportions; their interpretation depends on the denominator described in Derive medication outcomes.\n\n\nClick to show/hide R Code\nmedication_plots &lt;- list()\n\n# Rescue puffs, linear and log scale\nmedication_plots[[\"rescue_puffs\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE)\n\nmedication_plots[[\"rescue_puffs_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE) +\n  scale_y_log10()\n\n# Rescue days, linear and log scale\nmedication_plots[[\"rescue_days\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE)\n\nmedication_plots[[\"rescue_days_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE) +\n  scale_y_log10()\n\n# Controller PDC for the year\nmedication_plots[[\"controller_pdc_itt\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_itt, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE)\n\nmedication_plots[[\"controller_pdc_pp\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_pp, color = studyarm\n  )) +\n  theme_publication() +\n  label_figure(arm_axis = TRUE)",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#mixed-model-plots-overall",
+    "href": "quarto/figures.html#mixed-model-plots-overall",
+    "title": "Figures",
+    "section": "Mixed model plots overall",
+    "text": "Mixed model plots overall\nFaint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.\nWhat the plotted means, error bars and p-values come from is in How this code does it.\n\n\nClick to show/hide R Code\n# Outcome over time by arm, for each outcome, drawn from the estimates of the\n# models fitted in 05_fit_mixed_models.R\nmixed_model_plots &lt;- list()\n\nfor (population in names(mixed_model_data)) {\n  mixed_model_plots[[population]] &lt;- list()\n\n  for (outcome in repeated_outcomes) {\n    plot_title &lt;- paste0(\n      figure_label(outcome), \" over time, \", population_labels[[population]]\n    )\n\n    mixed_model_plots[[population]][[outcome]] &lt;- list()\n    mixed_model_plots[[population]][[outcome]][[\"overall\"]] &lt;-\n      plot_effect_trajectories(\n        mixed_model_data[[population]],\n        mixed_model_estimates[[population]][[outcome]][[\"overall\"]],\n        outcome_of_interest = outcome,\n        plot_title = plot_title\n      )\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/figures.html#mixed-model-plots-subgroups",
+    "href": "quarto/figures.html#mixed-model-plots-subgroups",
+    "title": "Figures",
+    "section": "Mixed model plots subgroups",
+    "text": "Mixed model plots subgroups\nThe loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the interaction explanation before comparing a small p-value in one panel with a large one in another.\nThe script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.\nEach level’s panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see How this code does it and What a p-value for interaction means.\n\n\nClick to show/hide R Code\n# Outcome over time by arm, stratified by each subgroup; child or adult only\n# for outcomes measured in both groups (subgroup_analyses, from\n# 05_fit_mixed_models.R)\nfor (population in names(mixed_model_data)) {\n  for (analysis in subgroup_analyses) {\n    outcome &lt;- analysis$outcome\n\n    for (subgroup in analysis$subgroups) {\n      plot_title &lt;- paste0(\n        figure_label(outcome), \" over time, by \",\n        tolower(figure_label(subgroup)), \", \",\n        population_labels[[population]]\n      )\n\n      mixed_model_plots[[population]][[outcome]][[subgroup]] &lt;-\n        plot_effect_trajectories(\n          mixed_model_data[[population]],\n          mixed_model_estimates[[population]][[outcome]][[subgroup]],\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup,\n          plot_title = plot_title\n        )\n    }\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Figures"
+    ]
+  },
+  {
+    "objectID": "quarto/methods_interactions.html",
+    "href": "quarto/methods_interactions.html",
+    "title": "Interactions",
     "section": "",
-    "text": "This page maps the ideas on the other methods pages to the analysis code, as it stands now, and notes what is planned to change.\nThink of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.",
+    "text": "This page explains what the coefficients of a model with an interaction mean, for the two kinds of model this analysis uses. It uses made-up numbers only.",
     "crumbs": [
       "Methods",
-      "How this code does it"
+      "Interactions"
     ]
   },
   {
-    "objectID": "quarto/methods_in_this_code.html#fitting-and-tables",
-    "href": "quarto/methods_in_this_code.html#fitting-and-tables",
-    "title": "How this code does it",
-    "section": "Fitting and tables",
-    "text": "Fitting and tables\nfit_mixed_model() fits outcome ~ time_factor * studyarm + (1 | study_id_screening), or the three-way version with a subgroup. 5. Fit mixed models fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.\ntabulate_model_terms() shows the raw coefficients described on Longitudinal data and mixed models and Interactions: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn’t show the arm effect in each subgroup level directly.",
+    "objectID": "quarto/methods_interactions.html#effect-modification-in-a-trial",
+    "href": "quarto/methods_interactions.html#effect-modification-in-a-trial",
+    "title": "Interactions",
+    "section": "Effect modification in a trial",
+    "text": "Effect modification in a trial\nA subgroup analysis asks whether the intervention’s effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an arm × subgroup interaction to the model. The interaction lets the arm effect take a different value in each subgroup level.\nAn overall effect averages across the participants being compared. A subgroup analysis asks an additional question: does that effect differ by a characteristic such as preferred language? This does not mean language itself was randomized. The subgroup main effect should not be read as a causal effect of speaking one language rather than another.",
     "crumbs": [
       "Methods",
-      "How this code does it"
+      "Interactions"
     ]
   },
   {
-    "objectID": "quarto/methods_in_this_code.html#estimates-and-plots",
-    "href": "quarto/methods_in_this_code.html#estimates-and-plots",
-    "title": "How this code does it",
-    "section": "Estimates and plots",
-    "text": "Estimates and plots\nestimate_effects() takes everything the plot shows from that one fitted model, with emmeans (Lenth and Piaskowski 2026):\n\n\n\n\n\n\n\nEstimate\nWhat it’s used for\n\n\n\n\nMean in each visit × arm cell (and subgroup level), with its 95% confidence interval\nThe points and bars on the plot\n\n\nArm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level\nThe p-values printed above each visit, or in each level’s panel\n\n\nDifference in that effect between each subgroup level and the first level\nThe row of p-values under the panels\n\n\n\nDegrees of freedom are Satterthwaite’s, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, #10). Using one fit also means the means, the p-values and the table come from the same analysis rows.\nplot_effect_trajectories() draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.\nTo read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.",
+    "objectID": "quarto/methods_interactions.html#reading-the-coefficients-count-models",
+    "href": "quarto/methods_interactions.html#reading-the-coefficients-count-models",
+    "title": "Interactions",
+    "section": "Reading the coefficients: count models",
+    "text": "Reading the coefficients: count models\nFor a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):\n\n\nClick to show/hide R Code\nglm.nb(\n  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),\n  data = participants\n)\n\n\nThe model fits coefficients on a log scale. Applying exp() converts them to ratios. English is the reference level, the category used as the starting comparison; it is not a statement that English speakers are the typical or preferred population. After exponentiating:\n\n\n\n\n\n\n\nExponentiated coefficient\nMeaning\n\n\n\n\nstudyarm1\nIncidence rate ratio (IRR), intervention vs control, in the reference level only (English)\n\n\nprefer_languageSpanish\nRate ratio, Spanish vs English, in the control arm only\n\n\nstudyarm1:prefer_languageSpanish\nRatio of the two IRRs: IRR in Spanish speakers ÷ IRR in English speakers\n\n\n\nSo a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if studyarm1 is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn’t an effect in anyone; it’s how much the effect changes between levels.\n\nKeep three quantities separate\nFor the invented example above:\n\n\n\n\n\n\n\n\nQuantity\nValue\nInterpretation\n\n\n\n\nIntervention/control IRR in English speakers\n0.80\nIntervention rate is 20% lower\n\n\nIntervention/control IRR in Spanish speakers\n1.00\nEqual modeled rates\n\n\nRatio of those IRRs\n1.25\nThe arm comparison differs between subgroups\n\n\n\nThe last value is a comparison of comparisons. It does not mean Spanish speakers have 25% more events.",
     "crumbs": [
       "Methods",
-      "How this code does it"
+      "Interactions"
     ]
   },
   {
-    "objectID": "quarto/methods_in_this_code.html#count-models",
-    "href": "quarto/methods_in_this_code.html#count-models",
-    "title": "How this code does it",
-    "section": "Count models",
-    "text": "Count models\n4. Fit count models fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn’t shown directly. The separate alternative rescue fits retain an offset-syntax defect documented on the count-model page.",
+    "objectID": "quarto/methods_interactions.html#reading-the-coefficients-linear-mixed-models",
+    "href": "quarto/methods_interactions.html#reading-the-coefficients-linear-mixed-models",
+    "title": "Interactions",
+    "section": "Reading the coefficients: linear mixed models",
+    "text": "Reading the coefficients: linear mixed models\nThe same logic holds on an additive scale. In outcome ~ time_factor * studyarm * subgroup + (1 | id):\n\nthe two-way and three-way terms involving studyarm describe how the arm effect differs between visits and between subgroup levels;\neach term is a difference: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see Longitudinal data and mixed models);\nwith six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.\n\nIn ordinary language, the three-way interaction asks: “Does the difference in improvement between the two arms also differ between subgroups?” Work out the arm comparison within each subgroup before comparing those comparisons.\nThat’s why tables of raw coefficients from these models are hard to read. What a p-value for interaction means explains what these terms’ p-values test, and Effects behind an interaction shows how to get the effects themselves.",
     "crumbs": [
       "Methods",
-      "How this code does it"
+      "Interactions"
     ]
   },
   {
-    "objectID": "quarto/methods_in_this_code.html#what-is-planned-to-change",
-    "href": "quarto/methods_in_this_code.html#what-is-planned-to-change",
-    "title": "How this code does it",
-    "section": "What is planned to change",
-    "text": "What is planned to change\nThese are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.\n\n#8: move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.\n#9: the examples on Effects behind an interaction, run on synthetic data where the true effects are known.",
+    "objectID": "quarto/methods_interactions.html#scale-matters",
+    "href": "quarto/methods_interactions.html#scale-matters",
+    "title": "Interactions",
+    "section": "Scale matters",
+    "text": "Scale matters\nAn interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both (Knol and VanderWeele 2012).\nFor a brief clinical-statistics explanation, read Altman and Bland on comparing two estimates (Altman and Bland 2003). For reporting guidance, Knol and VanderWeele explain why subgroup-specific effects belong alongside the interaction measure (Knol and VanderWeele 2012).",
     "crumbs": [
       "Methods",
-      "How this code does it"
-    ]
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Overview",
-    "section": "",
-    "text": "This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.\nThere are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.\nThe detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#what-this-analysis-does",
-    "href": "index.html#what-this-analysis-does",
-    "title": "Overview",
-    "section": "",
-    "text": "This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.\nThere are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.\nThe detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#how-to-read-this-site",
-    "href": "index.html#how-to-read-this-site",
-    "title": "Overview",
-    "section": "How to read this site",
-    "text": "How to read this site\nIf you have some R and introductory statistics experience, start with Longitudinal data and mixed models. Then read Interactions and What a p-value for interaction means. You can skip the optional algebra in Effects behind an interaction on a first pass.\nThe Code pages follow the order of R/main.R. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#follow-the-rows",
-    "href": "index.html#follow-the-rows",
-    "title": "Overview",
-    "section": "Follow the rows",
-    "text": "Follow the rows\n\n\n\n\n\n\n\n\nStage\nWhat a row represents\nWhy it matters\n\n\n\n\nImported visit data\nA participant at a recorded visit\nSeveral rows can belong to the same person\n\n\nApp medication records\nA recorded medication event\nMany records must be summarized before comparing participants\n\n\nParticipant-day grid\nA candidate day for a participant\nDays without records affect the adherence denominator\n\n\nCount-model data\nA participant with counts and follow-up time\nTime at risk matters when comparing counts\n\n\nMixed-model data\nA participant at a visit\nThe model accounts for repeated measurements within a person\n\n\n\nThe grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#terms-used-throughout",
-    "href": "index.html#terms-used-throughout",
-    "title": "Overview",
-    "section": "Terms used throughout",
-    "text": "Terms used throughout\n\n\n\n\n\n\n\nTerm\nMeaning here\n\n\n\n\nArm\nThe assigned intervention or control group\n\n\nBaseline\nThe starting assessment\n\n\nIntention to treat (ITT)\nComparing participants by assigned arm, using available observations\n\n\nPer protocol (PP)\nThis project’s restriction to observations on or before the app-glitch cutoff; not a general definition of adherence\n\n\nSubgroup\nA participant characteristic used to ask whether the arm effect differs between groups\n\n\nACT / AQLQ / PACQLQ / AFS\nCode labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification\n\n\nPDC\nProportion of days covered; here calculated from recorded controller use, as explained on the medication page\n\n\nConfidence interval\nAn interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions\n\n\n\nFor R syntax, R for Data Science is a free reference with worked examples (Wickham et al. 2023). You only need the linked topic when it helps with the section you are reading.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#status",
-    "href": "index.html#status",
-    "title": "Overview",
-    "section": "Status",
-    "text": "Status\nThe project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in Issues.\nThe analysis plan records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.",
-    "crumbs": [
-      "Home"
+      "Interactions"
     ]
   },
   {
@@ -592,174 +552,298 @@
     ]
   },
   {
-    "objectID": "quarto/methods_interactions.html",
-    "href": "quarto/methods_interactions.html",
-    "title": "Interactions",
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Overview",
     "section": "",
-    "text": "This page explains what the coefficients of a model with an interaction mean, for the two kinds of model this analysis uses. It uses made-up numbers only.",
+    "text": "This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.\nThere are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.\nThe detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.",
     "crumbs": [
-      "Methods",
-      "Interactions"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/methods_interactions.html#effect-modification-in-a-trial",
-    "href": "quarto/methods_interactions.html#effect-modification-in-a-trial",
-    "title": "Interactions",
-    "section": "Effect modification in a trial",
-    "text": "Effect modification in a trial\nA subgroup analysis asks whether the intervention’s effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an arm × subgroup interaction to the model. The interaction lets the arm effect take a different value in each subgroup level.\nAn overall effect averages across the participants being compared. A subgroup analysis asks an additional question: does that effect differ by a characteristic such as preferred language? This does not mean language itself was randomized. The subgroup main effect should not be read as a causal effect of speaking one language rather than another.",
-    "crumbs": [
-      "Methods",
-      "Interactions"
-    ]
-  },
-  {
-    "objectID": "quarto/methods_interactions.html#reading-the-coefficients-count-models",
-    "href": "quarto/methods_interactions.html#reading-the-coefficients-count-models",
-    "title": "Interactions",
-    "section": "Reading the coefficients: count models",
-    "text": "Reading the coefficients: count models\nFor a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):\n\n\nClick to show/hide R Code\nglm.nb(\n  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),\n  data = participants\n)\n\n\nThe model fits coefficients on a log scale. Applying exp() converts them to ratios. English is the reference level, the category used as the starting comparison; it is not a statement that English speakers are the typical or preferred population. After exponentiating:\n\n\n\n\n\n\n\nExponentiated coefficient\nMeaning\n\n\n\n\nstudyarm1\nIncidence rate ratio (IRR), intervention vs control, in the reference level only (English)\n\n\nprefer_languageSpanish\nRate ratio, Spanish vs English, in the control arm only\n\n\nstudyarm1:prefer_languageSpanish\nRatio of the two IRRs: IRR in Spanish speakers ÷ IRR in English speakers\n\n\n\nSo a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if studyarm1 is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn’t an effect in anyone; it’s how much the effect changes between levels.\n\nKeep three quantities separate\nFor the invented example above:\n\n\n\n\n\n\n\n\nQuantity\nValue\nInterpretation\n\n\n\n\nIntervention/control IRR in English speakers\n0.80\nIntervention rate is 20% lower\n\n\nIntervention/control IRR in Spanish speakers\n1.00\nEqual modeled rates\n\n\nRatio of those IRRs\n1.25\nThe arm comparison differs between subgroups\n\n\n\nThe last value is a comparison of comparisons. It does not mean Spanish speakers have 25% more events.",
-    "crumbs": [
-      "Methods",
-      "Interactions"
-    ]
-  },
-  {
-    "objectID": "quarto/methods_interactions.html#reading-the-coefficients-linear-mixed-models",
-    "href": "quarto/methods_interactions.html#reading-the-coefficients-linear-mixed-models",
-    "title": "Interactions",
-    "section": "Reading the coefficients: linear mixed models",
-    "text": "Reading the coefficients: linear mixed models\nThe same logic holds on an additive scale. In outcome ~ time_factor * studyarm * subgroup + (1 | id):\n\nthe two-way and three-way terms involving studyarm describe how the arm effect differs between visits and between subgroup levels;\neach term is a difference: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see Longitudinal data and mixed models);\nwith six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.\n\nIn ordinary language, the three-way interaction asks: “Does the difference in improvement between the two arms also differ between subgroups?” Work out the arm comparison within each subgroup before comparing those comparisons.\nThat’s why tables of raw coefficients from these models are hard to read. What a p-value for interaction means explains what these terms’ p-values test, and Effects behind an interaction shows how to get the effects themselves.",
-    "crumbs": [
-      "Methods",
-      "Interactions"
-    ]
-  },
-  {
-    "objectID": "quarto/methods_interactions.html#scale-matters",
-    "href": "quarto/methods_interactions.html#scale-matters",
-    "title": "Interactions",
-    "section": "Scale matters",
-    "text": "Scale matters\nAn interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both (Knol and VanderWeele 2012).\nFor a brief clinical-statistics explanation, read Altman and Bland on comparing two estimates (Altman and Bland 2003). For reporting guidance, Knol and VanderWeele explain why subgroup-specific effects belong alongside the interaction measure (Knol and VanderWeele 2012).",
-    "crumbs": [
-      "Methods",
-      "Interactions"
-    ]
-  },
-  {
-    "objectID": "quarto/figures.html",
-    "href": "quarto/figures.html",
-    "title": "Figures",
+    "objectID": "index.html#what-this-analysis-does",
+    "href": "index.html#what-this-analysis-does",
+    "title": "Overview",
     "section": "",
-    "text": "Build the figures: ACT by visit, count outcomes, rescue and controller use, and the mixed-model plots for every outcome and subgroup.",
+    "text": "This site explains the R analysis of the EM-ASTHMA pilot randomized trial, which compared the COHERO mobile app with control. Participants included adults and children with a caregiver. Assessments were scheduled at baseline and 2, 4, 6, 9 and 12 months. The analysis asks how outcomes differ between the assigned groups and whether those differences vary over time or between subgroups.\nThere are two main kinds of outcome. Questionnaire scores describe asthma control, quality of life, activity limitation and self-reported controller adherence at repeated visits. App medication records and health-care-use fields supply counts and measures of recorded use. Those different data structures need different statistical models.\nThe detailed intervention, eligibility criteria and choice of a primary outcome still need protocol information; the code alone cannot establish them. This site explains the implemented analysis and does not report trial findings.",
     "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/figures.html#act-plots",
-    "href": "quarto/figures.html#act-plots",
-    "title": "Figures",
-    "section": "ACT plots",
-    "text": "ACT plots\nACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant’s recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.\n\n\nClick to show/hide R Code\nact_plots &lt;- list()\n\n# ACT at each visit by arm\nact_plots[[\"act_by_visit_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(~time_factor, nrow = 1) +\n  theme_bw()\n\nact_plots[[\"act_by_visit_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = act_score, color = studyarm\n  )) +\n  facet_wrap(~time_factor, nrow = 1) +\n  theme_bw()\n\n# Spaghetti plots of ACT\nact_plots[[\"act_spaghetti_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_bw()\n\nact_plots[[\"act_spaghetti_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  geom_line(mapping = aes(\n    x = time_linear_shifted, y = act_score, color = studyarm,\n    group = study_id_screening\n  )) +\n  theme_bw()\n\n# Self-reported adherence vs interval controller PDC\nact_plots[[\"adherence_vs_pdc_itt\"]] &lt;- clean_asthma_data_itt %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_itt,\n    color = studyarm\n  ))\n\nact_plots[[\"adherence_vs_pdc_pp\"]] &lt;- clean_asthma_data_pp %&gt;%\n  ggplot() +\n  geom_point(mapping = aes(\n    x = self_reported_adherence, y = controller_pdc_quarter_pp,\n    color = studyarm\n  ))",
+    "objectID": "index.html#how-to-read-this-site",
+    "href": "index.html#how-to-read-this-site",
+    "title": "Overview",
+    "section": "How to read this site",
+    "text": "How to read this site\nIf you have some R and introductory statistics experience, start with Longitudinal data and mixed models. Then read Interactions and What a p-value for interaction means. You can skip the optional algebra in Effects behind an interaction on a first pass.\nThe Code pages follow the order of R/main.R. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.",
     "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/figures.html#count-outcome-plots",
-    "href": "quarto/figures.html#count-outcome-plots",
-    "title": "Figures",
-    "section": "Count outcome plots",
-    "text": "Count outcome plots\nThe loop creates one plot per count outcome and saves it under that outcome’s name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. aes() maps variables to positions and colours, while geom_*() chooses marks. The ggplot2 introduction explains this layering (ggplot2 authors, n.d.).\n\n\nClick to show/hide R Code\n# Each count outcome by arm, to check that outliers have been dealt with\ncount_outcome_plots &lt;- list()\n\nfor (outcome in count_outcomes) {\n  count_outcome_plots[[outcome]] &lt;- rescue_medication_merged %&gt;%\n    ggplot() +\n    geom_quasirandom(mapping = aes(\n      x = studyarm, y = .data[[outcome]], color = studyarm\n    )) +\n    theme_bw()\n}",
+    "objectID": "index.html#follow-the-rows",
+    "href": "index.html#follow-the-rows",
+    "title": "Overview",
+    "section": "Follow the rows",
+    "text": "Follow the rows\n\n\n\n\n\n\n\n\nStage\nWhat a row represents\nWhy it matters\n\n\n\n\nImported visit data\nA participant at a recorded visit\nSeveral rows can belong to the same person\n\n\nApp medication records\nA recorded medication event\nMany records must be summarized before comparing participants\n\n\nParticipant-day grid\nA candidate day for a participant\nDays without records affect the adherence denominator\n\n\nCount-model data\nA participant with counts and follow-up time\nTime at risk matters when comparing counts\n\n\nMixed-model data\nA participant at a visit\nThe model accounts for repeated measurements within a person\n\n\n\nThe grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.",
     "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/figures.html#medication-plots",
-    "href": "quarto/figures.html#medication-plots",
-    "title": "Figures",
-    "section": "Medication plots",
-    "text": "Medication plots\nRescue counts are shown on ordinary and logarithmic scales. A log scale makes multiplicative differences easier to see, but zero cannot be shown on that scale and may be omitted with a warning. Compare it with the ordinary-scale plot before interpreting the distribution. Controller PDC plots show participant proportions; their interpretation depends on the denominator described in Derive medication outcomes.\n\n\nClick to show/hide R Code\nmedication_plots &lt;- list()\n\n# Rescue puffs, linear and log scale\nmedication_plots[[\"rescue_puffs\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"rescue_puffs_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_puffs_itt, color = studyarm\n  )) +\n  theme_bw() +\n  scale_y_log10()\n\n# Rescue days, linear and log scale\nmedication_plots[[\"rescue_days\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"rescue_days_log\"]] &lt;- rescue_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = rescue_days_itt, color = studyarm\n  )) +\n  theme_bw() +\n  scale_y_log10()\n\n# Controller PDC for the year\nmedication_plots[[\"controller_pdc_itt\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_itt, color = studyarm\n  )) +\n  theme_bw()\n\nmedication_plots[[\"controller_pdc_pp\"]] &lt;- controller_medication_merged %&gt;%\n  ggplot() +\n  geom_quasirandom(mapping = aes(\n    x = studyarm, y = controller_pdc_pp, color = studyarm\n  )) +\n  theme_bw()",
+    "objectID": "index.html#terms-used-throughout",
+    "href": "index.html#terms-used-throughout",
+    "title": "Overview",
+    "section": "Terms used throughout",
+    "text": "Terms used throughout\n\n\n\n\n\n\n\nTerm\nMeaning here\n\n\n\n\nArm\nThe assigned intervention or control group\n\n\nBaseline\nThe starting assessment\n\n\nIntention to treat (ITT)\nComparing participants by assigned arm, using available observations\n\n\nPer protocol (PP)\nThis project’s restriction to observations on or before the app-glitch cutoff; not a general definition of adherence\n\n\nSubgroup\nA participant characteristic used to ask whether the arm effect differs between groups\n\n\nACT / AQLQ / PACQLQ / AFS\nCode labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification\n\n\nPDC\nProportion of days covered; here calculated from recorded controller use, as explained on the medication page\n\n\nConfidence interval\nAn interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions\n\n\n\nFor R syntax, R for Data Science is a free reference with worked examples (Wickham et al. 2023). You only need the linked topic when it helps with the section you are reading.",
     "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/figures.html#mixed-model-plots-overall",
-    "href": "quarto/figures.html#mixed-model-plots-overall",
-    "title": "Figures",
-    "section": "Mixed model plots overall",
-    "text": "Mixed model plots overall\nFaint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.\nWhat the plotted means, error bars and p-values come from is in How this code does it.\n\n\nClick to show/hide R Code\n# Outcome over time by arm, for each outcome, drawn from the estimates of the\n# models fitted in 05_fit_mixed_models.R\nmixed_model_plots &lt;- list()\n\nfor (population in names(mixed_model_data)) {\n  mixed_model_plots[[population]] &lt;- list()\n\n  for (outcome in repeated_outcomes) {\n    plot_title &lt;- paste(\n      outcome, \"vs. time in\", population_labels[[population]]\n    )\n\n    mixed_model_plots[[population]][[outcome]] &lt;- list()\n    mixed_model_plots[[population]][[outcome]][[\"overall\"]] &lt;-\n      plot_effect_trajectories(\n        mixed_model_data[[population]],\n        mixed_model_estimates[[population]][[outcome]][[\"overall\"]],\n        outcome_of_interest = outcome,\n        plot_title = plot_title\n      )\n  }\n}",
+    "objectID": "index.html#status",
+    "href": "index.html#status",
+    "title": "Overview",
+    "section": "Status",
+    "text": "Status\nThe project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in Issues.\nThe analysis plan records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.",
     "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
+      "Home"
     ]
   },
   {
-    "objectID": "quarto/figures.html#mixed-model-plots-subgroups",
-    "href": "quarto/figures.html#mixed-model-plots-subgroups",
-    "title": "Figures",
-    "section": "Mixed model plots subgroups",
-    "text": "Mixed model plots subgroups\nThe loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the interaction explanation before comparing a small p-value in one panel with a large one in another.\nThe script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.\nEach level’s panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see How this code does it and What a p-value for interaction means.\n\n\nClick to show/hide R Code\n# Outcome over time by arm, stratified by each subgroup; child or adult only\n# for outcomes measured in both groups (subgroup_analyses, from\n# 05_fit_mixed_models.R)\nfor (population in names(mixed_model_data)) {\n  for (analysis in subgroup_analyses) {\n    outcome &lt;- analysis$outcome\n\n    for (subgroup in analysis$subgroups) {\n      plot_title &lt;- paste(\n        outcome, \"vs. time, stratified by\", subgroup, \"in\",\n        population_labels[[population]]\n      )\n\n      mixed_model_plots[[population]][[outcome]][[subgroup]] &lt;-\n        plot_effect_trajectories(\n          mixed_model_data[[population]],\n          mixed_model_estimates[[population]][[outcome]][[subgroup]],\n          outcome_of_interest = outcome,\n          interaction_variable = subgroup,\n          plot_title = plot_title\n        )\n    }\n  }\n}",
-    "crumbs": [
-      "Code",
-      "Tables and figures",
-      "Figures"
-    ]
-  },
-  {
-    "objectID": "quarto/methods_stratified_effects.html",
-    "href": "quarto/methods_stratified_effects.html",
-    "title": "Effects behind an interaction",
+    "objectID": "quarto/methods_in_this_code.html",
+    "href": "quarto/methods_in_this_code.html",
+    "title": "How this code does it",
     "section": "",
-    "text": "The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model’s printed coefficient table may not answer that directly. A contrast is a requested comparison of model estimates, such as intervention minus control within a subgroup.\nIn the invented interaction example, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.\nThe code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.",
+    "text": "This page maps the ideas on the other methods pages to the analysis code, as it stands now, and notes what is planned to change.\nThink of the workflow in three steps: prepare the observations, fit the model, then turn the fit into a table or plot. An R object can hold any of these, so its name alone does not tell you whether it contains data, a fitted model or formatted output.",
     "crumbs": [
       "Methods",
-      "Effects behind an interaction"
+      "How this code does it"
     ]
   },
   {
-    "objectID": "quarto/methods_stratified_effects.html#with-emmeans",
-    "href": "quarto/methods_stratified_effects.html#with-emmeans",
-    "title": "Effects behind an interaction",
-    "section": "With emmeans",
-    "text": "With emmeans\nemmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand (Lenth and Piaskowski 2026). For the count model:\n\n\nClick to show/hide R Code\nlibrary(emmeans)\n\nemmeans(fit, ~ studyarm | prefer_language, type = \"response\") %&gt;%\n  contrast(\"revpairwise\") %&gt;%\n  confint()\n\n\nThis gives one row per language: the intervention-vs-control IRR (a ratio column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.\nFor the mixed model, the arm difference at each visit within each subgroup level:\n\n\nClick to show/hide R Code\nemmeans(fit_lmer, ~ studyarm | time_factor * prefer_language) %&gt;%\n  contrast(\"revpairwise\") %&gt;%\n  confint()\n\n\nThese are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model’s interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:\n\n\nClick to show/hide R Code\nemmeans(fit_lmer, ~ studyarm * time_factor | prefer_language) %&gt;%\n  contrast(interaction = c(\"revpairwise\", \"trt.vs.ctrl\")) %&gt;%\n  confint()\n\n\nFor lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.\nRead ~ studyarm | prefer_language as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an lmer() formula. revpairwise reverses the usual pairwise direction so the stated factor order gives intervention versus control. confint() explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.\nFor a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score’s units. An interval for a mean or contrast is not the range of scores expected for individual participants.\nStart with the package’s quick-start guide. The interval and summary reference explains confint(), scales and inference options (Lenth and Piaskowski 2026). These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.",
+    "objectID": "quarto/methods_in_this_code.html#fitting-and-tables",
+    "href": "quarto/methods_in_this_code.html#fitting-and-tables",
+    "title": "How this code does it",
+    "section": "Fitting and tables",
+    "text": "Fitting and tables\nfit_mixed_model() fits outcome ~ time_factor * studyarm + (1 | study_id_screening), or the three-way version with a subgroup. 5. Fit mixed models fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.\ntabulate_model_terms() shows the raw coefficients described on Longitudinal data and mixed models and Interactions: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn’t show the arm effect in each subgroup level directly.",
     "crumbs": [
       "Methods",
-      "Effects behind an interaction"
+      "How this code does it"
     ]
   },
   {
-    "objectID": "quarto/methods_stratified_effects.html#by-refitting-with-a-different-reference-level",
-    "href": "quarto/methods_stratified_effects.html#by-refitting-with-a-different-reference-level",
-    "title": "Effects behind an interaction",
-    "section": "By refitting with a different reference level",
-    "text": "By refitting with a different reference level\nThe coefficient for studyarm1 is the arm effect in the reference level, so making the other level the reference gives its effect directly:\n\n\nClick to show/hide R Code\nparticipants_spanish_ref &lt;- participants %&gt;%\n  mutate(prefer_language = relevel(prefer_language, ref = \"Spanish\"))\n\nfit_spanish_ref &lt;- glm.nb(\n  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),\n  data = participants_spanish_ref\n)\n# exp(coef(fit_spanish_ref)[\"studyarm1\"]) is now the IRR in Spanish speakers\n\n\nThis is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see How this code does it).\n\n\n\n\n\n\nNoteOptional: where the interval comes from\n\n\n\n\n\nBy hand from the coefficients\nThe arm effect in a non-reference level is a sum of coefficients, so its variance is a sum of variances and covariances. For the count model rescue_puffs_itt ~ studyarm * prefer_language + offset(...):\n\\[\n\\log \\text{IRR}_{\\text{Spanish}} = \\beta_{\\text{arm}} + \\beta_{\\text{arm} \\times \\text{Spanish}}\n\\]\n\\[\n\\text{Var} = \\text{Var}(\\beta_{\\text{arm}}) + \\text{Var}(\\beta_{\\text{arm} \\times \\text{Spanish}}) + 2\\,\\text{Cov}(\\beta_{\\text{arm}}, \\beta_{\\text{arm} \\times \\text{Spanish}})\n\\]\n\n\nClick to show/hide R Code\nb &lt;- coef(fit)\nv &lt;- vcov(fit)\nterms &lt;- c(\"studyarm1\", \"studyarm1:prefer_languageSpanish\")\n\nlog_irr &lt;- sum(b[terms])\nse &lt;- sqrt(sum(v[terms, terms]))     # the sum of the 2 x 2 block\n\nexp(log_irr)                          # IRR in Spanish speakers\nexp(log_irr + c(-1, 1) * qnorm(0.975) * se)\n\n\nThe same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.\nHere coef() extracts coefficient estimates and vcov() extracts their variance–covariance matrix. The covariance matters because terms from the same model are estimated together. The square root of the combined variance gives a standard error. The displayed hand calculation uses a normal approximation; it is not a universal replacement for the degrees-of-freedom or interval method used by a mixed-model package.",
+    "objectID": "quarto/methods_in_this_code.html#estimates-and-plots",
+    "href": "quarto/methods_in_this_code.html#estimates-and-plots",
+    "title": "How this code does it",
+    "section": "Estimates and plots",
+    "text": "Estimates and plots\nestimate_effects() takes everything the plot shows from that one fitted model, with emmeans (Lenth and Piaskowski 2026):\n\n\n\n\n\n\n\nEstimate\nWhat it’s used for\n\n\n\n\nMean in each visit × arm cell (and subgroup level), with its 95% confidence interval\nThe points and bars on the plot\n\n\nArm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level\nThe p-values printed above each visit, or in each level’s panel\n\n\nDifference in that effect between each subgroup level and the first level\nThe row of p-values under the panels\n\n\n\nDegrees of freedom are Satterthwaite’s, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, #10). Using one fit also means the means, the p-values and the table come from the same analysis rows.\nplot_effect_trajectories() draws those estimates over the individual trajectories. It fits nothing. The panels show mean trajectories and p-values for the contrasts, not a separate displayed estimate and confidence interval for each arm contrast. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.\nTo read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.",
     "crumbs": [
       "Methods",
-      "Effects behind an interaction"
+      "How this code does it"
     ]
   },
   {
-    "objectID": "quarto/methods_stratified_effects.html#check-that-the-methods-agree",
-    "href": "quarto/methods_stratified_effects.html#check-that-the-methods-agree",
-    "title": "Effects behind an interaction",
-    "section": "Check that the methods agree",
-    "text": "Check that the methods agree\nEquivalent contrasts from the same fitted model should agree when they use the same rows, coding, scale, degrees of freedom and interval method. Refitting can obscure those requirements, especially if missing predictors change the rows used. On synthetic data, compare the estimates and intervals explicitly before adopting a new reporting route. That validation is tracked in #9.",
+    "objectID": "quarto/methods_in_this_code.html#count-models",
+    "href": "quarto/methods_in_this_code.html#count-models",
+    "title": "How this code does it",
+    "section": "Count models",
+    "text": "Count models\n4. Fit count models fits negative binomial models with log follow-up time as the offset, overall and with each arm × subgroup interaction, and reports exponentiated coefficients: IRRs, and for the interaction terms, ratios of IRRs. As with the mixed-model tables, the IRR in the non-reference level of a subgroup isn’t shown directly. The separate alternative rescue fits retain an offset-syntax defect documented on the count-model page.",
     "crumbs": [
       "Methods",
-      "Effects behind an interaction"
+      "How this code does it"
+    ]
+  },
+  {
+    "objectID": "quarto/methods_in_this_code.html#what-is-planned-to-change",
+    "href": "quarto/methods_in_this_code.html#what-is-planned-to-change",
+    "title": "How this code does it",
+    "section": "What is planned to change",
+    "text": "What is planned to change\nThese are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.\n\n#8: move all tables to gtsummary, and decide whether to report the effects within each subgroup level, the interaction terms, or both.\n#9: the examples on Effects behind an interaction, run on synthetic data where the true effects are known.",
+    "crumbs": [
+      "Methods",
+      "How this code does it"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html",
+    "href": "quarto/tables.html",
+    "title": "Tables",
+    "section": "",
+    "text": "Build Table 1 and the count-outcome summary.",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html#table-1",
+    "href": "quarto/tables.html#table-1",
+    "title": "Tables",
+    "section": "Table 1",
+    "text": "Table 1\nThe baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. select() chooses the characteristics to describe and tbl_summary(by = studyarm) puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.\nbold_labels(), captions and as_flex_table() change presentation. The gtsummary tutorial shows how to read and customize the defaults (gtsummary authors, n.d.). The current script creates table_1 in memory; it does not export it.\n\n\nClick to show/hide R Code\n# Baseline characteristics by arm, ITT population\ntable_1 &lt;- clean_asthma_data_itt %&gt;%\n  filter(time_factor == \"0\") %&gt;%\n  select(\n    studyarm, participant_sex, child_adult, prefer_language, age_screening,\n    act_score, aqlq_score, pacqlq_score, afs_score, self_reported_adherence\n  ) %&gt;%\n  mutate(studyarm = factor(\n    studyarm,\n    levels = c(0, 1),\n    labels = c(\"Control\", \"Intervention\")\n  )) %&gt;%\n  tbl_summary(\n    by = studyarm,\n    label = list(\n      participant_sex ~ \"Sex\",\n      child_adult ~ \"Child or adult\",\n      prefer_language ~ \"Preferred language\",\n      age_screening ~ \"Age at screening (years)\",\n      act_score ~ \"Baseline ACT\",\n      aqlq_score ~ \"Baseline AQLQ score (adults)\",\n      pacqlq_score ~ \"Baseline PACQLQ score (children)\",\n      afs_score ~ \"Baseline AFS score\",\n      self_reported_adherence ~ \"Baseline self-reported adherence score\"\n    )\n  ) %&gt;%\n  bold_labels() %&gt;%\n  modify_caption(\"**Patient Characteristics** (N = {N})\") %&gt;%\n  as_flex_table()",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/tables.html#count-outcome-summary",
+    "href": "quarto/tables.html#count-outcome-summary",
+    "title": "Tables",
+    "section": "Count outcome summary",
+    "text": "Count outcome summary\nThis describes the distribution of participant-level counts by arm and stores it as count_outcome_summary. Raw counts can differ because follow-up durations differ. Use the count-model page to understand the separate rate comparison that accounts for duration. Model tables are produced by the model scripts, not this descriptive block.\n\n\nClick to show/hide R Code\n# Count outcomes by arm\ncount_outcome_summary &lt;- rescue_medication_merged %&gt;%\n  select(all_of(count_outcomes), studyarm) %&gt;%\n  tbl_summary(by = studyarm)",
+    "crumbs": [
+      "Code",
+      "Tables and figures",
+      "Tables"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html",
+    "href": "quarto/functions.html",
+    "title": "Functions",
+    "section": "",
+    "text": "Reusable helper functions. Each takes its inputs as arguments.\nEach repeated-outcome analysis runs in three steps: fit the model once, estimate effects from it, then report them as a table and a plot. The names are general (an exposure, a time variable and an optional modifier), so the same functions serve any exposure-by-time analysis, with or without a subgroup.",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#fit-mixed-model",
+    "href": "quarto/functions.html#fit-mixed-model",
+    "title": "Functions",
+    "section": "Fit mixed model",
+    "text": "Fit mixed model\nfit_mixed_model() accepts a visit dataset, the outcome column’s name and an optional modifier (subgroup) name. Without a modifier it fits visit × arm with a random intercept for each participant; with one, visit × arm × modifier. It returns the fitted model, which the next three functions all use.\nWhat the model’s coefficients mean is explained in Longitudinal data and mixed models and Interactions.\n\n\nClick to show/hide R Code\n# Linear mixed model of an outcome on time (as a factor) by exposure, with a\n# random intercept for each participant. With a modifier, the model is time\n# by exposure by modifier.\nfit_mixed_model &lt;- function(data, outcome, modifier = NULL,\n                            exposure = \"studyarm\", time = \"time_factor\",\n                            id = \"study_id_screening\") {\n  fixed_effects &lt;- paste(c(time, exposure, modifier), collapse = \" * \")\n  model_formula &lt;- paste0(\n    outcome, \" ~ \", fixed_effects, \" + (1 | \", id, \")\"\n  ) %&gt;%\n    as.formula()\n\n  lmer(model_formula, data = data)\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#tabulate-model-terms",
+    "href": "quarto/functions.html#tabulate-model-terms",
+    "title": "Functions",
+    "section": "Tabulate model terms",
+    "text": "Tabulate model terms\ntabulate_model_terms() turns a fitted model into a table of its coefficients. tidy() makes the model output table-shaped, and flextable() formats it. How this code does it describes what this table shows and doesn’t.\n\n\nClick to show/hide R Code\n# The fitted model's coefficients as a flextable: the baseline exposure\n# difference, the time-by-exposure interaction terms and, with a modifier,\n# the three-way terms\ntabulate_model_terms &lt;- function(fit, caption) {\n  fit %&gt;%\n    tidy(conf.int = TRUE) %&gt;%\n    flextable() %&gt;%\n    set_caption(caption)\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#estimate-effects",
+    "href": "quarto/functions.html#estimate-effects",
+    "title": "Functions",
+    "section": "Estimate effects",
+    "text": "Estimate effects\nestimate_effects() asks emmeans for the numbers the plot needs, from the fitted model and without refitting: the mean in each visit × arm cell (and subgroup level), the arm effect at each visit within each level, and, with a subgroup, how that effect differs between levels. It returns them as tidy tables. Effects behind an interaction explains the method.\n\n\nClick to show/hide R Code\n# Estimates from a fitted model, with emmeans: the mean in each time x\n# exposure (x modifier level) cell, and for each modifier level the exposure\n# effect at each time. At the first (baseline) time the effect is the\n# exposure difference; at later times it is the time-by-exposure interaction,\n# the change from baseline in the exposed group minus that in the reference\n# group. With a modifier, the difference in that effect between each level\n# and the first level. Degrees of freedom are Satterthwaite's, as in the\n# model table, and p values are not adjusted for multiplicity.\nestimate_effects &lt;- function(fit, exposure = \"studyarm\",\n                             time = \"time_factor\", modifier = NULL) {\n  emm &lt;- function(specs, by = NULL) {\n    emmeans(fit, specs = specs, by = by,\n            lmer.df = \"satterthwaite\", lmerTest.limit = Inf)\n  }\n  tidy_emm &lt;- function(x) {\n    as_tibble(as.data.frame(summary(x, infer = TRUE, adjust = \"none\")))\n  }\n  first &lt;- \"trt.vs.ctrl1\"\n  baseline &lt;- ref_grid(fit)@levels[[time]][1]\n  # The later time in a \"t - baseline\" interaction contrast\n  contrast_time &lt;- function(x) str_remove(x, \" - .*$\")\n\n  means &lt;- emm(exposure, by = c(time, modifier)) %&gt;%\n    tidy_emm() %&gt;%\n    rename(estimate = emmean, conf.low = lower.CL, conf.high = upper.CL)\n\n  at_baseline &lt;- emm(exposure, by = c(time, modifier)) %&gt;%\n    contrast(first) %&gt;%\n    tidy_emm() %&gt;%\n    filter(.data[[time]] == baseline)\n  over_time &lt;- emm(c(exposure, time), by = modifier) %&gt;%\n    contrast(interaction = c(first, first)) %&gt;%\n    tidy_emm() %&gt;%\n    mutate(!!time := contrast_time(.data[[paste0(time, \"_\", first)]]))\n  within_levels &lt;- bind_rows(at_baseline, over_time) %&gt;%\n    select(any_of(c(modifier, time)), estimate, conf.low = lower.CL,\n           conf.high = upper.CL, p.value)\n\n  between_levels &lt;- NULL\n  if (!is.null(modifier)) {\n    between_at_baseline &lt;- emm(c(exposure, modifier), by = time) %&gt;%\n      contrast(interaction = c(first, first)) %&gt;%\n      tidy_emm() %&gt;%\n      filter(.data[[time]] == baseline)\n    between_over_time &lt;- emm(c(exposure, time, modifier)) %&gt;%\n      contrast(interaction = c(first, first, first)) %&gt;%\n      tidy_emm() %&gt;%\n      mutate(!!time := contrast_time(.data[[paste0(time, \"_\", first)]]))\n    between_levels &lt;- bind_rows(between_at_baseline, between_over_time) %&gt;%\n      mutate(\n        comparison = .data[[paste0(modifier, \"_\", first)]],\n        .before = 1\n      ) %&gt;%\n      select(comparison, all_of(time), estimate, conf.low = lower.CL,\n             conf.high = upper.CL, p.value)\n  }\n\n  list(\n    means = means %&gt;%\n      select(\n        all_of(c(time, exposure, modifier)), estimate, conf.low, conf.high\n      ),\n    within_levels = within_levels,\n    between_levels = between_levels\n  )\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/functions.html#plot-effect-trajectories",
+    "href": "quarto/functions.html#plot-effect-trajectories",
+    "title": "Functions",
+    "section": "Plot effect trajectories",
+    "text": "Plot effect trajectories\nplot_effect_trajectories() draws the data and those estimates: individual trajectories, estimated means, confidence intervals, numbers observed and p-value annotations. It fits nothing. With a subgroup, it draws one panel per level, each with that level’s participants, and a row of p values for the difference between levels. Read it in that order: p-value labels, counts joined to the means, then the drawing layers. For general guidance on writing and reading reusable recipes, see the Functions chapter in R for Data Science (Wickham et al. 2023).\n\n\nClick to show/hide R Code\n# Spaghetti plot of an outcome over time by arm: individual trajectories,\n# model-estimated means with 95% confidence intervals, numbers observed, and\n# p values for the arm effect at each visit (at baseline the arm difference;\n# at follow-up, marked †, the difference in change from baseline). With a\n# modifier, one panel per level plus a row of p values for the difference in\n# that effect between levels, combined with patchwork. Takes the estimates\n# from estimate_effects(); it fits nothing.\nplot_effect_trajectories &lt;- function(trial_data, estimates, outcome_of_interest,\n                                     interaction_variable = NULL,\n                                     plot_title = \"Plot\") {\n  # Top of the plot\n  y_max &lt;- trial_data %&gt;%\n    select(all_of(outcome_of_interest)) %&gt;%\n    max(., na.rm = TRUE) + 3\n\n  # \"p=0.012\", with † for the follow-up contrasts\n  p_value_labels &lt;- function(effects, dagger = TRUE) {\n    effects %&gt;%\n      mutate(time_linear = as.numeric(as.character(time_factor))) %&gt;%\n      mutate(p.value = round(p.value, 3)) %&gt;%\n      mutate(p_value_label = paste0(\"p=\", p.value)) %&gt;%\n      mutate(p_value_label = ifelse(\n        time_linear == 0 | !dagger,\n        p_value_label,\n        paste0(p_value_label, \"†\")\n      ))\n  }\n  model_means &lt;- estimates$means %&gt;%\n    mutate(time_linear = as.numeric(as.character(time_factor)))\n\n  if (is.null(interaction_variable)) {\n    p_values &lt;- p_value_labels(estimates$within_levels) %&gt;%\n      select(time_linear, p_value_label)\n\n    # Number observed in each arm at each visit, with the model means\n    mixed_model_predictions &lt;- trial_data %&gt;%\n      filter(!is.na(.data[[outcome_of_interest]])) %&gt;%\n      group_by(time_linear, studyarm) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      left_join(\n        .,\n        model_means %&gt;%\n          select(time_linear, studyarm, estimate, conf.low, conf.high),\n        by = c(\"time_linear\", \"studyarm\")\n      ) %&gt;%\n      mutate(time_linear_shifted = ifelse(\n        studyarm == \"1\",\n        time_linear + 0.25,\n        time_linear - 0.25\n      ))\n\n    # Spaghetti plot with model means over individual trajectories\n    ggplot() +\n      geom_point(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = .data[[outcome_of_interest]],\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_line(\n        trial_data,\n        mapping = aes(\n          x = time_linear_shifted, y = .data[[outcome_of_interest]],\n          color = studyarm, group = study_id_screening\n        ),\n        alpha = 0.2\n      ) +\n      geom_point(\n        mixed_model_predictions,\n        mapping = aes(x = time_linear_shifted, y = estimate, color = studyarm),\n        size = 2\n      ) +\n      geom_line(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, y = estimate, color = studyarm,\n          group = studyarm\n        ),\n        linewidth = 2\n      ) +\n      geom_errorbar(\n        mixed_model_predictions,\n        mapping = aes(\n          x = time_linear_shifted, ymin = conf.low, ymax = conf.high,\n          color = studyarm\n        ),\n        linewidth = 1.5\n      ) +\n      theme_publication() +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 1),\n        mapping = aes(x = time_linear, y = 0, label = n_obs, color = studyarm)\n      ) +\n      geom_text(\n        filter(mixed_model_predictions, studyarm == 0),\n        mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n      ) +\n      geom_text(mapping = aes(x = -0.5, y = 1, label = \"N\")) +\n      geom_text(\n        p_values,\n        mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n      ) +\n      scale_x_continuous(\n        breaks = c(0, 2, 4, 6, 9, 12),\n        limits = c(-0.5, 12.5),\n        minor_breaks = 0:12\n      ) +\n      ylab(figure_label(outcome_of_interest)) +\n      xlab(figure_label(\"time_linear\")) +\n      scale_colour_discrete(\n        name = figure_label(\"studyarm\"),\n        labels = arm_labels\n      ) +\n      labs(caption = \"† adjusted for baseline differences\") +\n      theme(plot.caption = element_text(hjust = 0.0555)) +\n      ggtitle(plot_title)\n  } else {\n    plot_labels &lt;- trial_data %&gt;%\n      pull(interaction_variable) %&gt;%\n      levels()\n\n    # Levels are numbered 1, 2, ... in factor order; rows with a missing\n    # level are counted but never drawn\n    data_for_function &lt;- trial_data %&gt;%\n      mutate(interaction_variable_numeric = factor(\n        as.numeric(.data[[interaction_variable]])\n      ))\n    level_number &lt;- function(level) {\n      factor(match(as.character(level), plot_labels))\n    }\n\n    within_p_values &lt;- p_value_labels(estimates$within_levels) %&gt;%\n      mutate(\n        interaction_variable = level_number(.data[[interaction_variable]])\n      ) %&gt;%\n      select(interaction_variable, time_linear, p_value_label)\n    between_p_values &lt;- estimates$between_levels %&gt;%\n      p_value_labels(dagger = FALSE) %&gt;%\n      select(comparison, time_linear, p_value_label)\n\n    # Number observed in each arm and level at each visit, with the model\n    # means\n    predictions_interaction &lt;- data_for_function %&gt;%\n      filter(!is.na(.data[[outcome_of_interest]])) %&gt;%\n      group_by(time_linear, studyarm, interaction_variable_numeric) %&gt;%\n      summarize(n_obs = n()) %&gt;%\n      rename(interaction_variable = interaction_variable_numeric) %&gt;%\n      left_join(\n        .,\n        model_means %&gt;%\n          mutate(\n            interaction_variable = level_number(.data[[interaction_variable]])\n          ) %&gt;%\n          select(time_linear, studyarm, interaction_variable, estimate,\n                 conf.low, conf.high),\n        by = c(\"time_linear\", \"studyarm\", \"interaction_variable\")\n      ) %&gt;%\n      mutate(time_linear_shifted_2 = ifelse(\n        studyarm == \"1\",\n        time_linear + 0.25,\n        time_linear - 0.25\n      )) %&gt;%\n      group_by(studyarm, interaction_variable) %&gt;%\n      mutate(gid = cur_group_id())\n\n    # One panel per level, each drawing that level's participants (selected\n    # by level, not by position) and that level's estimates\n    plot_level &lt;- function(k) {\n      level_data &lt;- data_for_function %&gt;%\n        filter(interaction_variable_numeric == k)\n      level_predictions &lt;- predictions_interaction %&gt;%\n        filter(interaction_variable == k)\n\n      ggplot() +\n        geom_point(\n          level_data,\n          mapping = aes(\n            x = time_linear_shifted, y = .data[[outcome_of_interest]],\n            color = studyarm, group = study_id_screening\n          ),\n          alpha = 0.2\n        ) +\n        geom_line(\n          level_data,\n          mapping = aes(\n            x = time_linear_shifted, y = .data[[outcome_of_interest]],\n            color = studyarm, group = study_id_screening\n          ),\n          alpha = 0.2\n        ) +\n        geom_point(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, y = estimate, color = studyarm\n          ),\n          size = 2\n        ) +\n        geom_line(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, y = estimate, color = studyarm,\n            group = gid\n          ),\n          linewidth = 2\n        ) +\n        theme_publication() +\n        geom_text(\n          filter(level_predictions, studyarm == 0),\n          mapping = aes(x = time_linear, y = 1, label = n_obs, color = studyarm)\n        ) +\n        geom_text(\n          filter(level_predictions, studyarm == 1),\n          mapping = aes(\n            x = time_linear, y = -1, label = n_obs, color = studyarm\n          )\n        ) +\n        geom_text(mapping = aes(x = -1, y = 1, label = \"N\")) +\n        geom_text(mapping = aes(x = -1, y = -1, label = plot_labels[k])) +\n        geom_text(\n          filter(within_p_values, interaction_variable == k),\n          mapping = aes(x = time_linear, y = y_max, label = p_value_label)\n        ) +\n        geom_errorbar(\n          level_predictions,\n          mapping = aes(\n            x = time_linear_shifted_2, ymin = conf.low, ymax = conf.high,\n            color = studyarm\n          ),\n          linewidth = 1.5\n        ) +\n        scale_x_continuous(\n          breaks = NULL,\n          limits = c(-1, 12.5),\n          minor_breaks = 0:12\n        ) +\n        scale_y_continuous(limits = c(-3, y_max)) +\n        theme(axis.title.x = element_blank()) +\n        ylab(figure_label(outcome_of_interest)) +\n        scale_colour_discrete(\n          name = figure_label(\"studyarm\"),\n          labels = arm_labels\n        )\n    }\n\n    # One row of p values for each level's difference from the first level,\n    # named when there is more than one row\n    plot_p_values &lt;- function(level_comparison) {\n      p_value_row &lt;- ggplot() +\n        geom_text(\n          data = filter(between_p_values, comparison == level_comparison),\n          mapping = aes(x = time_linear, y = 0, label = p_value_label)\n        ) +\n        theme_void() +\n        scale_x_continuous(limits = c(-1, 12.5))\n      if (length(comparisons) &gt; 1) {\n        p_value_row &lt;- p_value_row +\n          annotate(\"text\", x = -1, y = 0, label = level_comparison, size = 3)\n      }\n      p_value_row\n    }\n\n    n_levels &lt;- length(plot_labels)\n    comparisons &lt;- unique(as.character(between_p_values$comparison))\n    panels &lt;- c(\n      lapply(seq_len(n_levels), plot_level),\n      lapply(comparisons, plot_p_values)\n    )\n\n    # Combine the panels with patchwork\n    wrap_plots(panels, ncol = 1) +\n      plot_layout(\n        guides = \"collect\",\n        heights = c(\n          rep(0.96 / n_levels, n_levels),\n          rep(0.04, length(comparisons))\n        )\n      ) +\n      plot_annotation(\n        title = plot_title,\n        caption = \"† adjusted for baseline differences\",\n        theme = theme(plot.caption = element_text(hjust = 0.0555))\n      )\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Functions"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html",
+    "href": "quarto/plot_style.html",
+    "title": "Plot style",
+    "section": "",
+    "text": "The house style for figures: one theme with its colours, shapes and line types, readable labels, and one way to save a figure at its printed size.",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#check-the-ggplot2-version",
+    "href": "quarto/plot_style.html#check-the-ggplot2-version",
+    "title": "Plot style",
+    "section": "Check the ggplot2 version",
+    "text": "Check the ggplot2 version\nThe theme relies on features added in ggplot2 4.0.0: a theme can carry the palettes its figures use, and labels can be looked up by variable name. On an older version the script stops with a message saying what to update, rather than failing later with a less helpful error.\n\n\nClick to show/hide R Code\nif (utils::packageVersion(\"ggplot2\") &lt; \"4.0.0\") {\n  stop(\n    \"The figures need ggplot2 4.0.0 or later; this R has ggplot2 \",\n    utils::packageVersion(\"ggplot2\"), \". Update it with install.packages().\"\n  )\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#palettes",
+    "href": "quarto/plot_style.html#palettes",
+    "title": "Plot style",
+    "section": "Palettes",
+    "text": "Palettes\nA palette is the ordered set of colours (or shapes, or line types) given to the groups in a figure. The colours are the Okabe-Ito set, chosen to stay distinguishable for people with the common kinds of colour-vision deficiency, with a neutral dark grey first so the control arm recedes and the intervention arm stands out. Groups also differ by point shape and line type, so a figure still works in greyscale and never relies on colour alone.\n\n\nClick to show/hide R Code\n# Okabe-Ito colours (safe for the common kinds of colour-vision deficiency),\n# with a neutral dark grey first: the first group of any factor, such as the\n# control arm or a reference level, is drawn in grey and the second in blue\nokabe_ito &lt;- unname(grDevices::palette.colors(palette = \"Okabe-Ito\"))\npublication_colours &lt;- c(\"#555555\", okabe_ito[c(6, 7, 4, 2, 8, 3, 5)])\n\n# Shapes and line types differ too, so groups never rely on colour alone.\n# Filled shapes 21-25 take a white fill, so overlapping points stay visible.\npublication_shapes &lt;- c(21, 24, 22, 23, 25)\npublication_linetypes &lt;- c(\"22\", \"solid\", \"42\", \"12\", \"4212\")",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#the-publication-theme",
+    "href": "quarto/plot_style.html#the-publication-theme",
+    "title": "Plot style",
+    "section": "The publication theme",
+    "text": "The publication theme\nA theme controls everything in a figure that is not data: background, gridlines, text sizes, legend position. theme_publication() keeps only what helps a reader: light horizontal gridlines to read values against, thin axis lines, no panel border. It also carries the palettes above, so a figure needs no colour settings of its own. Text sizes are set for the printed figure (9 points by default), so a figure should be saved at the size it will be printed.\n\n\nClick to show/hide R Code\n# A quiet theme for print: no panel border, light horizontal gridlines only,\n# thin axis lines, text sized for the printed figure. The legend sits above\n# the panel; figures that name their groups on the plot itself remove it.\ntheme_publication &lt;- function(base_size = 9, base_family = \"\",\n                              header_family = NULL) {\n  ggplot2::theme_minimal(\n    base_size = base_size,\n    base_family = base_family,\n    header_family = header_family\n  ) +\n    ggplot2::theme(\n      panel.grid.minor = ggplot2::element_blank(),\n      panel.grid.major.x = ggplot2::element_blank(),\n      panel.grid.major.y = ggplot2::element_line(\n        colour = \"grey90\", linewidth = 0.3\n      ),\n      axis.line.x = ggplot2::element_line(colour = \"grey30\", linewidth = 0.3),\n      axis.ticks.x = ggplot2::element_line(colour = \"grey30\", linewidth = 0.3),\n      axis.title = ggplot2::element_text(colour = \"grey20\"),\n      axis.text = ggplot2::element_text(colour = \"grey30\"),\n      strip.text = ggplot2::element_text(face = \"bold\", hjust = 0),\n      plot.title = ggplot2::element_text(face = \"bold\"),\n      plot.title.position = \"plot\",\n      plot.caption = ggplot2::element_text(colour = \"grey35\", hjust = 0),\n      plot.caption.position = \"plot\",\n      legend.position = \"top\",\n      legend.justification = \"left\",\n      palette.colour.discrete = publication_colours,\n      palette.fill.discrete = publication_colours,\n      palette.shape.discrete = scales::pal_manual(publication_shapes),\n      palette.linetype.discrete = publication_linetypes\n    )\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#labels",
+    "href": "quarto/plot_style.html#labels",
+    "title": "Plot style",
+    "section": "Labels",
+    "text": "Labels\nlabel_figure() replaces column names with the readable names in figure_labels (defined on Setup), and arm codes with “Control” and “Intervention”. figure_label() looks up one name, for titles and axis labels built in code.\n\n\nClick to show/hide R Code\n# Axis and legend titles from figure_labels (setup.R), looked up by variable\n# name, so no raw column name reaches a figure; arm names in place of their\n# codes in the legend and, with arm_axis = TRUE, on a study-arm x-axis\nlabel_figure &lt;- function(arm_axis = FALSE) {\n  layers &lt;- list(\n    ggplot2::labs(dictionary = figure_labels),\n    ggplot2::scale_colour_discrete(labels = arm_labels)\n  )\n  if (arm_axis) {\n    layers &lt;- c(layers, list(ggplot2::scale_x_discrete(labels = arm_labels)))\n  }\n  layers\n}\n\n# One variable's figure label, or its name when it has none\nfigure_label &lt;- function(variable) {\n  if (variable %in% names(figure_labels)) {\n    unname(figure_labels[[variable]])\n  } else {\n    variable\n  }\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#saving-a-figure",
+    "href": "quarto/plot_style.html#saving-a-figure",
+    "title": "Plot style",
+    "section": "Saving a figure",
+    "text": "Saving a figure\nsave_figure() writes a figure at its printed size in millimetres, in each format needed: PDF and SVG, which keep lines and text sharp at any zoom, for journals; and PNG for the website. The PDF device embeds fonts and handles symbols such as the dagger (†). Nothing in the analysis saves a figure yet; this is the function to use when it does.\n\n\nClick to show/hide R Code\n# Save a figure at its printed size, in millimetres: PDF (cairo, which embeds\n# fonts and handles symbols such as the dagger) and SVG for journals, PNG\n# (ragg) for the website. Returns the paths written.\nsave_figure &lt;- function(plot, file, width, height,\n                        formats = c(\"pdf\", \"svg\", \"png\"), dpi = 600) {\n  devices &lt;- list(\n    pdf = grDevices::cairo_pdf,\n    svg = svglite::svglite,\n    png = ragg::agg_png\n  )\n  paths &lt;- paste0(file, \".\", formats)\n  for (i in seq_along(formats)) {\n    ggplot2::ggsave(\n      paths[i], plot,\n      device = devices[[formats[i]]],\n      width = width, height = height, units = \"mm\", dpi = dpi,\n      bg = \"white\"\n    )\n  }\n  invisible(paths)\n}",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
+    ]
+  },
+  {
+    "objectID": "quarto/plot_style.html#the-default-theme",
+    "href": "quarto/plot_style.html#the-default-theme",
+    "title": "Plot style",
+    "section": "The default theme",
+    "text": "The default theme\nSetting the theme once makes it the starting point for every figure, including quick ones made while exploring. The figures in Figures also add it themselves, so each figure looks the same however it is printed, including in the snapshot tests.\n\n\nClick to show/hide R Code\n# Every figure starts from this theme unless it sets another\nggplot2::set_theme(theme_publication())\n\n\nFor more on themes and on choosing colours, see Fundamentals of Data Visualization by Claus Wilke.",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Plot style"
     ]
   },
   {
@@ -852,6 +936,18 @@
     "title": "Setup",
     "section": "Define constants",
     "text": "Define constants\nThese named objects collect the visit cutoff, questionnaire item lists, medication names, outcomes and subgroup variables used later. A vector such as count_outcomes is a list of column names; later loops repeat the same operation for each name. Changing a threshold or item list changes the analysis definition, so its justification belongs in the analysis plan, not just in this file.\n\n\nClick to show/hide R Code\n# Observations after this date are excluded from the per-protocol analysis\n# (app update glitch). See analysis-plan.md.\nglitch_date &lt;- as.Date(\"2018-5-16\")\n\n# Items averaged into each scale score\naqlq_items &lt;- c(\n  \"short_of_breath_2weeks\",\n  \"avoid_dust_2weeks\",\n  \"frustrated_2weeks\",\n  \"bothered_by_cough_2weeks\",\n  \"fear_of_not_having_meds_2weeks\",\n  \"chest_tightness_2weeks\",\n  \"avoid_cigarette_smoke_2weeks\",\n  \"difficulty_sleep_2weeks\",\n  \"concerned_2weeks\",\n  \"wheeze_in_chest_2weeks\",\n  \"avoid_pollution_2weeks\",\n  \"limited_strenuous_activity_2weeks\",\n  \"limited_moderate_activity_2weeks\",\n  \"limited_social_activity_2weeks\",\n  \"limited_work_tasks_2weeks\"\n)\n\npacqlq_items &lt;- c(\n  \"caregiver_helplessness_1week\",\n  \"family_plans_change_1week\",\n  \"caregiver_frustration_1week\",\n  \"caregiver_work_interference_1week\",\n  \"caregiver_upset_1week\",\n  \"caregiver_sleepless_1week\",\n  \"caregiver_family_relations_1week\",\n  \"caregivier_nightime_awakening_1week\", # spelled as in the REDCap export\n  \"caregiver_angry_1week\",\n  \"caregiver_worry_child_daily_activities_1week\",\n  \"caregiver_worry_medications_1week\",\n  \"caregiver_worry_overprotective_1week\",\n  \"caregiver_worry_child_normalcy_1week\"\n)\n\nafs_items &lt;- c(\n  \"limitation_structured_physical_activities\",\n  \"limitation_sports\",\n  \"limitation_strenuous_activities\",\n  \"limitation_moderate_activities\",\n  \"limitation_mild_activities\"\n)\n\n# Variables that code missing as 999\nmissing_999_variables &lt;- c(\n  \"act_score\",\n  \"only_give_controller_medication_needed\",\n  \"only_give_controller_medication_breathless\",\n  \"give_controller_medication_regularly\",\n  \"try_to_avoid_controller_medication\",\n  \"forget_give_controller_medication\",\n  \"alter_change_dosage_controller_medication\",\n  \"stop_giving_controller_medication\",\n  \"reserve_controller_medication_if_treatment_not_work\",\n  \"give_controller_medication_child_does_breathless\",\n  \"give_controller_medication_as_label\"\n)\n\n# Baseline cut-offs for the binary subgroup variables. See analysis-plan.md.\nadherence_cutoff &lt;- 35 # self-reported adherence score &gt;= 35 is \"Adherent\"\nact_cutoff &lt;- 12 # ACT score &gt;= 12 is \"Controlled\"\n\n# Inhaler names used to relabel controller vs rescue medication\ncontroller_medication_names &lt;- c(\n  \"Advair\", \"Breo\", \"Dulera\", \"Flovent\", \"QVAR\", \"Symbicort\"\n)\nrescue_medication_names &lt;- c(\"Combivent\", \"ProAir\", \"Ventolin\", \"Proventil\")\n\n# Upper bound of the study ID range used to build the day grid; see #15\nn_subject_ids &lt;- 81\n\n# 12-month health care use outcomes\nhospital_count_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"hospitalization_number_times_12months\",\n  \"urgent_care_number_times_12months\"\n)\nhospital_binary_outcomes &lt;- c(\n  \"ed_visit_12months\",\n  \"hospitalization_asthma_12months\",\n  \"urgent_care_12months\"\n)\n\n# Count outcomes modelled with negative binomial regression\ncount_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"hospitalization_number_times_12months\",\n  \"urgent_care_number_times_12months\",\n  \"rescue_puffs_itt\",\n  \"rescue_days_itt\"\n)\n\n# Repeated-measures outcomes and subgroup variables for the mixed models\nrepeated_outcomes &lt;- c(\n  \"act_score\",\n  \"aqlq_score\",\n  \"pacqlq_score\",\n  \"afs_score\",\n  \"self_reported_adherence\"\n)\nsubgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"child_adult\",\n  \"participant_sex\",\n  \"self_reported_adherence_binary\",\n  \"act_binary\"\n)\n\n# Subgroup variables for the count-model interactions, and the count outcomes\n# fitted with the baseline asthma control subgroup (hospitalizations are left\n# out, as in the original analysis)\ncount_subgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"participant_sex\",\n  \"child_adult\",\n  \"self_reported_adherence_binary\"\n)\nact_subgroup_count_outcomes &lt;- c(\n  \"ed_visit_number_times_12months\",\n  \"urgent_care_number_times_12months\",\n  \"rescue_puffs_itt\",\n  \"rescue_days_itt\"\n)\n\n# Subgroup variables for the mixed-model interactions, and the repeated\n# outcomes also fitted by child or adult (AQLQ and PACQLQ each apply to one\n# group only)\nmixed_subgroup_variables &lt;- c(\n  \"prefer_language\",\n  \"participant_sex\",\n  \"self_reported_adherence_binary\",\n  \"act_binary\"\n)\nchild_adult_mixed_outcomes &lt;- c(\n  \"act_score\",\n  \"afs_score\",\n  \"self_reported_adherence\"\n)\n\n# Population names used in plot titles\npopulation_labels &lt;- c(\n  itt = \"ITT analysis\",\n  pp = \"per-protocol analysis\"\n)",
+    "crumbs": [
+      "Code",
+      "Setup and helper functions",
+      "Setup"
+    ]
+  },
+  {
+    "objectID": "quarto/setup.html#figure-labels",
+    "href": "quarto/setup.html#figure-labels",
+    "title": "Setup",
+    "section": "Figure labels",
+    "text": "Figure labels\nfigure_labels gives each variable a readable name for figures, so a reader sees “ACT score” rather than act_score. arm_labels names the arms in place of their codes, 0 and 1. The figure style on Plot style uses both. The labels give names and units only: each instrument’s range and direction will be added once its scoring source is confirmed in the analysis plan.\n\n\nClick to show/hide R Code\n# Readable names for variables in figures, used by label_figure() (in\n# plot_style.R). Names and units only: the instruments' score ranges and\n# directions wait for the scoring sources to be confirmed (analysis-plan.md).\nfigure_labels &lt;- c(\n  act_score = \"ACT score\",\n  aqlq_score = \"AQLQ score\",\n  pacqlq_score = \"PACQLQ score\",\n  afs_score = \"Activity limitation (AFS) score\",\n  self_reported_adherence = \"Self-reported adherence score\",\n  ed_visit_number_times_12months = \"Emergency department visits, 12 months\",\n  hospitalization_number_times_12months = \"Hospitalisations, 12 months\",\n  urgent_care_number_times_12months = \"Urgent care visits, 12 months\",\n  rescue_puffs_itt = \"Rescue inhaler puffs\",\n  rescue_days_itt = \"Days with rescue inhaler use\",\n  controller_pdc_itt = \"Controller proportion of days covered\",\n  controller_pdc_pp = \"Controller proportion of days covered\",\n  controller_pdc_quarter_itt =\n    \"Controller proportion of days covered, interval\",\n  controller_pdc_quarter_pp =\n    \"Controller proportion of days covered, interval\",\n  prefer_language = \"Preferred language\",\n  participant_sex = \"Sex\",\n  child_adult = \"Child or adult\",\n  self_reported_adherence_binary = \"Baseline self-reported adherence\",\n  act_binary = \"Baseline asthma control\",\n  studyarm = \"Study arm\",\n  time_linear = \"Months since baseline\",\n  time_linear_shifted = \"Months since baseline\"\n)\n\n# Names for the arms, in place of their codes\narm_labels &lt;- c(\"0\" = \"Control\", \"1\" = \"Intervention\")",
     "crumbs": [
       "Code",
       "Setup and helper functions",
