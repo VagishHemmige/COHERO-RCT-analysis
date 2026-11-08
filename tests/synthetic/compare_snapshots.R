@@ -1,9 +1,12 @@
 # Purpose: report what differs between two snapshots of the analysis outputs
 #   on synthetic data, for example a pull request against main.
 # Run: Rscript tests/synthetic/compare_snapshots.R base.rds proposed.rds
-# Produces: one line per output (identical, differs or missing) and the first
-#   difference for each output that differs. Report only: it never fails the
-#   run, because a pull request may change outputs on purpose.
+# Produces: one count per status and the first differences for each output
+#   that is not identical. An output whose values match once the columns of
+#   every data frame are sorted by name is reported as "reordered", not as
+#   "differs": ggplot2 versions can order built-plot columns differently for
+#   the same plot. Report only: it never fails the run, because a pull
+#   request may change outputs on purpose.
 
 ## ---- read-snapshots
 args <- commandArgs(trailingOnly = TRUE)
@@ -19,6 +22,17 @@ base <- readRDS(args[1])
 proposed <- readRDS(args[2])
 
 ## ---- compare
+# Sort the columns of every data frame by name, at any depth
+sort_columns <- function(x) {
+  if (is.data.frame(x)) {
+    x[sort(names(x))]
+  } else if (is.list(x)) {
+    lapply(x, sort_columns)
+  } else {
+    x
+  }
+}
+
 outputs <- union(names(base), names(proposed))
 status <- vapply(outputs, function(name) {
   if (!name %in% names(base)) {
@@ -27,6 +41,9 @@ status <- vapply(outputs, function(name) {
     "removed"
   } else if (identical(base[[name]], proposed[[name]])) {
     "identical"
+  } else if (identical(sort_columns(base[[name]]),
+                       sort_columns(proposed[[name]]))) {
+    "reordered"
   } else {
     "differs"
   }
@@ -34,13 +51,15 @@ status <- vapply(outputs, function(name) {
 
 ## ---- report
 cat("Outputs compared:", length(outputs), "\n")
-for (s in c("identical", "differs", "new", "removed")) {
+for (s in c("identical", "reordered", "differs", "new", "removed")) {
   cat(sprintf("  %-9s %d\n", s, sum(status == s)))
 }
 for (name in outputs[status != "identical"]) {
   cat("\n", toupper(status[[name]]), ": ", name, "\n", sep = "")
   if (status[[name]] == "differs") {
-    difference <- all.equal(base[[name]], proposed[[name]])
+    difference <- all.equal(
+      sort_columns(base[[name]]), sort_columns(proposed[[name]])
+    )
     cat(paste0("  ", head(difference, 3), "\n"), sep = "")
   }
 }
