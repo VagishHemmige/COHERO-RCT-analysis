@@ -32,7 +32,7 @@ for (outcome in count_outcomes) {
       show_single_row = "studyarm",
       label = list(studyarm ~ outcome)
     ) %>%
-    modify_header(update = list(label ~ "**Outcome**"))
+    modify_header(label = "**Outcome**")
 
   if (is.null(count_model_table)) {
     count_model_table <- outcome_table
