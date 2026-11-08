@@ -1,5 +1,6 @@
-# Stub site: Home and the Code pages only. Background, study methods,
-# project-document and About pages come later (r-analysis-workflow,
+# Home, the Methods pages (the techniques the code uses) and the Code pages.
+# Clinical background, study design, project-document and About pages come
+# later (r-analysis-workflow,
 # references/quarto.md). Published by .github/workflows/publish.yml to the
 # gh-pages branch; docs/ is not committed.
 project:
@@ -33,6 +34,26 @@ website:
       - href: index.qmd
         text: Home
         icon: house
+
+      # How the methods the code uses work, in general terms; nothing about
+      # the trial's results.
+      - section: Methods
+        contents:
+          - href: quarto/methods_longitudinal.qmd
+            text: Longitudinal data and mixed models
+            icon: book
+          - href: quarto/methods_interactions.qmd
+            text: Interactions
+            icon: book
+          - href: quarto/methods_interaction_p_values.qmd
+            text: What a p-value for interaction means
+            icon: book
+          - href: quarto/methods_stratified_effects.qmd
+            text: Effects behind an interaction
+            icon: book
+          - href: quarto/methods_in_this_code.qmd
+            text: How this code does it
+            icon: book
 
       - section: Code
         contents:

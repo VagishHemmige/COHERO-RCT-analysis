@@ -10,6 +10,9 @@ The goal of this analysis is to compare the COHERO mobile app with control in th
 
 This analysis is currently in progress. The code is a port of an earlier R Markdown analysis into plain R scripts, and has not yet been run in this form.
 
+The analysis website, which explains the methods and shows the code step by step, is at:
+https://vagishhemmige.github.io/COHERO-RCT-analysis/
+
 ## Documentation
 
 - [`analysis-plan.md`](analysis-plan.md): what the analysis does (a retrospective record, written after the results were seen)
@@ -17,7 +20,7 @@ This analysis is currently in progress. The code is a port of an earlier R Markd
 - [`REPOSITORY-BLUEPRINT.md`](REPOSITORY-BLUEPRINT.md): the standard repository layout
 - [Issues](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues): known defects, open decisions and planned changes
 
-`ARCHITECTURE.md` and an explanatory website are not written yet.
+`ARCHITECTURE.md` is not written yet.
 
 ## Running the analysis
 

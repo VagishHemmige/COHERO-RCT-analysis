@@ -1,0 +1,46 @@
+---
+title: "Interactions"
+format: html
+---
+
+This page explains what the coefficients of a model with an interaction mean, for the two kinds of model this analysis uses. It uses made-up numbers only.
+
+## Effect modification in a trial
+
+A subgroup analysis asks whether the intervention's effect differs between groups of participants: by preferred language, sex, child or adult, or baseline adherence or asthma control. The usual way to ask it is to add an **arm × subgroup interaction** to the model. The interaction lets the arm effect take a different value in each subgroup level.
+
+## Reading the coefficients: count models
+
+For a count outcome with a two-level subgroup (say English and Spanish, with English as the reference level):
+
+```{r}
+#| eval: false
+glm.nb(
+  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),
+  data = participants
+)
+```
+
+On the log scale, and after exponentiating:
+
+| Exponentiated coefficient | Meaning |
+|---|---|
+| `studyarm1` | Incidence rate ratio (IRR), intervention vs control, **in the reference level only** (English) |
+| `prefer_languageSpanish` | Rate ratio, Spanish vs English, **in the control arm only** |
+| `studyarm1:prefer_languageSpanish` | **Ratio of the two IRRs**: IRR in Spanish speakers ÷ IRR in English speakers |
+
+So a table of these terms never shows the arm effect in the second level directly. With made-up numbers: if `studyarm1` is 0.80 and the interaction is 1.25, the IRR in English speakers is 0.80 and the IRR in Spanish speakers is 0.80 × 1.25 = 1.00. The interaction of 1.25 isn't an effect in anyone; it's how much the effect changes between levels.
+
+## Reading the coefficients: linear mixed models
+
+The same logic holds on an additive scale. In `outcome ~ time_factor * studyarm * subgroup + (1 | id)`:
+
+- the two-way and three-way terms involving `studyarm` describe how the arm effect differs between visits and between subgroup levels;
+- each term is a **difference**: a difference between levels in the arm difference, or, for the three-way terms, a difference between levels in the change-from-baseline arm difference (see [Longitudinal data and mixed models](methods_longitudinal.qmd));
+- with six visits and a two-level subgroup there are 24 fixed effects, and the arm effect at a given visit in a given level is the sum of up to four of them.
+
+That's why tables of raw coefficients from these models are hard to read. [What a p-value for interaction means](methods_interaction_p_values.qmd) explains what these terms' p-values test, and [Effects behind an interaction](methods_stratified_effects.qmd) shows how to get the effects themselves.
+
+## Scale matters
+
+An interaction is always measured on a scale. The count models are multiplicative (a ratio of IRRs); the mixed models are additive (a difference of differences). The same data can show an interaction on one scale and none on the other. For example, rates of 2 and 1 in one subgroup and 4 and 2 in another have the same ratio (2) in both, so no multiplicative interaction, but different differences (1 and 2), so an additive one. Knol and VanderWeele recommend reporting the effect within each stratum alongside interaction measures, so readers can judge both [@knol2012presenting].

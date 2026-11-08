@@ -1,0 +1,47 @@
+---
+title: "Longitudinal data and mixed models"
+format: html
+---
+
+This page explains the model behind the repeated-measures outcomes (ACT, AQLQ, PACQLQ, AFS and self-reported adherence) in general terms. It says nothing about this trial's results. The [last methods page](methods_in_this_code.qmd) shows where each idea appears in the code.
+
+## Why repeated measures need their own model
+
+In a trial with visits at baseline and at several follow-up times, each participant contributes several measurements. Measurements from the same person are more alike than measurements from different people: someone with well-controlled asthma at baseline tends to stay better controlled than average. A model that treats every row as independent overstates how much information the data hold, and its standard errors come out too small.
+
+A **linear mixed model** handles this by giving each participant their own baseline level, a **random intercept**. The fixed effects describe the average course of each arm over time, and the random intercept absorbs each person's persistent difference from that average. This is the model fitted with lme4 [@bates2015lme4]:
+
+```{r}
+#| eval: false
+# Each participant (study_id_screening) gets a random intercept
+lmer(act_score ~ time_factor * studyarm + (1 | study_id_screening), data = visits)
+```
+
+A random intercept assumes that any two visits from the same person are equally correlated, however far apart they are. Richer structures (random slopes for time, or a correlation that falls off with distance) are possible, at the cost of more parameters.
+
+## Time as a factor, not a line
+
+`time_factor` treats each visit (0, 2, 4, 6, 9, 12 months) as its own category, so the model estimates a separate mean for each arm at each visit without assuming a straight line or any other shape over time. With six visits that's 12 means (6 visits × 2 arms). The price is more parameters than a linear trend; the gain is that a rise and then a fall, or an early change that levels off, are described as they are.
+
+## What the coefficients mean
+
+With R's default coding, control is the reference arm and baseline is the reference visit. The model `time_factor * studyarm` then has these fixed effects:
+
+| Coefficient | Meaning |
+|---|---|
+| `(Intercept)` | Mean in the control arm at baseline |
+| `studyarm1` | Difference between arms at baseline |
+| `time_factor2`, `time_factor4`, ... | Change from baseline in the control arm at each visit |
+| `time_factor2:studyarm1`, ... | How much more (or less) the intervention arm changed from baseline than the control arm, at each visit |
+
+The last row matters most. Each visit-by-arm term is a **difference in change from baseline**: the arm difference at that visit minus the arm difference at baseline. This is what the plots mean by "adjusted for baseline differences". In a randomized trial the baseline difference should be small, but subtracting it removes any chance imbalance from the comparison at later visits.
+
+The arm difference at a given visit itself, with no baseline subtraction, is not one coefficient: it's `studyarm1` plus that visit's interaction term. Adding a subgroup to this model is covered in [Interactions](methods_interactions.qmd). Getting such combinations, with their confidence intervals, is the subject of [Effects behind an interaction](methods_stratified_effects.qmd).
+
+## Missed visits
+
+A mixed model uses every visit a participant attended, even if they missed others. That's a real advantage over analyses that keep only people with complete data. The estimates are unbiased if missing visits are **missing at random**: whether a visit is missed may depend on the person's earlier, observed values, but not on the value that would have been measured. If people tended to miss visits because they were doing badly at that moment, the model can't detect it, and the estimates would be biased.
+
+## Count outcomes are different
+
+The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don't need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person's follow-up time as an **offset**, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are **incidence rate ratios**: an arm effect of 0.8 means the intervention arm's rate is 80% of the control arm's.

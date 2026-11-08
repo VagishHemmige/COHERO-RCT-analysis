@@ -48,12 +48,16 @@ knitr::read_chunk("../R/figures.R")
 
 ## Mixed model plots overall
 
+What the plotted means, error bars and p-values come from is in [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot).
+
 ```{r}
 #| label: mixed-model-plots-overall
 #| eval: false
 ```
 
 ## Mixed model plots subgroups
+
+Each level's panel shows the arm effect within that level, and the bottom row the difference between levels; see [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
 
 ```{r}
 #| label: mixed-model-plots-subgroups

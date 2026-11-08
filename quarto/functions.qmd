@@ -26,12 +26,16 @@ knitr::read_chunk("../R/functions.R")
 
 ## Create ME table
 
+What the model's coefficients mean is explained in [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd); [How this code does it](methods_in_this_code.qmd#mixed-model-tables-create_me_table) describes what this table shows and doesn't.
+
 ```{r}
 #| label: create-me-table
 #| eval: false
 ```
 
 ## Create ME plot
+
+Inside, the function refits the same model in three codings (models A, B and C) to read off cell means and contrasts; [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) explains each one, and [Effects behind an interaction](methods_stratified_effects.qmd) the method behind model C.
 
 ```{r}
 #| label: create-me-plot
