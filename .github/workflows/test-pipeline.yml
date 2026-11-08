@@ -33,6 +33,8 @@ jobs:
           use-public-rspm: true
 
       # The packages R/setup.R attaches, plus writexl for the synthetic files
+      # and broom.helpers, which gtsummary's tbl_regression() needs but only
+      # suggests
       - name: Install the R packages the analysis uses
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
@@ -49,6 +51,7 @@ jobs:
             any::gganimate
             any::flextable
             any::gtsummary
+            any::broom.helpers
             any::patchwork
 
       - name: Run the analysis on synthetic data
