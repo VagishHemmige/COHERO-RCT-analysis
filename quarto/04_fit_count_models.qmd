@@ -27,6 +27,10 @@ knitr::read_chunk("../R/04_fit_count_models.R")
 
 ## Count models
 
+Each input row represents one participant, with a count and a follow-up duration. A `for` loop repeats the same formula for each outcome named in `count_outcomes`. `glm.nb()` fits a negative binomial model, which allows more variation in counts than a Poisson model. `offset(log(followup_time_itt))` accounts for exposure time with its coefficient fixed at one. `tbl_regression(exp = TRUE)` converts log-scale coefficients to rate ratios, and `tbl_stack()` combines the outcome tables.
+
+An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the [MASS function reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) for fitting details [@massglmnb].
+
 Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in [Longitudinal data and mixed models](methods_longitudinal.qmd#count-outcomes-are-different).
 
 ```{r}
@@ -35,6 +39,8 @@ Why the offset turns counts into rates, and why the exponentiated coefficients a
 ```
 
 ## Count interaction models
+
+These loops add one subgroup at a time; they do not fit all subgroup variables together. `studyarm * subgroup` includes the arm term, subgroup term and their interaction. The named list stores each table first by outcome and then by subgroup, making the analysis that generated it identifiable. Read the reference category before interpreting the arm coefficient: it now applies within that category.
 
 What each coefficient of an arm × subgroup model means is in [Interactions](methods_interactions.qmd#reading-the-coefficients-count-models), what the interaction p-value tests in [What a p-value for interaction means](methods_interaction_p_values.qmd), and how to get the IRR in each subgroup level in [Effects behind an interaction](methods_stratified_effects.qmd).
 
@@ -45,12 +51,16 @@ What each coefficient of an arm × subgroup model means is in [Interactions](met
 
 ## Rescue models alternative
 
+These additional fits were retained from the earlier analysis. Their formula uses `log(offset(followup_time_itt))`, which is not the working offset syntax shown above; [#1](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/1) tracks the correction. Treat this block as a documented implementation problem, not as a second recommended way to specify a rate model.
+
 ```{r}
 #| label: rescue-models-alternative
 #| eval: false
 ```
 
 ## Controller PDC comparison
+
+PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. `add_p()` asks gtsummary to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The [gtsummary tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) explains summary statistics, missing rows and test annotations [@gtsummarytutorial].
 
 ```{r}
 #| label: controller-pdc-comparison

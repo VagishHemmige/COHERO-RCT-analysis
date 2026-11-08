@@ -27,12 +27,18 @@ knitr::read_chunk("../R/tables.R")
 
 ## Table 1
 
+The baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. `select()` chooses the characteristics to describe and `tbl_summary(by = studyarm)` puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.
+
+`bold_labels()`, captions and `as_flex_table()` change presentation. The [gtsummary tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) shows how to read and customize the defaults [@gtsummarytutorial]. The current script creates `table_1` in memory; it does not export it.
+
 ```{r}
 #| label: table-1
 #| eval: false
 ```
 
 ## Count outcome summary
+
+This describes the distribution of participant-level counts by arm and stores it as `count_outcome_summary`. Raw counts can differ because follow-up durations differ. Use the [count-model page](04_fit_count_models.qmd) to understand the separate rate comparison that accounts for duration. Model tables are produced by the model scripts, not this descriptive block.
 
 ```{r}
 #| label: count-outcome-summary

@@ -22,12 +22,41 @@ knitr::read_chunk("../R/setup.R")
 
 ## Load packages
 
+A few R symbols recur throughout the site: `<-` stores a result under a name; `%>%` passes the result on the left into the next operation; `---
+title: "Setup"
+format: html
+---
+
+Attach packages and define constants shared by every script.
+
+::: {.Rcode title="Source code"}
+The full R script is available at:
+
+-   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+
+The code sections below are imported directly from that script when this page is rendered.
+:::
+
+```{r}
+#| include: false
+#| eval: true
+#| cache: false
+knitr::read_chunk("../R/setup.R")
+```
+
+ selects a named column; and `[["name"]]` selects an item from a named list. Read a pipeline from top to bottom, asking how each step changes the rows or columns.
+
+
+A package supplies functions that R does not provide on its own. `library()` attaches an already installed package for this session; it does not install it. Here, readxl reads spreadsheets, dplyr/tidyr (within tidyverse) reshape data, MASS and lme4 fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.
+
 ```{r}
 #| label: load-packages
 #| eval: false
 ```
 
 ## Data paths
+
+`COHERO_DATA_DIR` is a setting supplied by an authorized analyst outside the repository. `Sys.getenv()` reads that setting and `file.path()` combines it with each filename. The explicit `stop()` prevents the script from continuing with an unspecified data folder. Reading this website does not require the files: its code blocks are displayed, not executed.
 
 ```{r}
 #| label: data-paths
@@ -36,12 +65,16 @@ knitr::read_chunk("../R/setup.R")
 
 ## Define constants
 
+These named objects collect the visit cutoff, questionnaire item lists, medication names, outcomes and subgroup variables used later. A vector such as `count_outcomes` is a list of column names; later loops repeat the same operation for each name. Changing a threshold or item list changes the analysis definition, so its justification belongs in the [analysis plan](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md), not just in this file.
+
 ```{r}
 #| label: define-constants
 #| eval: false
 ```
 
 ## Output folders
+
+These calls create local `tables` and `figures` directories if needed. Creating a folder does not export a table or plot: the current table and figure scripts keep their objects in memory. For help with scripts, projects and finding function help, see the corresponding chapters of [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
 
 ```{r}
 #| label: output-folders

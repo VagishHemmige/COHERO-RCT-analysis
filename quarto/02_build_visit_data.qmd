@@ -27,6 +27,14 @@ knitr::read_chunk("../R/02_build_visit_data.R")
 
 ## Build visit data
 
+The input is the imported REDCap table; the intended output still has one row per participant and recorded visit. `mutate()` creates or changes columns without summarizing the rows. `case_when()` maps each event name to its scheduled month. `time_linear` stores that number; `time_factor` stores the visit as a category for the models.
+
+The code groups by participant before `fill()` carries baseline information down later rows. This assumes the baseline row precedes the rows that need it. It carries assignment and baseline subgroup information, not a missed visit's outcome score. See the [fill documentation](https://tidyr.tidyverse.org/reference/fill.html) for direction and grouping [@tidyrfill].
+
+Selected 999 codes become `NA`, R's missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in [#16](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16). Scores are then derived from the item columns: `rowMeans(..., na.rm = TRUE)` averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.
+
+The baseline adherence and asthma-control groups are carried to later visits, so a participant does not switch subgroup because a later score changes. The small horizontal time shift is only for separating points in plots. For the R verbs in this block, see [Data transformation](https://r4ds.hadley.nz/data-transform.html) [@r4ds2].
+
 ```{r}
 #| label: build-visit-data
 #| eval: false
@@ -34,12 +42,16 @@ knitr::read_chunk("../R/02_build_visit_data.R")
 
 ## Per protocol population
 
+`clean_asthma_data_itt` retains the visit records for the intention-to-treat analysis, which compares participants by assigned arm. The project's per-protocol dataset is a filtered copy keeping observations on or before the app-glitch cutoff. Here, “per protocol” means this specific date restriction, not a general selection of participants who adhered to treatment. A missing visit date produces a missing comparison and is not retained by `filter(post_glitch_date == FALSE)`. The two datasets feed the same model code later.
+
 ```{r}
 #| label: per-protocol-population
 #| eval: false
 ```
 
 ## Study dates
+
+Filtering to baseline makes a participant-level lookup table of consent and scheduled follow-up dates. The medication script joins this lookup onto app records to place them within each participant's follow-up. Check that the lookup has one row per participant: otherwise each medication record could match several rows. A blank follow-up date also needs attention because later comparisons against that date cannot establish whether a record is in the window.
 
 ```{r}
 #| label: study-dates

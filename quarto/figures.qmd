@@ -27,12 +27,16 @@ knitr::read_chunk("../R/figures.R")
 
 ## ACT plots
 
+ACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant's recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.
+
 ```{r}
 #| label: act-plots
 #| eval: false
 ```
 
 ## Count outcome plots
+
+The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. `aes()` maps variables to positions and colours, while `geom_*()` chooses marks. The [ggplot2 introduction](https://ggplot2.tidyverse.org/articles/ggplot2.html) explains this layering [@ggplotintro].
 
 ```{r}
 #| label: count-outcome-plots
@@ -41,12 +45,16 @@ knitr::read_chunk("../R/figures.R")
 
 ## Medication plots
 
+Rescue counts are shown on ordinary and logarithmic scales. A log scale makes multiplicative differences easier to see, but zero cannot be shown on that scale and may be omitted with a warning. Compare it with the ordinary-scale plot before interpreting the distribution. Controller PDC plots show participant proportions; their interpretation depends on the denominator described in [Derive medication outcomes](03_derive_medication_outcomes.qmd#controller-day-grid).
+
 ```{r}
 #| label: medication-plots
 #| eval: false
 ```
 
 ## Mixed model plots overall
+
+Faint trajectories show recorded measurements, while prominent points and lines show model-estimated group means. Error bars are confidence intervals for those means, not the range containing most individual scores. The displayed N is the number of nonmissing outcome records counted at that visit; it is not necessarily the model sample if predictors are missing. Follow-up p-values marked with a dagger test differences in change from baseline, so they do not simply test the visible gap between the two means at that visit.
 
 What the plotted means, error bars and p-values come from is in [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot).
 
@@ -57,7 +65,11 @@ What the plotted means, error bars and p-values come from is in [How this code d
 
 ## Mixed model plots subgroups
 
-Each level's panel shows the arm effect within that level, and the bottom row the difference between levels; see [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
+The loops add one subgroup at a time and return plots in a list indexed by population, outcome and subgroup. The within-panel p-values and between-subgroup p-values answer different questions. At follow-up the latter concern differences in the change-from-baseline arm contrast. Read the [interaction explanation](methods_interaction_p_values.qmd) before comparing a small p-value in one panel with a large one in another.
+
+The script creates plot objects in memory and does not export them. The website displays this code without showing participant-derived plots.
+
+Each level's panel shows its mean trajectories and within-level contrast p-values, and the bottom row tests differences between levels; see [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) and [What a p-value for interaction means](methods_interaction_p_values.qmd).
 
 ```{r}
 #| label: mixed-model-plots-subgroups

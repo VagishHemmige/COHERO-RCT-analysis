@@ -27,12 +27,16 @@ knitr::read_chunk("../R/05_fit_mixed_models.R")
 
 ## Mixed model data
 
+`mixed_model_data` is a named list containing the two visit datasets. The labels `itt` and `pp` let the later loops select a population by name. Each dataset still contains repeated rows per participant; the helper's random intercept accounts for that dependence. `mixed_model_tables` begins empty and will hold the resulting tables.
+
 ```{r}
 #| label: mixed-model-data
 #| eval: false
 ```
 
 ## Mixed models overall
+
+For each population and outcome, this calls `create_me_table()`. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, `mixed_model_tables[["itt"]][["act_score"]][["overall"]]` selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.
 
 The model and what its coefficients mean are explained in [Longitudinal data and mixed models](methods_longitudinal.qmd).
 
@@ -42,6 +46,8 @@ The model and what its coefficients mean are explained in [Longitudinal data and
 ```
 
 ## Mixed models subgroups
+
+The extra loop asks whether the arm-by-visit pattern differs by one baseline subgroup at a time. Children and adults are compared only for outcomes used in both groups; the adult and caregiver quality-of-life measures are not interchangeable. A missing outcome or model predictor can change the rows used by a particular fit, so the same dataset name does not guarantee the same analysis sample for every outcome.
 
 Reading the three-way visit × arm × subgroup terms is covered in [Interactions](methods_interactions.qmd#reading-the-coefficients-linear-mixed-models), and the meaning of their p-values in [What a p-value for interaction means](methods_interaction_p_values.qmd).
 

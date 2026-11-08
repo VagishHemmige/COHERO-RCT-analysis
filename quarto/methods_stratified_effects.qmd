@@ -3,9 +3,76 @@ title: "Effects behind an interaction"
 format: html
 ---
 
-A model with an interaction holds the arm effect for every subgroup level and every visit, but its coefficients show only some of them directly (see [Interactions](methods_interactions.qmd)). This page shows two ways to get all of them, with confidence intervals, from a model already fitted. Both give the same answer. The code is shown, not run, and uses illustrative object names.
+The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model's printed coefficient table may not answer that directly. A **contrast** is a requested comparison of model estimates, such as intervention minus control within a subgroup.
 
-## By hand from the coefficients
+In the [invented interaction example](methods_interactions.qmd), the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.
+
+The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.
+
+## With emmeans
+
+emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand [@lenth2026emmeans]. For the count model:
+
+```{r}
+#| eval: false
+library(emmeans)
+
+emmeans(fit, ~ studyarm | prefer_language, type = "response") %>%
+  contrast("revpairwise") %>%
+  confint()
+```
+
+This gives one row per language: the intervention-vs-control IRR (a `ratio` column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.
+
+For the mixed model, the arm difference at each visit within each subgroup level:
+
+```{r}
+#| eval: false
+emmeans(fit_lmer, ~ studyarm | time_factor * prefer_language) %>%
+  contrast("revpairwise") %>%
+  confint()
+```
+
+These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model's interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:
+
+```{r}
+#| eval: false
+emmeans(fit_lmer, ~ studyarm * time_factor | prefer_language) %>%
+  contrast(interaction = c("revpairwise", "trt.vs.ctrl")) %>%
+  confint()
+```
+
+For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.
+
+
+Read `~ studyarm | prefer_language` as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an `lmer()` formula. `revpairwise` reverses the usual pairwise direction so the stated factor order gives intervention versus control. `confint()` explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.
+
+For a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score's units. An interval for a mean or contrast is not the range of scores expected for individual participants.
+
+Start with the package's [quick-start guide](https://rvlenth.github.io/emmeans/articles/AQuickStart.html). The [interval and summary reference](https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html) explains `confint()`, scales and inference options [@lenth2026emmeans]. These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.
+
+## By refitting with a different reference level
+
+The coefficient for `studyarm1` is the arm effect in the reference level, so making the other level the reference gives its effect directly:
+
+```{r}
+#| eval: false
+participants_spanish_ref <- participants %>%
+  mutate(prefer_language = relevel(prefer_language, ref = "Spanish"))
+
+fit_spanish_ref <- glm.nb(
+  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),
+  data = participants_spanish_ref
+)
+# exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers
+```
+
+This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. The plotting function uses a related idea: model C rewrites the formula to expose subgroup-specific terms directly, rather than literally calling `relevel()` (see [How this code does it](methods_in_this_code.qmd)).
+
+
+::: {.callout-note collapse="true" title="Optional: where the interval comes from"}
+
+### By hand from the coefficients
 
 The arm effect in a non-reference level is a **sum of coefficients**, so its variance is a sum of variances and covariances. For the count model `rescue_puffs_itt ~ studyarm * prefer_language + offset(...)`:
 
@@ -32,56 +99,11 @@ exp(log_irr + c(-1, 1) * qnorm(0.975) * se)
 
 The same idea works for any combination: the arm difference at the 6-month visit in one subgroup level of a mixed model is the sum of the baseline arm term and the relevant two- and three-way terms.
 
-## By refitting with a different reference level
 
-The coefficient for `studyarm1` is the arm effect in the reference level, so making the other level the reference gives its effect directly:
+Here `coef()` extracts coefficient estimates and `vcov()` extracts their variance–covariance matrix. The covariance matters because terms from the same model are estimated together. The square root of the combined variance gives a standard error. The displayed hand calculation uses a normal approximation; it is not a universal replacement for the degrees-of-freedom or interval method used by a mixed-model package.
 
-```{r}
-#| eval: false
-participants_spanish_ref <- participants %>%
-  mutate(prefer_language = relevel(prefer_language, ref = "Spanish"))
-
-fit_spanish_ref <- glm.nb(
-  rescue_puffs_itt ~ studyarm * prefer_language + offset(log(followup_time_itt)),
-  data = participants_spanish_ref
-)
-# exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers
-```
-
-This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. Recoding the reference level this way is also what the plotting function's "model C" does (see [How this code does it](methods_in_this_code.qmd)).
-
-## With emmeans
-
-emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand [@lenth2026emmeans]. For the count model:
-
-```{r}
-#| eval: false
-library(emmeans)
-
-emmeans(fit, ~ studyarm | prefer_language, type = "response") %>%
-  contrast("revpairwise")
-```
-
-This gives one row per language: the intervention-vs-control IRR (a `ratio` column) with its confidence interval. On the log scale, comparisons are differences of logs, which become ratios when back-transformed. Both arms are compared at the same follow-up time, so the offset cancels out of the ratio.
-
-For the mixed model, the arm difference at each visit within each subgroup level:
-
-```{r}
-#| eval: false
-emmeans(fit_lmer, ~ studyarm | time_factor * prefer_language) %>%
-  contrast("revpairwise")
-```
-
-These are differences on the score scale, with no baseline subtraction. To get the change-from-baseline differences that the model's interaction terms describe, ask for an interaction contrast between arms and between each visit and baseline:
-
-```{r}
-#| eval: false
-emmeans(fit_lmer, ~ studyarm * time_factor | prefer_language) %>%
-  contrast(interaction = c("revpairwise", "trt.vs.ctrl"))
-```
-
-For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.
+:::
 
 ## Check that the methods agree
 
-On synthetic data, the hand calculation, the refit with a new reference level and emmeans should give the same estimate and, for the count models, the same confidence interval. Showing that is a good test that the right terms were combined. These calls are checked against emmeans' help pages for the installed version before they're used in the analysis.
+Equivalent contrasts from the same fitted model should agree when they use the same rows, coding, scale, degrees of freedom and interval method. Refitting can obscure those requirements, especially if missing predictors change the rows used. On synthetic data, compare the estimates and intervals explicitly before adopting a new reporting route. That validation is tracked in [#9](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/9).

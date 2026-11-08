@@ -7,9 +7,9 @@ This page explains the model behind the repeated-measures outcomes (ACT, AQLQ, P
 
 ## Why repeated measures need their own model
 
-In a trial with visits at baseline and at several follow-up times, each participant contributes several measurements. Measurements from the same person are more alike than measurements from different people: someone with well-controlled asthma at baseline tends to stay better controlled than average. A model that treats every row as independent overstates how much information the data hold, and its standard errors come out too small.
+In a trial with visits at baseline and at several follow-up times, each participant contributes several measurements. Measurements from the same person are more alike than measurements from different people: someone with well-controlled asthma at baseline tends to stay better controlled than average. Treating all rows as independent ignores that relationship and can give incorrect uncertainty estimates; the direction of the error depends on the comparison.
 
-A **linear mixed model** handles this by giving each participant their own baseline level, a **random intercept**. The fixed effects describe the average course of each arm over time, and the random intercept absorbs each person's persistent difference from that average. This is the model fitted with lme4 [@bates2015lme4]:
+A **linear mixed model** represents this with a participant-specific shift in the expected score, a **random intercept**. The fixed effects describe the average course of each arm over time, and the random intercept absorbs each person's persistent difference from that average. This is the model fitted with lme4 [@bates2015lme4]:
 
 ```{r}
 #| eval: false
@@ -17,7 +17,18 @@ A **linear mixed model** handles this by giving each participant their own basel
 lmer(act_score ~ time_factor * studyarm + (1 | study_id_screening), data = visits)
 ```
 
-A random intercept assumes that any two visits from the same person are equally correlated, however far apart they are. Richer structures (random slopes for time, or a correlation that falls off with distance) are possible, at the cost of more parameters.
+In this model, a random intercept together with constant residual variance assumes equal residual correlation between any two visits from the same person, however far apart they are. Richer structures (random slopes for time, or a correlation that falls off with distance) are possible, at the cost of more parameters.
+
+Read the formula as “model asthma-control score using visit, arm and how their relationship changes, while allowing participants to have different starting levels.”
+
+| R notation | How to read it |
+|---|---|
+| `outcome ~ predictors` | The outcome on the left is modeled using the terms on the right |
+| `time_factor * studyarm` | Include visit, arm and the visit-by-arm interaction |
+| `(1 \| study_id_screening)` | Allow a participant-specific intercept |
+| `data = visits` | Find the named columns in this dataset |
+
+An **interaction** allows the arm difference to vary with visit. A **factor** tells R that values are categories. The reference category is the starting point against which the other categories are expressed.
 
 ## Time as a factor, not a line
 
@@ -34,9 +45,22 @@ With R's default coding, control is the reference arm and baseline is the refere
 | `time_factor2`, `time_factor4`, ... | Change from baseline in the control arm at each visit |
 | `time_factor2:studyarm1`, ... | How much more (or less) the intervention arm changed from baseline than the control arm, at each visit |
 
-The last row matters most. Each visit-by-arm term is a **difference in change from baseline**: the arm difference at that visit minus the arm difference at baseline. This is what the plots mean by "adjusted for baseline differences". In a randomized trial the baseline difference should be small, but subtracting it removes any chance imbalance from the comparison at later visits.
+The last row matters most. Each visit-by-arm term is a **difference in change from baseline**: the arm difference at that visit minus the arm difference at baseline. This is what the plots mean by "adjusted for baseline differences". This subtraction defines a change contrast; it does not guarantee that baseline imbalance or regression to the mean has been accounted for appropriately. It is different from using the baseline score as a covariate in an analysis of covariance (ANCOVA) [@vickers2001baseline].
 
 The arm difference at a given visit itself, with no baseline subtraction, is not one coefficient: it's `studyarm1` plus that visit's interaction term. Adding a subgroup to this model is covered in [Interactions](methods_interactions.qmd). Getting such combinations, with their confidence intervals, is the subject of [Effects behind an interaction](methods_stratified_effects.qmd).
+
+### A small invented example
+
+These means are entirely invented, not trial results.
+
+| Arm | Baseline score | Follow-up score | Change |
+|---|---:|---:|---:|
+| Control | 10 | 12 | +2 |
+| Intervention | 11 | 15 | +4 |
+
+The follow-up arm difference is 15 − 12 = **3 points**. The difference in change is 4 − 2 = **2 points**, equivalently the follow-up difference of 3 minus the baseline difference of 1. Both describe these numbers, but they answer different questions. Whether a score difference is clinically important requires the instrument's interpretation, not just a p-value.
+
+For a short explanation of baseline adjustment, see [Vickers and Altman's Statistics Note](https://pmc.ncbi.nlm.nih.gov/articles/PMC1121605/) [@vickers2001baseline].
 
 ## Missed visits and missing at random
 
@@ -61,3 +85,12 @@ For an accessible introduction, see Box 1 and the practical discussion in [Stern
 ## Count outcomes are different
 
 The 12-month health care use counts and the rescue inhaler counts are one value per participant, not repeated measures, so they don't need a mixed model. They are fitted with negative binomial regression on the log scale, with the log of each person's follow-up time as an **offset**, so the model describes rates (events per day of follow-up) rather than raw counts. On the log scale, exponentiated coefficients are **incidence rate ratios**: an arm effect of 0.8 means the intervention arm's rate is 80% of the control arm's.
+
+
+### Counts, rates and the offset
+
+In an invented example, 6 events over 60 days and 3 events over 30 days have the same rate: 0.1 events per day. Comparing the counts alone would miss that equality. The **offset** supplies the exposure duration with its coefficient fixed, so the model compares rates. Negative binomial regression additionally allows counts to vary more than a Poisson model assumes. Neither choice repairs incorrectly defined event counts or follow-up windows.
+
+An IRR of 1 means equal modeled rates; an IRR below 1 means a lower rate in the intervention arm, with the direction reversed above 1. A 95% confidence interval crossing 1 includes equal rates among the values compatible with the data and model at that confidence level; it does not prove equivalence.
+
+For technical depth after the examples, [Bates and colleagues](https://www.jstatsoft.org/article/view/v067i01) explain the mixed-model implementation [@bates2015lme4]. The [MASS reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) documents the negative binomial function [@massglmnb].

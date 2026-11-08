@@ -27,12 +27,16 @@ knitr::read_chunk("../R/03_derive_medication_outcomes.R")
 
 ## Clean medication records
 
+Start with individual app records. Rows without an identifier are removed, and medication names help classify records whose app label is not already Control or Rescue. Joining `study_dates` adds each participant's follow-up boundaries. The current filter applies the upper boundary at the 12-month visit; the missing lower boundary at consent is tracked in [#3](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/3). Classification and time-window checks determine which records contribute to every later summary.
+
 ```{r}
 #| label: clean-medication-records
 #| eval: false
 ```
 
 ## Count rescue use
+
+`group_by(SUBJECTID)` followed by `summarize()` reduces many records to one row per participant. Here `n()` counts records (the code calls these rescue puffs), while `n_distinct(PuffDate)` counts distinct recorded date values. The latter represents days only if the field has been reduced to calendar dates; timestamps within the same day would remain distinct. The second calculation restricts records to the per-protocol cutoff before joining the summaries.
 
 ```{r}
 #| label: count-rescue-use
@@ -41,12 +45,20 @@ knitr::read_chunk("../R/03_derive_medication_outcomes.R")
 
 ## Count controller use
 
+Controller records are grouped by participant, study-day offset and recorded date. The code counts rows and distinct `Puff(EST)` values, then keeps distinct summary rows. These summaries describe recorded use. Their correspondence to actual doses depends on the export's definition of a record and its date fields.
+
 ```{r}
 #| label: count-controller-use
 #| eval: false
 ```
 
 ## Controller day grid
+
+A proportion needs days with no recorded use in its denominator too. The grid supplies candidate participant-days, then the join attaches controller records; unmatched grid rows receive zero recorded puffs.
+
+Read the implementation carefully: its candidate days come from `unique(medication_data_clean$StudyPeriod)`, not an independently generated sequence of every calendar day. Its identifiers also come from a numeric sequence ([#15](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/15)). If an eligible study-day offset never appears in the medication data, it cannot enter this grid. This is a denominator issue, not evidence that those days had no use.
+
+The `quarter` label means a visit interval here; the intervals are not all three months long. The interval's value is attached to the visit that ends it.
 
 ```{r}
 #| label: controller-day-grid
@@ -55,12 +67,20 @@ knitr::read_chunk("../R/03_derive_medication_outcomes.R")
 
 ## Controller PDC
 
+**Proportion of days covered (PDC)** is the name used here for the fraction of represented days with at least one recorded controller puff. It is not a pharmacy-refill measure. `day_is_covered` is 1 for such a day and 0 otherwise, so its mean is the fraction covered. In a wholly invented example, four covered days among ten eligible days gives 0.40 (40%). Four covered days in a grid containing only eight of those days gives 0.50: the denominator matters.
+
+The code calculates an overall value and a value for each visit interval, both with and without the cutoff. Zero recorded use is a coding assumption about the app record, not proof that a person took no medication. Read this alongside the preceding grid section.
+
 ```{r}
 #| label: controller-pdc
 #| eval: false
 ```
 
 ## Baseline count data
+
+This returns to one row per participant using the baseline REDCap records, where the code retrieves the health-care-use count fields. Missing counts are changed to zero before 999 codes are changed to missing. Those operations have different meanings: zero asserts no events, while missing means the count is unknown. The analysis plan leaves this handling open.
+
+Follow-up is expressed in days for use in count-model offsets. The current per-protocol calculation uses `min()` across participants rather than a separate minimum for each participant ([#2](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/2)); it is not used by the displayed count models.
 
 ```{r}
 #| label: baseline-count-data
@@ -69,12 +89,16 @@ knitr::read_chunk("../R/03_derive_medication_outcomes.R")
 
 ## Merge medication summaries
 
+The participant-level rescue and controller summaries are attached to baseline data for [count models](04_fit_count_models.qmd). Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. The [joins chapter](https://r4ds.hadley.nz/joins.html) explains why key uniqueness matters [@r4ds2].
+
 ```{r}
 #| label: merge-medication-summaries
 #| eval: false
 ```
 
 ## Medication by interval
+
+This further summary groups records by participant, visit interval and medication type. `complete()` adds missing combinations of the values present in the data; it does not discover participants or intervals absent from those values. Added count cells become zero. The final interval here excludes the 12-month endpoint, whereas the day-grid calculation includes it; [#4](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/4) tracks that mismatch.
 
 ```{r}
 #| label: medication-by-interval

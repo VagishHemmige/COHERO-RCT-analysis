@@ -26,6 +26,8 @@ knitr::read_chunk("../R/functions.R")
 
 ## Create ME table
 
+“ME” means mixed effects. A function is a reusable recipe: this one accepts a visit dataset, the outcome column's name and an optional subgroup name. With `interaction_variable = NULL`, it fits visit × arm; supplying a subgroup adds the three-way interaction. `tidy()` turns model output into a table-shaped object, and `flextable()` formats it. The returned object is a table, not the fitted model itself. You can use the helper without understanding every formatting line; begin with its arguments and model formula.
+
 What the model's coefficients mean is explained in [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd); [How this code does it](methods_in_this_code.qmd#mixed-model-tables-create_me_table) describes what this table shows and doesn't.
 
 ```{r}
@@ -35,7 +37,9 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Create ME plot
 
-Inside, the function refits the same model in three codings (models A, B and C) to read off cell means and contrasts; [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) explains each one, and [Effects behind an interaction](methods_stratified_effects.qmd) the method behind model C.
+This helper accepts the same analysis inputs plus a title. It returns a plot object combining individual trajectories, estimated means, confidence intervals and p-value annotations. The long function mainly prepares those layers and arranges subgroup panels. Read it in that order: model fits, extracted estimates, observed counts, drawing layers. The two subgroup panels assume a two-level factor. For general guidance on writing and reading reusable recipes, see the Functions chapter in [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
+
+Inside, the function fits alternative codings (models A, B and C) intended to expose cell means and contrasts; equivalence requires the same analysis rows and model specification. [How this code does it](methods_in_this_code.qmd#mixed-model-plots-create_me_plot) explains each one, and [Effects behind an interaction](methods_stratified_effects.qmd) the method behind model C.
 
 ```{r}
 #| label: create-me-plot
