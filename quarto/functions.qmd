@@ -39,7 +39,7 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Tabulate model terms
 
-`tabulate_model_terms()` turns a fitted model into a table of its fixed-effect terms with gtsummary's `tbl_regression()`, which takes the estimates, 95% confidence intervals and p-values from the model itself. Variables are named from `figure_labels`, and p-values are written the same way as on the figures. [How this code does it](methods_in_this_code.qmd#fitting-and-tables) describes what this table shows and doesn't.
+`tabulate_model_terms()` turns a fitted model into a table of its fixed-effect terms with gtsummary's `tbl_regression()`, which takes the estimates, 95% confidence intervals and p-values from the model itself. Variables are named from `figure_labels`, and p-values are written the same way as on the figures. gtsummary shows only the fixed effects of a mixed model, so a note under the table gives the participant and residual standard deviations from `VarCorr()`: rarely published, but needed to check the model. [How this code does it](methods_in_this_code.qmd#fitting-and-tables) describes what this table shows and doesn't.
 
 ```{r}
 #| label: tabulate-model-terms

@@ -35,13 +35,22 @@ fit_mixed_model <- function(data, outcome, modifier = NULL,
 # modifier, the three-way terms (issue #8). Estimates, 95% confidence
 # intervals and p values are the model's own, from broom.mixed::tidy(), with
 # Satterthwaite degrees of freedom. labels: readable names for the model's
-# variables, looked up by name.
+# variables, looked up by name. tbl_regression() shows fixed effects only, so
+# the random intercept's SD and the residual SD go in a note under the table,
+# where the model can be checked without them reading as effects.
 tabulate_model_terms <- function(fit, caption, labels = NULL) {
   model_variables <- all.vars(formula(fit, fixed.only = TRUE))[-1]
   variable_labels <- as.list(labels[intersect(names(labels), model_variables)])
+  standard_deviations <- as.data.frame(VarCorr(fit))
+  sd_note <- sprintf(
+    "Participant SD %.2f; residual SD %.2f (random intercept for each participant).",
+    standard_deviations$sdcor[standard_deviations$grp != "Residual"][1],
+    standard_deviations$sdcor[standard_deviations$grp == "Residual"]
+  )
 
   tbl_regression(fit, label = variable_labels) %>%
     modify_fmt_fun(p.value ~ format_p_value) %>%
+    modify_source_note(sd_note) %>%
     modify_caption(caption)
 }
 
