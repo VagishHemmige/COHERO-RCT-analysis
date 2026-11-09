@@ -36,7 +36,7 @@ testthat::test_that("the trajectory figure's options change it as recorded", {
       mixed_model_estimates[["itt"]][["act_score"]][["participant_sex"]],
       "act_score", modifier = "participant_sex",
       show_trajectories = FALSE, show_p = FALSE, show_baseline_p = FALSE,
-      show_effect_panel = TRUE
+      show_effect_panel = TRUE, arm_labels = arm_labels, labels = figure_labels
     )
   )
   # P values without the baseline test, no trajectories
@@ -45,7 +45,8 @@ testthat::test_that("the trajectory figure's options change it as recorded", {
     compose_trajectory_figure(
       mixed_model_data[["itt"]],
       mixed_model_estimates[["itt"]][["act_score"]][["overall"]],
-      "act_score", show_trajectories = FALSE, show_baseline_p = FALSE
+      "act_score", show_trajectories = FALSE, show_baseline_p = FALSE,
+      arm_labels = arm_labels, labels = figure_labels
     )
   )
 })
@@ -56,7 +57,9 @@ testthat::test_that("jitter changes only the display", {
   data <- mixed_model_data[["itt"]]
   estimates <- mixed_model_estimates[["itt"]][["act_score"]][["overall"]]
   draw <- function(...) {
-    figure <- compose_trajectory_figure(data, estimates, "act_score", ...)
+    figure <- compose_trajectory_figure(
+      data, estimates, "act_score", ..., arm_labels = arm_labels, labels = figure_labels
+    )
     lapply(ggplot2::ggplot_build(figure[[1]])$data, as.data.frame)
   }
   plain <- draw()
@@ -80,7 +83,9 @@ testthat::test_that("jitter changes only the display", {
 
   # The y-axis widens so every displaced value stays on it
   limits <- ggplot2::ggplot_build(
-    compose_trajectory_figure(data, estimates, "act_score", jitter_y = 1)[[1]]
+    compose_trajectory_figure(
+      data, estimates, "act_score", jitter_y = 1, arm_labels = arm_labels, labels = figure_labels
+    )[[1]]
   )$layout$panel_params[[1]]$y.range
   testthat::expect_true(all(jittered[[1]]$y >= limits[1] &
                               jittered[[1]]$y <= limits[2]))

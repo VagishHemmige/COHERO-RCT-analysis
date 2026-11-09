@@ -23,7 +23,8 @@ overall <- compose_trajectory_figure(
   data, mixed_model_estimates[["itt"]][["act_score"]][["overall"]],
   "act_score", title = "Synthetic example: one outcome, two arms",
   show_trajectories = FALSE, show_baseline_p = FALSE,
-  show_effect_panel = TRUE
+  show_effect_panel = TRUE,
+  arm_labels = arm_labels, labels = figure_labels
 )
 save_figure(
   overall, "quarto/images/trajectory_example_effects",
@@ -37,7 +38,8 @@ three_levels <- compose_trajectory_figure(
     modifier = "example_group"
   ),
   "act_score", modifier = "example_group",
-  title = "Synthetic example: three subgroup levels"
+  title = "Synthetic example: three subgroup levels",
+  arm_labels = arm_labels, labels = figure_labels
 )
 save_figure(
   three_levels, "quarto/images/trajectory_example_three_levels",

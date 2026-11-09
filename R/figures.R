@@ -1,7 +1,9 @@
 # Purpose: build the figures: ACT by visit, count outcomes, rescue and
 #   controller use, and the mixed-model plots for every outcome and subgroup.
-# Needs: setup.R (count_outcomes, repeated_outcomes, population_labels);
-#   functions.R (compose_trajectory_figure(), add_plot_offset());
+# Needs: setup.R (count_outcomes, repeated_outcomes, population_labels,
+#   figure_labels, arm_labels); functions.R (compose_trajectory_figure(),
+#   add_plot_offset()); plot_style.R (theme_publication(), label_figure(),
+#   figure_label());
 #   03_derive_medication_outcomes.R (clean_asthma_data_itt,
 #   clean_asthma_data_pp, rescue_medication_merged,
 #   controller_medication_merged); 05_fit_mixed_models.R (mixed_model_data,
@@ -14,6 +16,10 @@
 #   mixed-model plot chunks of MR_SJ_asthma_pilot_2023-9-15.Rmd. In the RMD
 #   each plot was printed into the document; here they are kept in named
 #   lists. The animations are in R/exploratory/animate_trajectories.R.
+
+## ---- set-default-theme
+# Every figure starts from the publication theme unless it sets another
+ggplot2::set_theme(theme_publication())
 
 ## ---- act-plots
 act_plots <- list()
@@ -29,7 +35,7 @@ act_plots[["act_by_visit_itt"]] <- clean_asthma_data_itt %>%
     labeller = labeller(time_factor = function(month) paste("Month", month))
   ) +
   theme_publication() +
-  label_figure() +
+  label_figure(figure_labels, arm_labels) +
   # The legend names the arms; six narrow panels leave no room on the axis
   theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 
@@ -43,7 +49,7 @@ act_plots[["act_by_visit_pp"]] <- clean_asthma_data_pp %>%
     labeller = labeller(time_factor = function(month) paste("Month", month))
   ) +
   theme_publication() +
-  label_figure() +
+  label_figure(figure_labels, arm_labels) +
   # The legend names the arms; six narrow panels leave no room on the axis
   theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 
@@ -60,7 +66,7 @@ act_plots[["act_spaghetti_itt"]] <- clean_asthma_data_itt %>%
     group = study_id_screening
   )) +
   theme_publication() +
-  label_figure()
+  label_figure(figure_labels, arm_labels)
 
 act_plots[["act_spaghetti_pp"]] <- clean_asthma_data_pp %>%
   add_plot_offset() %>%
@@ -74,7 +80,7 @@ act_plots[["act_spaghetti_pp"]] <- clean_asthma_data_pp %>%
     group = study_id_screening
   )) +
   theme_publication() +
-  label_figure()
+  label_figure(figure_labels, arm_labels)
 
 # Self-reported adherence vs interval controller PDC
 act_plots[["adherence_vs_pdc_itt"]] <- clean_asthma_data_itt %>%
@@ -84,7 +90,7 @@ act_plots[["adherence_vs_pdc_itt"]] <- clean_asthma_data_itt %>%
     color = studyarm
   )) +
   theme_publication() +
-  label_figure()
+  label_figure(figure_labels, arm_labels)
 
 act_plots[["adherence_vs_pdc_pp"]] <- clean_asthma_data_pp %>%
   ggplot() +
@@ -93,7 +99,7 @@ act_plots[["adherence_vs_pdc_pp"]] <- clean_asthma_data_pp %>%
     color = studyarm
   )) +
   theme_publication() +
-  label_figure()
+  label_figure(figure_labels, arm_labels)
 
 ## ---- count-outcome-plots
 # Each count outcome by arm, to check that outliers have been dealt with
@@ -106,7 +112,7 @@ for (outcome in count_outcomes) {
       x = studyarm, y = .data[[outcome]], color = studyarm
     )) +
     theme_publication() +
-    label_figure(arm_axis = TRUE)
+    label_figure(figure_labels, arm_labels, arm_axis = TRUE)
 }
 
 ## ---- medication-plots
@@ -119,7 +125,7 @@ medication_plots[["rescue_puffs"]] <- rescue_medication_merged %>%
     x = studyarm, y = rescue_puffs_itt, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE)
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE)
 
 medication_plots[["rescue_puffs_log"]] <- rescue_medication_merged %>%
   ggplot() +
@@ -127,7 +133,7 @@ medication_plots[["rescue_puffs_log"]] <- rescue_medication_merged %>%
     x = studyarm, y = rescue_puffs_itt, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE) +
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE) +
   scale_y_log10()
 
 # Rescue days, linear and log scale
@@ -137,7 +143,7 @@ medication_plots[["rescue_days"]] <- rescue_medication_merged %>%
     x = studyarm, y = rescue_days_itt, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE)
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE)
 
 medication_plots[["rescue_days_log"]] <- rescue_medication_merged %>%
   ggplot() +
@@ -145,7 +151,7 @@ medication_plots[["rescue_days_log"]] <- rescue_medication_merged %>%
     x = studyarm, y = rescue_days_itt, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE) +
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE) +
   scale_y_log10()
 
 # Controller PDC for the year
@@ -155,7 +161,7 @@ medication_plots[["controller_pdc_itt"]] <- controller_medication_merged %>%
     x = studyarm, y = controller_pdc_itt, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE)
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE)
 
 medication_plots[["controller_pdc_pp"]] <- controller_medication_merged %>%
   ggplot() +
@@ -163,7 +169,7 @@ medication_plots[["controller_pdc_pp"]] <- controller_medication_merged %>%
     x = studyarm, y = controller_pdc_pp, color = studyarm
   )) +
   theme_publication() +
-  label_figure(arm_axis = TRUE)
+  label_figure(figure_labels, arm_labels, arm_axis = TRUE)
 
 ## ---- mixed-model-plots-overall
 # Outcome over time by arm, for each outcome, drawn from the estimates of the
@@ -175,7 +181,7 @@ for (population in names(mixed_model_data)) {
 
   for (outcome in repeated_outcomes) {
     plot_title <- paste0(
-      figure_label(outcome), " over time, ", population_labels[[population]]
+      figure_label(outcome, figure_labels), " over time, ", population_labels[[population]]
     )
 
     mixed_model_plots[[population]][[outcome]] <- list()
@@ -184,7 +190,8 @@ for (population in names(mixed_model_data)) {
         mixed_model_data[[population]],
         mixed_model_estimates[[population]][[outcome]][["overall"]],
         outcome,
-        title = plot_title
+        title = plot_title,
+        arm_labels = arm_labels, labels = figure_labels
       )
   }
 }
@@ -199,8 +206,8 @@ for (population in names(mixed_model_data)) {
 
     for (subgroup in analysis$subgroups) {
       plot_title <- paste0(
-        figure_label(outcome), " over time, by ",
-        tolower(figure_label(subgroup)), ", ",
+        figure_label(outcome, figure_labels), " over time, by ",
+        tolower(figure_label(subgroup, figure_labels)), ", ",
         population_labels[[population]]
       )
 
@@ -210,7 +217,8 @@ for (population in names(mixed_model_data)) {
           mixed_model_estimates[[population]][[outcome]][[subgroup]],
           outcome,
           modifier = subgroup,
-          title = plot_title
+          title = plot_title,
+          arm_labels = arm_labels, labels = figure_labels
         )
     }
   }

@@ -47,7 +47,7 @@ This describes the distribution of participant-level counts by arm and stores it
 
 ## Export tables
 
-Every table, from this script and the model scripts, is saved to `tables/` as a Word file, one file per table. gtsummary tables are converted with `as_flex_table()` and saved with flextable's `save_as_docx()`. The file name says where the table came from, for example `mixed_model_effects_itt_act_score_overall.docx`. `tables/` is not committed: the tables are made from study data and stay private until they are cleared for release.
+Every table, from this script and the model scripts, is saved to `tables/` as a Word file, one file per table, with [`save_table()`](functions.qmd#save-a-table), which converts gtsummary tables with `as_flex_table()` and saves them with flextable's `save_as_docx()`. The file name says where the table came from, for example `mixed_model_effects_itt_act_score_overall.docx`. `tables/` is not committed: the tables are made from study data and stay private until they are cleared for release.
 
 ```{r}
 #| label: export-tables

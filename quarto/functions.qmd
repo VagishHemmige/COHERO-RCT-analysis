@@ -3,16 +3,18 @@ title: "Functions"
 format: html
 ---
 
-Reusable helper functions. Each takes its inputs as arguments.
+Reusable helper functions. Each takes its inputs as arguments and reads nothing else from this project, so `R/functions.R` and `R/plot_style.R` can be copied into another project and used there. Column names, arm names, readable labels and colors are arguments; this project passes its own from [Setup](setup.qmd).
+
+The functions expect one row per participant and visit; an exposure with exactly two groups, the first being the reference; and time as a factor whose levels are visit numbers in increasing order, baseline first. A subgroup can have any number of levels. Data that do not fit stop with a message rather than giving output that cannot be read correctly. They need the tidyverse attached, and lme4, lmerTest, emmeans, gtsummary, patchwork, withr and flextable installed; functions from those packages are called by name, so attaching them is not required. A test runs every function in a fresh R session with only these two files loaded, on invented data with other column names (`tests/synthetic/test_portable.R`).
 
 ::: {.Rcode title="Source code"}
 The full R script is available at:
 
 -   [`R/functions.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)
 
-This R script file is itself reliant on the following helper files:
+This R script file is itself reliant on the following helper file:
 
--   [`R/setup.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)
+-   [`R/plot_style.R`](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/plot_style.R), for the figure functions
 
 The code sections below are imported directly from that script when this page is rendered.
 :::
@@ -43,6 +45,15 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ```{r}
 #| label: tabulate-model-terms
+#| eval: false
+```
+
+## Checks on the data
+
+`check_two_levels()` stops when the exposure does not have exactly two groups: with three, each visit would have two comparisons that the tables and figures could not tell apart. `check_time_levels()` stops when the time levels are not numbers in increasing order, because the first level is taken as baseline.
+
+```{r}
+#| label: check-two-levels
 #| eval: false
 ```
 
@@ -139,5 +150,14 @@ The result is a patchwork object. To change every panel, add to it with `&`, for
 
 ```{r}
 #| label: compose-trajectory-figure
+#| eval: false
+```
+
+## Save a table
+
+`save_table()` saves one table as a Word file, converting a gtsummary table with `as_flex_table()` first, and creates the folder if needed. [Tables](tables.qmd#export-tables) uses it to save every table.
+
+```{r}
+#| label: save-table
 #| eval: false
 ```

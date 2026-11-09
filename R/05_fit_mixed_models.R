@@ -40,7 +40,7 @@ for (population in names(mixed_model_data)) {
     fit <- fit_mixed_model(mixed_model_data[[population]], outcome)
     estimates <- estimate_effects(fit)
     caption <- paste0(
-      figure_label(outcome), ", ", population_labels[[population]]
+      figure_label(outcome, figure_labels), ", ", population_labels[[population]]
     )
 
     mixed_model_fits[[population]][[outcome]] <- list(overall = fit)
@@ -84,7 +84,7 @@ for (population in names(mixed_model_data)) {
 
       estimates <- estimate_effects(fit, modifier = subgroup)
       caption <- paste0(
-        figure_label(outcome), " by ", tolower(figure_label(subgroup)), ", ",
+        figure_label(outcome, figure_labels), " by ", tolower(figure_label(subgroup, figure_labels)), ", ",
         population_labels[[population]]
       )
 
