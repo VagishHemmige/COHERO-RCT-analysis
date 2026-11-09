@@ -47,13 +47,7 @@ count_outcome_summary <- rescue_medication_merged %>%
 
 ## ---- export-tables
 # Every table as a Word file in tables/, one file per table, named for the
-# list it comes from (issue #8)
-save_table <- function(table, name) {
-  if (inherits(table, "gtsummary")) {
-    table <- as_flex_table(table)
-  }
-  save_as_docx(table, path = file.path("tables", paste0(name, ".docx")))
-}
+# list it comes from (issue #8), with save_table() (functions.R)
 
 single_tables <- list(
   table_1 = table_1,

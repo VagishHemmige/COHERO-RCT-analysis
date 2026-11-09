@@ -25,6 +25,15 @@ The code sections below are imported directly from that script when this page is
 knitr::read_chunk("../R/figures.R")
 ```
 
+## The default theme
+
+Setting the theme once makes it the starting point for every figure, including quick ones made while exploring. The figures below also add it themselves, so each figure looks the same however it is printed, including in the snapshot tests.
+
+```{r}
+#| label: set-default-theme
+#| eval: false
+```
+
 ## ACT plots
 
 ACT denotes the asthma-control score used in the code. In the visit panels, each point is an observed participant score; horizontal spreading helps reveal overlapping points. The trajectory plots connect a participant's recorded visits. A connecting segment does not provide measurements between visits. A separate scatterplot compares self-reported adherence with interval app-recorded PDC; agreement between these measures is a different question from whether the intervention changed either one.

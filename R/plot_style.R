@@ -1,12 +1,13 @@
 # Purpose: the house style for figures: a publication theme with its color,
 #   shape and line-type palettes, readable labels for variables, and one way
-#   to save a figure at print size. Applied to every figure by setting the
-#   theme once.
-# Needs: setup.R (packages, figure_labels). ggplot2 4.0.0 or later, for
-#   palettes carried by the theme and labels by dictionary.
+#   to save a figure at print size. Reads no global objects and changes no
+#   settings when loaded, so it can be copied into another project together
+#   with functions.R; this project sets the theme as the default in
+#   figures.R.
+# Needs: ggplot2 4.0.0 or later (palettes carried by the theme, labels by
+#   dictionary); installed: scales, svglite, ragg.
 # Produces: theme_publication(), label_figure(), figure_label(),
-#   save_figure(), publication_colors; sets theme_publication() as the
-#   default theme.
+#   save_figure(), publication_colors.
 
 ## ---- check-ggplot2-version
 if (utils::packageVersion("ggplot2") < "4.0.0") {
@@ -64,12 +65,12 @@ theme_publication <- function(base_size = 9, base_family = "",
 }
 
 ## ---- label-figure
-# Axis and legend titles from figure_labels (setup.R), looked up by variable
-# name, so no raw column name reaches a figure; arm names in place of their
-# codes in the legend and, with arm_axis = TRUE, on a study-arm x-axis
-label_figure <- function(arm_axis = FALSE) {
+# Axis and legend titles from labels (readable names, named by variable), so
+# no raw column name reaches a figure; arm names (named by level) in place of
+# their codes in the legend and, with arm_axis = TRUE, on an arm x-axis
+label_figure <- function(labels, arm_labels, arm_axis = FALSE) {
   layers <- list(
-    ggplot2::labs(dictionary = figure_labels),
+    ggplot2::labs(dictionary = labels),
     ggplot2::scale_color_discrete(labels = arm_labels)
   )
   if (arm_axis) {
@@ -78,10 +79,10 @@ label_figure <- function(arm_axis = FALSE) {
   layers
 }
 
-# One variable's figure label, or its name when it has none
-figure_label <- function(variable) {
-  if (variable %in% names(figure_labels)) {
-    unname(figure_labels[[variable]])
+# One variable's readable label from labels, or its name when it has none
+figure_label <- function(variable, labels = NULL) {
+  if (variable %in% names(labels)) {
+    unname(labels[[variable]])
   } else {
     variable
   }
@@ -109,7 +110,3 @@ save_figure <- function(plot, file, width, height,
   }
   invisible(paths)
 }
-
-## ---- set-default-theme
-# Every figure starts from this theme unless it sets another
-ggplot2::set_theme(theme_publication())

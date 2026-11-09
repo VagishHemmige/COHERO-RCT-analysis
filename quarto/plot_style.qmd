@@ -53,7 +53,7 @@ A theme controls everything in a figure that is not data: background, gridlines,
 
 ## Labels
 
-`label_figure()` replaces column names with the readable names in `figure_labels` (defined on [Setup](setup.qmd#figure-labels)), and arm codes with "Control" and "Intervention". `figure_label()` looks up one name, for titles and axis labels built in code.
+`label_figure()` replaces column names with readable names, and arm codes with arm names; this project passes `figure_labels` and `arm_labels` (defined on [Setup](setup.qmd#figure-labels)), giving "ACT score" rather than `act_score` and "Control" and "Intervention" rather than 0 and 1. `figure_label()` looks up one name, for titles and axis labels built in code. Both take the labels as arguments, so this file reads nothing from the rest of the project and can be copied with [`R/functions.R`](functions.qmd) into another one.
 
 ```{r}
 #| label: label-figure
@@ -71,11 +71,6 @@ A theme controls everything in a figure that is not data: background, gridlines,
 
 ## The default theme
 
-Setting the theme once makes it the starting point for every figure, including quick ones made while exploring. The figures in [Figures](figures.qmd) also add it themselves, so each figure looks the same however it is printed, including in the snapshot tests.
-
-```{r}
-#| label: set-default-theme
-#| eval: false
-```
+Loading this file changes no settings. [Figures](figures.qmd#the-default-theme) sets `theme_publication()` as the default theme for this project, so another project that copies the file keeps its own default.
 
 For more on themes and on choosing colors, see [Fundamentals of Data Visualization](https://clauswilke.com/dataviz/) by Claus Wilke.

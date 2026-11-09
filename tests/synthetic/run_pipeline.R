@@ -88,7 +88,8 @@ panels_match_levels <- tryCatch({
   )
   reversed_plot <- compose_trajectory_figure(
     reversed_data, estimate_effects(reversed_fit, modifier = "participant_sex"),
-    "act_score", modifier = "participant_sex"
+    "act_score", modifier = "participant_sex",
+    arm_labels = arm_labels, labels = figure_labels
   )
   baseline_levels <- reversed_data %>%
     filter(time_factor == "0") %>%
@@ -123,6 +124,23 @@ figure_results <- tryCatch(
 figures_pass <- !is.null(figure_results) &&
   all(figure_results$failed == 0) && !any(figure_results$error) &&
   !any(figure_results$skipped)
+
+## ---- check-portable
+# The model, table and figure functions run in a fresh R session that has
+# only the tidyverse attached and only functions.R and plot_style.R loaded,
+# on invented data with other column names (test_portable.R). A function that
+# reads one of this project's objects fails there. The run's output is shown
+# only if it fails.
+portable_output <- suppressWarnings(system2(
+  file.path(R.home("bin"), "Rscript"),
+  file.path(harness_dir, "test_portable.R"),
+  stdout = TRUE, stderr = TRUE
+))
+portable_pass <- is.null(attr(portable_output, "status"))
+if (!portable_pass) {
+  cat("test_portable.R failed:\n", paste(portable_output, collapse = "\n"),
+      "\n")
+}
 
 ## ---- check-tables
 # Every number in the mixed-model tables matches its source (issue #8): the
@@ -253,6 +271,8 @@ expected <- list(
   "subgroup panels draw their own level's participants" =
     panels_match_levels,
   "figures match their snapshots and save in every format" = figures_pass,
+  "model, table and figure functions work outside this project" =
+    portable_pass,
   "every mixed-model cell has 2 or more observations" =
     length(thin_cells) == 0,
   "no singular mixed-model fits" = singular_fits == 0,
