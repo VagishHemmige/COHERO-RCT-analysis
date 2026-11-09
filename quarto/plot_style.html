@@ -112,17 +112,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -132,6 +121,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 div.callout-Pending.callout {
@@ -506,16 +506,16 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="labels" class="level2">
 <h2 class="anchored" data-anchor-id="labels">Labels</h2>
-<p><code>label_figure()</code> replaces column names with the readable names in <code>figure_labels</code> (defined on <a href="../quarto/setup.html#figure-labels">Setup</a>), and arm codes with “Control” and “Intervention”. <code>figure_label()</code> looks up one name, for titles and axis labels built in code.</p>
+<p><code>label_figure()</code> replaces column names with readable names, and arm codes with arm names; this project passes <code>figure_labels</code> and <code>arm_labels</code> (defined on <a href="../quarto/setup.html#figure-labels">Setup</a>), giving “ACT score” rather than <code>act_score</code> and “Control” and “Intervention” rather than 0 and 1. <code>figure_label()</code> looks up one name, for titles and axis labels built in code. Both take the labels as arguments, so this file reads nothing from the rest of the project and can be copied with <a href="../quarto/functions.html"><code>R/functions.R</code></a> into another one.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Axis and legend titles from figure_labels (setup.R), looked up by variable</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># name, so no raw column name reaches a figure; arm names in place of their</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># codes in the legend and, with arm_axis = TRUE, on a study-arm x-axis</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>label_figure <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">arm_axis =</span> <span class="cn">FALSE</span>) {</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Axis and legend titles from labels (readable names, named by variable), so</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># no raw column name reaches a figure; arm names (named by level) in place of</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># their codes in the legend and, with arm_axis = TRUE, on an arm x-axis</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>label_figure <span class="ot">&lt;-</span> <span class="cf">function</span>(labels, arm_labels, <span class="at">arm_axis =</span> <span class="cn">FALSE</span>) {</span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  layers <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">dictionary =</span> figure_labels),</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">labs</span>(<span class="at">dictionary =</span> labels),</span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">scale_color_discrete</span>(<span class="at">labels =</span> arm_labels)</span>
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (arm_axis) {</span>
@@ -524,10 +524,10 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  layers</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># One variable's figure label, or its name when it has none</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>figure_label <span class="ot">&lt;-</span> <span class="cf">function</span>(variable) {</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (variable <span class="sc">%in%</span> <span class="fu">names</span>(figure_labels)) {</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unname</span>(figure_labels[[variable]])</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># One variable's readable label from labels, or its name when it has none</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>figure_label <span class="ot">&lt;-</span> <span class="cf">function</span>(variable, <span class="at">labels =</span> <span class="cn">NULL</span>) {</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (variable <span class="sc">%in%</span> <span class="fu">names</span>(labels)) {</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unname</span>(labels[[variable]])</span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
 <span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    variable</span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  }</span>
@@ -567,14 +567,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="the-default-theme" class="level2">
 <h2 class="anchored" data-anchor-id="the-default-theme">The default theme</h2>
-<p>Setting the theme once makes it the starting point for every figure, including quick ones made while exploring. The figures in <a href="../quarto/figures.html">Figures</a> also add it themselves, so each figure looks the same however it is printed, including in the snapshot tests.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Every figure starts from this theme unless it sets another</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ggplot2<span class="sc">::</span><span class="fu">set_theme</span>(<span class="fu">theme_publication</span>())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
-</div>
+<p>Loading this file changes no settings. <a href="../quarto/figures.html#the-default-theme">Figures</a> sets <code>theme_publication()</code> as the default theme for this project, so another project that copies the file keeps its own default.</p>
 <p>For more on themes and on choosing colors, see <a href="https://clauswilke.com/dataviz/">Fundamentals of Data Visualization</a> by Claus Wilke.</p>
 
 
@@ -1046,87 +1039,82 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Plot style"</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>The house style for figures: one theme with its colors, shapes and line types, readable labels, and one way to save a figure at its printed size.</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/plot_style.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/plot_style.R)</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/plot_style.R"</span>)</span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check the ggplot2 version</span></span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>The theme relies on features added in ggplot2 4.0.0: a theme can carry the palettes its figures use, and labels can be looked up by variable name. On an older version the script stops with a message saying what to update, rather than failing later with a less helpful error.</span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-ggplot2-version</span></span>
-<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Palettes</span></span>
-<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>A palette is the ordered set of colors (or shapes, or line types) given to the groups in a figure. The colors are the Okabe-Ito set, chosen to stay distinguishable for people with the common kinds of color-vision deficiency, with a neutral dark gray first so the control arm recedes and the intervention arm stands out. Groups also differ by point shape and line type, so a figure still works in grayscale and never relies on color alone.</span>
-<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: publication-palettes</span></span>
-<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## The publication theme</span></span>
-<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>A theme controls everything in a figure that is not data: background, gridlines, text sizes, legend position. <span class="in">`theme_publication()`</span> keeps only what helps a reader: light horizontal gridlines to read values against, thin axis lines, no panel border. It also carries the palettes above, so a figure needs no color settings of its own. Text sizes are set for the printed figure (9 points by default), so a figure should be saved at the size it will be printed.</span>
-<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: theme-publication</span></span>
-<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Labels</span></span>
-<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a><span class="in">`label_figure()`</span> replaces column names with the readable names in <span class="in">`figure_labels`</span> (defined on <span class="co">[</span><span class="ot">Setup</span><span class="co">](setup.qmd#figure-labels)</span>), and arm codes with "Control" and "Intervention". <span class="in">`figure_label()`</span> looks up one name, for titles and axis labels built in code.</span>
-<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: label-figure</span></span>
-<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Saving a figure</span></span>
-<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a><span class="in">`save_figure()`</span> writes a figure at its printed size in millimetres, in each format needed: PDF and SVG, which keep lines and text sharp at any zoom, for journals; and PNG for the website. The PDF device embeds fonts and handles symbols such as the dagger (†). Nothing in the analysis saves a figure yet; this is the function to use when it does.</span>
-<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: save-figure</span></span>
-<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## The default theme</span></span>
-<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a>Setting the theme once makes it the starting point for every figure, including quick ones made while exploring. The figures in <span class="co">[</span><span class="ot">Figures</span><span class="co">](figures.qmd)</span> also add it themselves, so each figure looks the same however it is printed, including in the snapshot tests.</span>
-<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: set-default-theme</span></span>
-<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a>For more on themes and on choosing colors, see <span class="co">[</span><span class="ot">Fundamentals of Data Visualization</span><span class="co">](https://clauswilke.com/dataviz/)</span> by Claus Wilke.</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Plot style"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>The house style for figures: one theme with its colors, shapes and line types, readable labels, and one way to save a figure at its printed size.</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/plot_style.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/plot_style.R)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/plot_style.R"</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check the ggplot2 version</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>The theme relies on features added in ggplot2 4.0.0: a theme can carry the palettes its figures use, and labels can be looked up by variable name. On an older version the script stops with a message saying what to update, rather than failing later with a less helpful error.</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: check-ggplot2-version</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Palettes</span></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>A palette is the ordered set of colors (or shapes, or line types) given to the groups in a figure. The colors are the Okabe-Ito set, chosen to stay distinguishable for people with the common kinds of color-vision deficiency, with a neutral dark gray first so the control arm recedes and the intervention arm stands out. Groups also differ by point shape and line type, so a figure still works in grayscale and never relies on color alone.</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: publication-palettes</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="fu">## The publication theme</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>A theme controls everything in a figure that is not data: background, gridlines, text sizes, legend position. <span class="in">`theme_publication()`</span> keeps only what helps a reader: light horizontal gridlines to read values against, thin axis lines, no panel border. It also carries the palettes above, so a figure needs no color settings of its own. Text sizes are set for the printed figure (9 points by default), so a figure should be saved at the size it will be printed.</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: theme-publication</span></span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="fu">## Labels</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="in">`label_figure()`</span> replaces column names with readable names, and arm codes with arm names; this project passes <span class="in">`figure_labels`</span> and <span class="in">`arm_labels`</span> (defined on <span class="co">[</span><span class="ot">Setup</span><span class="co">](setup.qmd#figure-labels)</span>), giving "ACT score" rather than <span class="in">`act_score`</span> and "Control" and "Intervention" rather than 0 and 1. <span class="in">`figure_label()`</span> looks up one name, for titles and axis labels built in code. Both take the labels as arguments, so this file reads nothing from the rest of the project and can be copied with <span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](functions.qmd)</span> into another one.</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: label-figure</span></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Saving a figure</span></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="in">`save_figure()`</span> writes a figure at its printed size in millimetres, in each format needed: PDF and SVG, which keep lines and text sharp at any zoom, for journals; and PNG for the website. The PDF device embeds fonts and handles symbols such as the dagger (†). Nothing in the analysis saves a figure yet; this is the function to use when it does.</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: save-figure</span></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="fu">## The default theme</span></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>Loading this file changes no settings. <span class="co">[</span><span class="ot">Figures</span><span class="co">](figures.qmd#the-default-theme)</span> sets <span class="in">`theme_publication()`</span> as the default theme for this project, so another project that copies the file keeps its own default.</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>For more on themes and on choosing colors, see <span class="co">[</span><span class="ot">Fundamentals of Data Visualization</span><span class="co">](https://clauswilke.com/dataviz/)</span> by Claus Wilke.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

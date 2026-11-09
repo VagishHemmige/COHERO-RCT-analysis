@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -162,6 +151,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 </style>
@@ -499,54 +499,48 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="export-tables" class="level2">
 <h2 class="anchored" data-anchor-id="export-tables">Export tables</h2>
-<p>Every table, from this script and the model scripts, is saved to <code>tables/</code> as a Word file, one file per table. gtsummary tables are converted with <code>as_flex_table()</code> and saved with flextable’s <code>save_as_docx()</code>. The file name says where the table came from, for example <code>mixed_model_effects_itt_act_score_overall.docx</code>. <code>tables/</code> is not committed: the tables are made from study data and stay private until they are cleared for release.</p>
+<p>Every table, from this script and the model scripts, is saved to <code>tables/</code> as a Word file, one file per table, with <a href="../quarto/functions.html#save-a-table"><code>save_table()</code></a>, which converts gtsummary tables with <code>as_flex_table()</code> and saves them with flextable’s <code>save_as_docx()</code>. The file name says where the table came from, for example <code>mixed_model_effects_itt_act_score_overall.docx</code>. <code>tables/</code> is not committed: the tables are made from study data and stay private until they are cleared for release.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Every table as a Word file in tables/, one file per table, named for the</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># list it comes from (issue #8)</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>save_table <span class="ot">&lt;-</span> <span class="cf">function</span>(table, name) {</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">inherits</span>(table, <span class="st">"gtsummary"</span>)) {</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    table <span class="ot">&lt;-</span> <span class="fu">as_flex_table</span>(table)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_as_docx</span>(table, <span class="at">path =</span> <span class="fu">file.path</span>(<span class="st">"tables"</span>, <span class="fu">paste0</span>(name, <span class="st">".docx"</span>)))</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>single_tables <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">table_1 =</span> table_1,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">count_outcome_summary =</span> count_outcome_summary,</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">count_model_table =</span> count_model_table,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">rescue_puffs_model_alt_table =</span> rescue_puffs_model_alt_table,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">rescue_days_model_alt_table =</span> rescue_days_model_alt_table,</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">controller_pdc_comparison =</span> controller_pdc_comparison</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name <span class="cf">in</span> <span class="fu">names</span>(single_tables)) {</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_table</span>(single_tables[[name]], name)</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (outcome <span class="cf">in</span> <span class="fu">names</span>(count_interaction_tables)) {</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (subgroup <span class="cf">in</span> <span class="fu">names</span>(count_interaction_tables[[outcome]])) {</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="fu">save_table</span>(</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      count_interaction_tables[[outcome]][[subgroup]],</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(<span class="st">"count_interaction"</span>, outcome, subgroup, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (population <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables)) {</span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (outcome <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables[[population]])) {</span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (analysis <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables[[population]][[outcome]])) {</span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">save_table</span>(</span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        mixed_model_tables[[population]][[outcome]][[analysis]],</span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="st">"mixed_model_terms"</span>, population, outcome, analysis, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>      <span class="fu">save_table</span>(</span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>        mixed_model_effect_tables[[population]][[outcome]][[analysis]],</span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="st">"mixed_model_effects"</span>, population, outcome, analysis, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># list it comes from (issue #8), with save_table() (functions.R)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>single_tables <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">table_1 =</span> table_1,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">count_outcome_summary =</span> count_outcome_summary,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">count_model_table =</span> count_model_table,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">rescue_puffs_model_alt_table =</span> rescue_puffs_model_alt_table,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">rescue_days_model_alt_table =</span> rescue_days_model_alt_table,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">controller_pdc_comparison =</span> controller_pdc_comparison</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (name <span class="cf">in</span> <span class="fu">names</span>(single_tables)) {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">save_table</span>(single_tables[[name]], name)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (outcome <span class="cf">in</span> <span class="fu">names</span>(count_interaction_tables)) {</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (subgroup <span class="cf">in</span> <span class="fu">names</span>(count_interaction_tables[[outcome]])) {</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">save_table</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      count_interaction_tables[[outcome]][[subgroup]],</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste</span>(<span class="st">"count_interaction"</span>, outcome, subgroup, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (population <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables)) {</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (outcome <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables[[population]])) {</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (analysis <span class="cf">in</span> <span class="fu">names</span>(mixed_model_tables[[population]][[outcome]])) {</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      <span class="fu">save_table</span>(</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>        mixed_model_tables[[population]][[outcome]][[analysis]],</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="st">"mixed_model_terms"</span>, population, outcome, analysis, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">save_table</span>(</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>        mixed_model_effect_tables[[population]][[outcome]][[analysis]],</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        <span class="fu">paste</span>(<span class="st">"mixed_model_effects"</span>, population, outcome, analysis, <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1073,7 +1067,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## Export tables</span></span>
 <span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>Every table, from this script and the model scripts, is saved to <span class="in">`tables/`</span> as a Word file, one file per table. gtsummary tables are converted with <span class="in">`as_flex_table()`</span> and saved with flextable's <span class="in">`save_as_docx()`</span>. The file name says where the table came from, for example <span class="in">`mixed_model_effects_itt_act_score_overall.docx`</span>. <span class="in">`tables/`</span> is not committed: the tables are made from study data and stay private until they are cleared for release.</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>Every table, from this script and the model scripts, is saved to <span class="in">`tables/`</span> as a Word file, one file per table, with <span class="co">[</span><span class="ot">`save_table()`</span><span class="co">](functions.qmd#save-a-table)</span>, which converts gtsummary tables with <span class="in">`as_flex_table()`</span> and saves them with flextable's <span class="in">`save_as_docx()`</span>. The file name says where the table came from, for example <span class="in">`mixed_model_effects_itt_act_score_overall.docx`</span>. <span class="in">`tables/`</span> is not committed: the tables are made from study data and stay private until they are cleared for release.</span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: export-tables</span></span>

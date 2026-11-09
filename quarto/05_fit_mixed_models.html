@@ -112,17 +112,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -132,6 +121,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -462,7 +462,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="fu">fit_mixed_model</span>(mixed_model_data[[population]], outcome)</span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    estimates <span class="ot">&lt;-</span> <span class="fu">estimate_effects</span>(fit)</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    caption <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">figure_label</span>(outcome), <span class="st">", "</span>, population_labels[[population]]</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">figure_label</span>(outcome, figure_labels), <span class="st">", "</span>, population_labels[[population]]</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    mixed_model_fits[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">overall =</span> fit)</span>
@@ -514,7 +514,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      estimates <span class="ot">&lt;-</span> <span class="fu">estimate_effects</span>(fit, <span class="at">modifier =</span> subgroup)</span>
 <span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      caption <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">figure_label</span>(outcome), <span class="st">" by "</span>, <span class="fu">tolower</span>(<span class="fu">figure_label</span>(subgroup)), <span class="st">", "</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">figure_label</span>(outcome, figure_labels), <span class="st">" by "</span>, <span class="fu">tolower</span>(<span class="fu">figure_label</span>(subgroup, figure_labels)), <span class="st">", "</span>,</span>
 <span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        population_labels[[population]]</span>
 <span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      )</span>
 <span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
