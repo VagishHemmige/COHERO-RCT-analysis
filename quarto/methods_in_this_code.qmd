@@ -11,7 +11,7 @@ Think of the workflow in three steps: prepare the observations, fit the model, t
 
 [`fit_mixed_model()`](functions.qmd#fit-mixed-model) fits `outcome ~ time_factor * studyarm + (1 | study_id_screening)`, or the three-way version with a subgroup. [5. Fit mixed models](05_fit_mixed_models.qmd) fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.
 
-[`tabulate_model_terms()`](functions.qmd#tabulate-model-terms) shows the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly.
+[`tabulate_model_terms()`](functions.qmd#tabulate-model-terms) shows the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly; [`tabulate_effects()`](functions.qmd#tabulate-effects) does, from the estimates below. Both are gtsummary tables.
 
 ## Estimates and plots
 
@@ -37,5 +37,4 @@ To read a plot, first identify the outcome, population, visit and subgroup. Then
 
 These are implementation proposals, not prerequisites for understanding the current analysis. Changing formatting and extracting a contrast can leave a model unchanged; changing the sample or formula can change the scientific comparison.
 
-- [#8](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/8): move all tables to gtsummary. The decision to report both kinds of table, the model terms and the effects within each subgroup level, is recorded there.
 - [#25](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/25): run the examples on these Methods pages on synthetic data, where the true effects are known.

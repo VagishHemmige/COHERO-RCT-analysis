@@ -67,6 +67,9 @@ snapshot_outputs <- function() {
   ), table_data)
   add("count interaction table", snapshot_value(flatten_named(count_interaction_tables)), table_data)
   add("mixed model table", snapshot_value(flatten_named(mixed_model_tables)), table_data)
+  if (exists("mixed_model_effect_tables")) {
+    add("mixed model effect table", snapshot_value(flatten_named(mixed_model_effect_tables)), table_data)
+  }
   add("mixed model plot", snapshot_value(flatten_named(mixed_model_plots)), built_plot_data)
   add("count outcome plot", snapshot_value(count_outcome_plots), built_plot_data)
   snapshot
