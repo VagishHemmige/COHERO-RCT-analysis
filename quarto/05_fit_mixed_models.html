@@ -112,17 +112,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
-  background-image: none;
-}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -132,6 +121,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -439,13 +439,14 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>mixed_model_fits <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>mixed_model_tables <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mixed_model_estimates <span class="ot">&lt;-</span> <span class="fu">list</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>mixed_model_estimates <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>mixed_model_effect_tables <span class="ot">&lt;-</span> <span class="fu">list</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="mixed-models-overall" class="level2">
 <h2 class="anchored" data-anchor-id="mixed-models-overall">Mixed models overall</h2>
-<p>For each population and outcome, this fits the model once with <code>fit_mixed_model()</code>, then makes its coefficient table with <code>tabulate_model_terms()</code> and its estimates with <code>estimate_effects()</code>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <code>mixed_model_tables[["itt"]][["act_score"]][["overall"]]</code> selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.</p>
+<p>For each population and outcome, this fits the model once with <code>fit_mixed_model()</code>, then makes its table of model terms with <code>tabulate_model_terms()</code>, its estimates with <code>estimate_effects()</code>, and a table of those estimates with <code>tabulate_effects()</code>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <code>mixed_model_tables[["itt"]][["act_score"]][["overall"]]</code> selects the overall intention-to-treat ACT table after an authorized run. Those are tables of model terms. The intervention effect at each visit is in <code>mixed_model_effect_tables</code>, indexed the same way.</p>
 <p>The model and what its coefficients mean are explained in <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -455,19 +456,31 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  mixed_model_fits[[population]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  mixed_model_tables[[population]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  mixed_model_estimates[[population]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (outcome <span class="cf">in</span> repeated_outcomes) {</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="fu">fit_mixed_model</span>(mixed_model_data[[population]], outcome)</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    mixed_model_fits[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">overall =</span> fit)</span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    mixed_model_tables[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">overall =</span> <span class="fu">tabulate_model_terms</span>(fit, <span class="fu">paste0</span>(outcome, <span class="st">" vs. time"</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  mixed_model_effect_tables[[population]] <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (outcome <span class="cf">in</span> repeated_outcomes) {</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    fit <span class="ot">&lt;-</span> <span class="fu">fit_mixed_model</span>(mixed_model_data[[population]], outcome)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    estimates <span class="ot">&lt;-</span> <span class="fu">estimate_effects</span>(fit)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    caption <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">figure_label</span>(outcome), <span class="st">", "</span>, population_labels[[population]]</span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    mixed_model_estimates[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">overall =</span> <span class="fu">estimate_effects</span>(fit)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    mixed_model_fits[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">overall =</span> fit)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    mixed_model_tables[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">overall =</span> <span class="fu">tabulate_model_terms</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        fit, <span class="fu">paste0</span>(caption, <span class="st">": model terms"</span>), <span class="at">labels =</span> figure_labels</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    mixed_model_estimates[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">overall =</span> estimates</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    mixed_model_effect_tables[[population]][[outcome]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">overall =</span> <span class="fu">tabulate_effects</span>(</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        estimates, <span class="fu">paste0</span>(caption, <span class="st">": intervention vs control"</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -499,16 +512,26 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="at">modifier =</span> subgroup</span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      )</span>
 <span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      mixed_model_fits[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span> fit</span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      mixed_model_tables[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tabulate_model_terms</span>(</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>          fit, <span class="fu">paste0</span>(outcome, <span class="st">" vs. time * "</span>, subgroup)</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>      mixed_model_estimates[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>        <span class="fu">estimate_effects</span>(fit, <span class="at">modifier =</span> subgroup)</span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>      estimates <span class="ot">&lt;-</span> <span class="fu">estimate_effects</span>(fit, <span class="at">modifier =</span> subgroup)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      caption <span class="ot">&lt;-</span> <span class="fu">paste0</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">figure_label</span>(outcome), <span class="st">" by "</span>, <span class="fu">tolower</span>(<span class="fu">figure_label</span>(subgroup)), <span class="st">", "</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        population_labels[[population]]</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>      mixed_model_fits[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span> fit</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>      mixed_model_tables[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tabulate_model_terms</span>(</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>          fit, <span class="fu">paste0</span>(caption, <span class="st">": model terms"</span>), <span class="at">labels =</span> figure_labels</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>      mixed_model_estimates[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span> estimates</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>      mixed_model_effect_tables[[population]][[outcome]][[subgroup]] <span class="ot">&lt;-</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tabulate_effects</span>(</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>          estimates, <span class="fu">paste0</span>(caption, <span class="st">": intervention vs control"</span>),</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>          <span class="at">modifier =</span> subgroup</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -1019,7 +1042,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mixed models overall</span></span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>For each population and outcome, this fits the model once with <span class="in">`fit_mixed_model()`</span>, then makes its coefficient table with <span class="in">`tabulate_model_terms()`</span> and its estimates with <span class="in">`estimate_effects()`</span>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <span class="in">`mixed_model_tables[["itt"]][["act_score"]][["overall"]]`</span> selects the overall intention-to-treat ACT table after an authorized run. These are coefficient tables, not a single intervention-effect estimate per visit.</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>For each population and outcome, this fits the model once with <span class="in">`fit_mixed_model()`</span>, then makes its table of model terms with <span class="in">`tabulate_model_terms()`</span>, its estimates with <span class="in">`estimate_effects()`</span>, and a table of those estimates with <span class="in">`tabulate_effects()`</span>. Read the nested brackets as a filing system: population, then outcome, then analysis. For example, <span class="in">`mixed_model_tables[["itt"]][["act_score"]][["overall"]]`</span> selects the overall intention-to-treat ACT table after an authorized run. Those are tables of model terms. The intervention effect at each visit is in <span class="in">`mixed_model_effect_tables`</span>, indexed the same way.</span>
 <span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>The model and what its coefficients mean are explained in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span>.</span>
 <span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
