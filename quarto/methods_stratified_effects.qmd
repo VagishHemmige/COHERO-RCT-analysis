@@ -7,7 +7,7 @@ The clinical question is usually “How large is the intervention effect in each
 
 In the [invented interaction example](methods_interactions.qmd), the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.
 
-The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.
+The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses emmeans in `estimate_effects()` (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.
 
 ## With emmeans
 

@@ -126,6 +126,7 @@ format:
   html:
     theme: cosmo
     css: styles.css
+    lightbox: true
     toc: true
     code-fold: true
     code-tools: true

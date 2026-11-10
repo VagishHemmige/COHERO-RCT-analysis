@@ -249,47 +249,46 @@ if (!portable_pass) {
 }
 
 ## ---- check-tables
-# Every number in the mixed-model tables matches its source (issue #8): the
-# model-term tables match broom.mixed::tidy() of each fit, with its two
-# standard deviations and intraclass correlation in the note under the table, and the effects
-# tables match estimate_effects(). Compared as sorted sets of values, so the
-# check does not depend on how the table lays them out. FALSE, not an error,
+# Every number in the mixed-model tables matches its source, row by row with
+# its label (issues #8, #49): the model-term tables match broom.mixed::tidy()
+# of each fit by model term, with the fit's two standard deviations and
+# intraclass correlation in the note under the table; the effects tables
+# match estimate_effects() by visit and by column (a subgroup level, or a
+# difference between levels, in the order tabulate_effects() lays them out).
+# A number under the wrong visit, level or term fails. FALSE, not an error,
 # when the code under test predates these tables.
-table_values <- function(table_body, prefix) {
-  table_body %>%
-    select(starts_with(prefix)) %>%
-    unlist(use.names = FALSE) %>%
-    as.numeric() %>%
-    na.omit() %>%
-    sort()
-}
-same_values <- function(table_body, source, prefix) {
-  isTRUE(all.equal(
-    table_values(table_body, prefix), sort(na.omit(source)),
-    tolerance = 1e-8
-  ))
+statistics <- c("estimate", "conf.low", "conf.high", "p.value")
+same_rows <- function(table_rows, source_rows, keys) {
+  compared <- full_join(
+    table_rows, source_rows, by = keys, suffix = c("_table", "_source")
+  )
+  all(vapply(statistics, function(statistic) {
+    isTRUE(all.equal(
+      compared[[paste0(statistic, "_table")]],
+      compared[[paste0(statistic, "_source")]],
+      tolerance = 1e-8
+    ))
+  }, logical(1)))
 }
 model_terms_match <- tryCatch(all(unlist(lapply(
   names(mixed_model_fits), function(population) {
     lapply(names(mixed_model_fits[[population]]), function(outcome) {
       lapply(names(mixed_model_fits[[population]][[outcome]]), function(analysis) {
         fit <- mixed_model_fits[[population]][[outcome]][[analysis]]
+        table <- mixed_model_tables[[population]][[outcome]][[analysis]]
         terms <- broom.mixed::tidy(fit, effects = "fixed", conf.int = TRUE) %>%
-          filter(term != "(Intercept)")
+          filter(term != "(Intercept)") %>%
+          select(term, all_of(statistics))
         # Reference levels carry a placeholder estimate, not a model term
-        body <- mixed_model_tables[[population]][[outcome]][[analysis]]$table_body %>%
-          filter(is.na(reference_row) | !reference_row)
+        table_rows <- table$table_body %>%
+          filter(!is.na(term), is.na(reference_row) | !reference_row) %>%
+          select(term, all_of(statistics))
         # The note under the table states the fit's two standard deviations
         standard_deviations <- broom.mixed::tidy(fit, effects = "ran_pars")$estimate
         intraclass_correlation <- standard_deviations[1]^2 /
           sum(standard_deviations^2)
-        note <- mixed_model_tables[[population]][[outcome]][[analysis]]$
-          table_styling$source_note$source_note
-        all(vapply(
-          c("estimate", "conf.low", "conf.high", "p.value"),
-          function(column) same_values(body, terms[[column]], column),
-          logical(1)
-        )) &&
+        note <- table$table_styling$source_note$source_note
+        same_rows(table_rows, terms, "term") &&
           all(vapply(
             sprintf("%.2f", c(standard_deviations, intraclass_correlation)),
             function(value) any(grepl(value, note, fixed = TRUE)),
@@ -300,22 +299,71 @@ model_terms_match <- tryCatch(all(unlist(lapply(
   }
 ))), error = function(e) FALSE)
 
+# The effects as tabulate_effects() lays them out: one row per visit, and
+# one column group per subgroup level, then per difference between levels
+expected_effect_rows <- function(estimates, modifier) {
+  by_visit <- function(rows, column) {
+    rows %>%
+      transmute(
+        label = paste("Month", time_factor), column = column,
+        across(all_of(statistics))
+      )
+  }
+  if (is.null(modifier)) {
+    return(by_visit(estimates$within_levels, ""))
+  }
+  within <- estimates$within_levels
+  levels_shown <- levels(droplevels(factor(within[[modifier]])))
+  comparisons <- unique(as.character(estimates$between_levels$comparison))
+  bind_rows(
+    lapply(seq_along(levels_shown), function(i) {
+      by_visit(
+        filter(within, as.character(.data[[modifier]]) == levels_shown[i]),
+        as.character(i)
+      )
+    }),
+    lapply(seq_along(comparisons), function(j) {
+      by_visit(
+        filter(
+          estimates$between_levels, as.character(comparison) == comparisons[j]
+        ),
+        as.character(length(levels_shown) + j)
+      )
+    })
+  )
+}
+table_effect_rows <- function(table_body) {
+  table_body %>%
+    select(label, matches("^(estimate|conf\\.low|conf\\.high|p\\.value)(_[0-9]+)?$")) %>%
+    pivot_longer(
+      -label, names_to = c(".value", "column"),
+      names_pattern = "^(estimate|conf\\.low|conf\\.high|p\\.value)_?([0-9]*)$"
+    )
+}
 effect_tables_match <- tryCatch(all(unlist(lapply(
   names(mixed_model_estimates), function(population) {
     lapply(names(mixed_model_estimates[[population]]), function(outcome) {
       lapply(names(mixed_model_estimates[[population]][[outcome]]), function(analysis) {
-        estimates <- mixed_model_estimates[[population]][[outcome]][[analysis]]
-        effects <- bind_rows(estimates$within_levels, estimates$between_levels)
-        body <- mixed_model_effect_tables[[population]][[outcome]][[analysis]]$table_body
-        all(vapply(
-          c("estimate", "conf.low", "conf.high", "p.value"),
-          function(column) same_values(body, effects[[column]], column),
-          logical(1)
-        ))
+        modifier <- if (analysis == "overall") NULL else analysis
+        same_rows(
+          table_effect_rows(
+            mixed_model_effect_tables[[population]][[outcome]][[analysis]]$table_body
+          ),
+          expected_effect_rows(
+            mixed_model_estimates[[population]][[outcome]][[analysis]], modifier
+          ),
+          c("label", "column")
+        )
       })
     })
   }
 ))), error = function(e) FALSE)
+
+## ---- check-model-warnings
+# The count models fit without convergence warnings (review finding F19)
+count_model_warnings <- sum(grepl(
+  "iteration limit reached|alternation limit reached", collected_warnings
+))
 
 ## ---- check-recovery
 # Refit two models directly and check that the 95% confidence interval
@@ -366,6 +414,7 @@ expected <- list(
   ),
   "model-term tables match the fitted models" = model_terms_match,
   "effect tables match the estimates" = effect_tables_match,
+  "count models fit without convergence warnings" = count_model_warnings == 0,
   "outputs saved only in the temporary folder" = tryCatch(
     startsWith(normalizePath(tables_dir), normalizePath(tempdir())),
     error = function(e) FALSE

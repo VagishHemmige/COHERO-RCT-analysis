@@ -55,7 +55,7 @@ status <- vapply(outputs, function(name) {
   }
 }, character(1))
 
-## ---- report
+## ---- report-differences
 cat("Outputs compared:", length(outputs), "\n")
 for (s in c("identical", "reordered", "rounding", "differs", "new",
            "removed")) {

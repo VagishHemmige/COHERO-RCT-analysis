@@ -144,7 +144,9 @@ clean_asthma_data_itt <- visits %>%
   mutate(
     pacqlq_score = rowMeans(across(all_of(pacqlq_items)), na.rm = TRUE)
   ) %>%
-  mutate(afs_score = rowMeans(across(all_of(afs_items)), na.rm = TRUE))
+  mutate(afs_score = rowMeans(across(all_of(afs_items)), na.rm = TRUE)) %>%
+  # A score with no answered items is missing (rowMeans() gives NaN)
+  mutate(across(c(aqlq_score, pacqlq_score, afs_score), ~ replace(.x, is.nan(.x), NA)))
 
 ## ---- per-protocol-population
 clean_asthma_data_pp <- clean_asthma_data_itt %>%
