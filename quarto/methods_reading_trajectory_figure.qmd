@@ -24,7 +24,7 @@ Read the figure from top to bottom.
 - At baseline (month 0, no mark): whether the arms differ at the start.
 - At each follow-up (marked †): whether the arms differ in change from baseline, the difference shown in the effect panel.
 
-They are shown to three decimals, and as "<0.001" when smaller. A blank means the model gave no estimate for that visit.
+They are shown to three decimals, and as "<0.001" when smaller. A blank means the model gave no estimate for that visit. A figure can leave out the baseline test, as the one above does; month 0 then has no p value, and the caption says so. The second figure shows it.
 
 **Observed, n** is the number of participants in each arm with the outcome recorded at that visit. It falls when visits are missed. The means and intervals come from the model, which uses every recorded value, not only participants seen at every visit.
 
