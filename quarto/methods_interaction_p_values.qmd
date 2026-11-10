@@ -7,7 +7,7 @@ This page explains what the p-value of an interaction term tests, and what it do
 
 ## It tests a difference between effects
 
-The p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in every level of the subgroup**. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.
+With two subgroup levels, the p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in both levels**. With three or more levels there are two different tests. One compares each level with a reference level, giving one p-value per level; this is what the analysis here reports. The other is a joint test of whether the effect is the same in every level; the analysis here does not report it. In either case, a small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup. In the trajectory figures, the comparison at baseline is between the arms' baseline differences, and at each follow-up visit between the arms' differences in change from baseline.
 
 A p-value measures how incompatible the observed test statistic is with a specified null hypothesis and model assumptions. It is not the probability that the null hypothesis is true, nor the probability that a result happened “by chance.” Here the null is about equal effects on the scale being tested.
 

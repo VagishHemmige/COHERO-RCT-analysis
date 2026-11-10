@@ -117,7 +117,7 @@ No adjustment for multiple comparisons. Mixed models use all available visits; o
 
 ### Software
 
-R with MASS (negative binomial), lme4 and lmerTest (mixed models), broom and broom.mixed, gtsummary and flextable (tables), ggplot2, ggbeeswarm, patchwork and gganimate (figures). Package citations to be added from the analysis machine's `citation()` output.
+R with MASS (negative binomial), lme4 and lmerTest (mixed models), emmeans (effects from the fitted models), broom and broom.mixed, gtsummary and flextable (tables), ggplot2, ggbeeswarm, patchwork and gganimate (figures). Package citations to be added from the analysis machine's `citation()` output.
 
 ## 8. Disclosure control
 
@@ -126,7 +126,7 @@ R with MASS (negative binomial), lme4 and lmerTest (mixed models), broom and bro
 ## 9. Limitations to address in reporting
 
 - The plan was written after the results were seen; all analyses are post hoc.
-- The pilot extension treats feasibility as the aim of a pilot trial and does not apply subgroup or adjusted analyses (checklist 12b, 17b). The comparative and subgroup analyses here are exploratory, and their p values are not evidence of effectiveness.
+- The pilot extension treats feasibility as the aim of a pilot trial and does not apply subgroup or adjusted analyses (checklist 12b). The comparative and subgroup analyses here are exploratory, and their p values are not evidence of effectiveness.
 - No adjustment for multiplicity across many outcomes, populations and subgroups.
 - The per-protocol population is defined by calendar date relative to the app glitch, not by adherence to the intervention.
 
