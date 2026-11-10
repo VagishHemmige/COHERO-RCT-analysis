@@ -29,7 +29,10 @@ medication_data_clean <- raw_medications %>%
     str_detect(Medication, paste(rescue_medication_names, collapse = "|")) ~
       "Rescue"
   )) %>%
-  left_join(study_dates, by = c("SUBJECTID" = "study_id_screening")) %>%
+  left_join(
+    study_dates, join_by(SUBJECTID == study_id_screening),
+    relationship = "many-to-one"
+  ) %>%
   # Drop records after the 12-month visit. See issue #3 for the lower bound.
   filter(PuffDate <= follow_up_12_month)
 
@@ -58,7 +61,10 @@ total_rescue_medication_uses <- rescue_medication %>%
   ) %>%
   ungroup() %>%
   select(SUBJECTID, rescue_puffs_pp, rescue_days_pp) %>%
-  right_join(total_rescue_medication_uses)
+  right_join(
+    total_rescue_medication_uses, join_by(SUBJECTID),
+    relationship = "one-to-one"
+  )
 
 ## ---- count-controller-use
 # Controller puffs and uses per participant per day
@@ -79,7 +85,10 @@ full_date_grid <- expand.grid(
   unique(medication_data_clean$StudyPeriod)
 ) %>%
   rename(SUBJECTID = Var1, StudyPeriod = Var2) %>%
-  left_join(study_dates, by = c("SUBJECTID" = "study_id_screening")) %>%
+  left_join(
+    study_dates, join_by(SUBJECTID == study_id_screening),
+    relationship = "many-to-one"
+  ) %>%
   arrange(SUBJECTID, StudyPeriod) %>%
   mutate(consent_date = as.Date(consent_date)) %>%
   mutate(PuffDate = consent_date + StudyPeriod) %>%
@@ -108,7 +117,10 @@ full_date_grid <- expand.grid(
   select(SUBJECTID, StudyPeriod, PuffDate, quarter, time_factor)
 
 # Days with no controller record get zero puffs and uses
-control_medication <- right_join(control_medication, full_date_grid) %>%
+control_medication <- right_join(
+  control_medication, full_date_grid,
+  join_by(SUBJECTID, StudyPeriod, PuffDate), relationship = "one-to-one"
+) %>%
   mutate(control_puffs = ifelse(is.na(control_puffs), 0, control_puffs)) %>%
   mutate(control_uses = ifelse(is.na(control_uses), 0, control_uses)) %>%
   arrange(SUBJECTID, StudyPeriod)
@@ -127,7 +139,7 @@ controller_pdc <- control_medication %>%
   group_by(SUBJECTID) %>%
   summarize(controller_pdc_pp = mean(day_is_covered)) %>%
   ungroup() %>%
-  right_join(controller_pdc)
+  right_join(controller_pdc, join_by(SUBJECTID), relationship = "one-to-one")
 
 # The same, within each visit interval
 controller_pdc_quarter <- control_medication %>%
@@ -144,7 +156,10 @@ controller_pdc_quarter <- control_medication %>%
   summarize(controller_pdc_quarter_pp = mean(day_is_covered)) %>%
   rename(study_id_screening = SUBJECTID) %>%
   ungroup() %>%
-  right_join(controller_pdc_quarter)
+  right_join(
+    controller_pdc_quarter, join_by(study_id_screening, time_factor),
+    relationship = "one-to-one"
+  )
 
 ## ---- baseline-count-data
 # One row per participant: baseline values and 12-month health care use
@@ -174,7 +189,8 @@ baseline_clean_data <- clean_asthma_data_itt %>%
 rescue_medication_merged <- left_join(
   baseline_clean_data,
   total_rescue_medication_uses,
-  by = c("study_id_screening" = "SUBJECTID")
+  join_by(study_id_screening == SUBJECTID),
+  relationship = "one-to-one"
 ) %>%
   mutate(rescue_puffs_itt = ifelse(
     is.na(rescue_puffs_itt), 0, rescue_puffs_itt
@@ -192,16 +208,25 @@ rescue_medication_merged <- left_join(
 controller_medication_merged <- left_join(
   baseline_clean_data,
   controller_pdc,
-  by = c("study_id_screening" = "SUBJECTID")
+  join_by(study_id_screening == SUBJECTID),
+  relationship = "one-to-one"
 )
 
-# Interval controller PDC joined to the visit data
+# Interval controller PDC joined to the visit data. Every join in this script
+# names its keys and the relationship it expects, so a repeated participant
+# or day stops the run instead of multiplying rows (issue #48).
 clean_asthma_data_itt <- clean_asthma_data_itt %>%
-  left_join(controller_pdc_quarter) %>%
+  left_join(
+    controller_pdc_quarter, join_by(study_id_screening, time_factor),
+    relationship = "many-to-one"
+  ) %>%
   select(-controller_pdc_quarter_pp)
 
 clean_asthma_data_pp <- clean_asthma_data_pp %>%
-  left_join(controller_pdc_quarter) %>%
+  left_join(
+    controller_pdc_quarter, join_by(study_id_screening, time_factor),
+    relationship = "many-to-one"
+  ) %>%
   select(-controller_pdc_quarter_itt)
 
 ## ---- medication-by-interval

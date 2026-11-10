@@ -60,6 +60,12 @@ redcap_date_variables <- c(
   "follow_up_6_months", "follow_up_9_months", "follow_up_12_month"
 )
 
+# Values recorded only at the baseline visit; 02_build_visit_data.R copies
+# them from each participant's baseline row to their other visits
+baseline_variables <- c(
+  "studyarm", "child_adult", "prefer_language", redcap_date_variables
+)
+
 # Items averaged into each scale score
 aqlq_items <- c(
   "short_of_breath_2weeks",

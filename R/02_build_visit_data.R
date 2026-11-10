@@ -1,16 +1,18 @@
 # Purpose: build the visit-level analysis data for the ITT and per-protocol
 #   populations, with recodes and scale scores.
 # Needs: setup.R (item lists, missing_999_variables, glitch_date,
-#   adherence_cutoff, act_cutoff); 01_import_data.R (clean_asthma_data).
+#   adherence_cutoff, act_cutoff, baseline_variables); 01_import_data.R
+#   (clean_asthma_data).
 # Produces: clean_asthma_data_itt (all visits), clean_asthma_data_pp (visits
 #   on or before glitch_date), study_dates (one row per participant with
 #   consent and follow-up visit dates).
 # Ported from the cleaning steps of the ImportData chunk of
 #   MR_SJ_asthma_pilot_2023-9-15.Rmd.
 
-## ---- build-visit-data
-clean_asthma_data_itt <- clean_asthma_data %>%
-  # Months since baseline for each REDCap event
+## ---- visit-times
+# Months since baseline for each REDCap event, and the preferred-language
+# recode, before baseline values are copied to other visits
+visits <- clean_asthma_data %>%
   mutate(time_linear = case_when(
     redcap_event_name == "baseline_arm_1" ~ 0,
     redcap_event_name == "2month_followup_arm_1" ~ 2,
@@ -24,9 +26,54 @@ clean_asthma_data_itt <- clean_asthma_data %>%
     prefer_language == 999,
     1,
     prefer_language
+  ))
+
+## ---- baseline-values
+# The values recorded only at baseline, one row per participant, to copy to
+# their other visits (issue #48). Taken from the baseline row itself, so the
+# order of rows in the export does not matter. A participant with two
+# baseline rows stops the run; one with visits but no baseline row keeps
+# missing values, with a warning.
+baseline_values <- visits %>%
+  filter(time_linear == 0) %>%
+  select(study_id_screening, all_of(baseline_variables))
+repeated_baselines <- baseline_values %>%
+  count(study_id_screening) %>%
+  filter(n > 1)
+if (nrow(repeated_baselines) > 0) {
+  stop(
+    nrow(repeated_baselines), " participant(s) have more than one baseline ",
+    "row; each needs exactly one.", call. = FALSE
+  )
+}
+no_baseline <- setdiff(
+  visits$study_id_screening, baseline_values$study_id_screening
+)
+if (length(no_baseline) > 0) {
+  warning(
+    length(no_baseline), " participant(s) have visits but no baseline row; ",
+    "their baseline values stay missing.", call. = FALSE
+  )
+}
+
+## ---- build-visit-data
+clean_asthma_data_itt <- visits %>%
+  # Visit time as a factor, for models that treat time as categorical. The
+  # levels are in time order, baseline first, whatever the row order.
+  mutate(time_factor = factor(
+    time_linear, levels = sort(unique(time_linear))
   )) %>%
-  # Visit time as a factor, for models that treat time as categorical
-  mutate(time_factor = as_factor(time_linear)) %>%
+  # These are recorded only at baseline: a visit keeps its own value if it
+  # has one, and otherwise takes the participant's baseline value
+  left_join(
+    baseline_values, join_by(study_id_screening),
+    suffix = c("", "_at_baseline"), relationship = "many-to-one"
+  ) %>%
+  mutate(across(
+    all_of(baseline_variables),
+    ~ coalesce(.x, pick(everything())[[paste0(cur_column(), "_at_baseline")]])
+  )) %>%
+  select(-ends_with("_at_baseline")) %>%
   mutate(studyarm = as.factor(studyarm)) %>%
   mutate(participant_sex = factor(
     participant_sex,
@@ -43,14 +90,6 @@ clean_asthma_data_itt <- clean_asthma_data %>%
     levels = c(1, 2),
     labels = c("English", "Spanish")
   )) %>%
-  # These are recorded only at baseline; carry them to every visit
-  group_by(study_id_screening) %>%
-  fill(
-    studyarm, child_adult, prefer_language, consent_date,
-    follow_up_2_months, follow_up_4_months, follow_up_6_months,
-    follow_up_9_months, follow_up_12_month
-  ) %>%
-  ungroup() %>%
   mutate(across(
     all_of(c(aqlq_items, pacqlq_items, afs_items, missing_999_variables)),
     ~ ifelse(.x == 999, NA, .x)
@@ -93,8 +132,12 @@ clean_asthma_data_itt <- clean_asthma_data %>%
     act_score < act_cutoff & time_factor == "0" ~ "Uncontrolled"
   )) %>%
   mutate(act_binary = as.factor(act_binary)) %>%
+  # Each participant's baseline group, on every visit
   group_by(study_id_screening) %>%
-  fill(self_reported_adherence_binary, act_binary) %>%
+  mutate(across(
+    c(self_reported_adherence_binary, act_binary),
+    ~ .x[which(time_linear == 0)][1]
+  )) %>%
   ungroup() %>%
   # Each score is the mean of the items answered at that visit
   mutate(aqlq_score = rowMeans(across(all_of(aqlq_items)), na.rm = TRUE)) %>%

@@ -36,7 +36,7 @@ Start with individual app records. Rows without an identifier are removed, and m
 
 ## Count rescue use
 
-`group_by(SUBJECTID)` followed by `summarize()` reduces many records to one row per participant. Here `n()` counts records (the code calls these rescue puffs), while `n_distinct(PuffDate)` counts distinct recorded date values. The latter represents days only if the field has been reduced to calendar dates; timestamps within the same day would remain distinct. The second calculation restricts records to the per-protocol cutoff before joining the summaries.
+`group_by(SUBJECTID)` followed by `summarize()` reduces many records to one row per participant. Here `n()` counts records (the code calls these rescue puffs), while `n_distinct(PuffDate)` counts distinct recorded date values. `PuffDate` is a calendar date ([Import data](01_import_data.qmd)), so this counts days. The second calculation restricts records to the per-protocol cutoff before joining the summaries.
 
 ```{r}
 #| label: count-rescue-use
@@ -89,7 +89,7 @@ Follow-up is expressed in days for use in count-model offsets. The current per-p
 
 ## Merge medication summaries
 
-The participant-level rescue and controller summaries are attached to baseline data for [count models](04_fit_count_models.qmd). Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. The [joins chapter](https://r4ds.hadley.nz/joins.html) explains why key uniqueness matters [@r4ds2].
+The participant-level rescue and controller summaries are attached to baseline data for [count models](04_fit_count_models.qmd). Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. Every join in this script names its keys with `join_by()` and declares the relationship it expects ("one-to-one" or "many-to-one"), so a repeated key stops the run instead of silently multiplying rows. The [joins chapter](https://r4ds.hadley.nz/joins.html) explains why key uniqueness matters [@r4ds2].
 
 ```{r}
 #| label: merge-medication-summaries
