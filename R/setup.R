@@ -242,5 +242,14 @@ figure_labels <- c(
 arm_labels <- c("0" = "Control", "1" = "Intervention")
 
 ## ---- output-folders
-dir.create("figures", showWarnings = FALSE)
-dir.create("tables", showWarnings = FALSE)
+# Where tables and figures are saved: tables/ and figures/ in the project,
+# unless COHERO_OUTPUT_DIR names another folder. The synthetic-data runs set
+# it to a temporary folder, so a test run never overwrites analysis outputs.
+output_dir <- Sys.getenv("COHERO_OUTPUT_DIR")
+if (output_dir == "") {
+  output_dir <- "."
+}
+tables_dir <- file.path(output_dir, "tables")
+figures_dir <- file.path(output_dir, "figures")
+dir.create(tables_dir, showWarnings = FALSE, recursive = TRUE)
+dir.create(figures_dir, showWarnings = FALSE, recursive = TRUE)

@@ -1,8 +1,10 @@
 # Purpose: run the definitive analysis in dependency order.
 # Run from the project root in a fresh session, with COHERO_DATA_DIR set in
 #   your .Renviron. Scripts in R/exploratory/ are not run from here.
-# Produces: every object listed in the scripts' headers. Nothing is written
-#   to disk yet.
+# Produces: every object listed in the scripts' headers, and every table as
+#   a Word file in tables/ (tables.R). Set COHERO_OUTPUT_DIR to save outputs
+#   in another folder; the synthetic-data runs do. Figures are kept in memory
+#   and not yet saved.
 
 source("R/setup.R")
 source("R/functions.R")

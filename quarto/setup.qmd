@@ -60,7 +60,7 @@ These named objects collect the visit cutoff, questionnaire item lists, medicati
 
 ## Output folders
 
-These calls create local `tables` and `figures` directories if needed. Creating a folder does not export a table or plot: the current table and figure scripts keep their objects in memory. For help with scripts, projects and finding function help, see the corresponding chapters of [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
+Tables are saved to `tables/` in the project and figures, once they are exported, to `figures/`; these lines name the two folders and create them if needed. Setting `COHERO_OUTPUT_DIR` (for example in `.Renviron`, like `COHERO_DATA_DIR`) sends both to another folder instead. The synthetic-data runs in `tests/synthetic/` set it to a temporary folder, so a test run can never overwrite tables made from the study data. [Tables](tables.qmd#export-tables) saves every table as a Word file; the figure script keeps its plots in memory. For help with scripts, projects and finding function help, see the corresponding chapters of [R for Data Science](https://r4ds.hadley.nz/) [@r4ds2].
 
 ```{r}
 #| label: output-folders
