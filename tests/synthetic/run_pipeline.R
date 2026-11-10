@@ -125,6 +125,33 @@ figures_pass <- !is.null(figure_results) &&
   all(figure_results$failed == 0) && !any(figure_results$error) &&
   !any(figure_results$skipped)
 
+## ---- check-time-zones
+# Scripts 01-03 give the same date-dependent results in time zones behind,
+# at and far ahead of UTC (check_time_zone.R, each in its own R session).
+# Date windows must not move with the computer's time zone.
+time_zone_results <- vapply(
+  c("Pacific/Honolulu", "UTC", "Pacific/Kiritimati"),
+  function(time_zone) {
+    output <- suppressWarnings(system2(
+      file.path(R.home("bin"), "Rscript"),
+      file.path(harness_dir, "check_time_zone.R"),
+      stdout = TRUE, stderr = TRUE, env = paste0("TZ=", time_zone)
+    ))
+    status <- attr(output, "status")
+    if (!is.null(status)) {
+      return(paste("failed:", paste(output, collapse = " ")))
+    }
+    utils::tail(output, 1)
+  },
+  character(1)
+)
+time_zones_agree <- length(unique(time_zone_results)) == 1 &&
+  !any(startsWith(time_zone_results, "failed"))
+if (!time_zones_agree) {
+  cat("Results by time zone:\n")
+  print(time_zone_results)
+}
+
 ## ---- check-portable
 # The model, table and figure functions run in a fresh R session that has
 # only the tidyverse attached and only functions.R and plot_style.R loaded,
@@ -273,6 +300,7 @@ expected <- list(
   "figures match their snapshots and save in every format" = figures_pass,
   "model, table and figure functions work outside this project" =
     portable_pass,
+  "date windows are the same in every time zone" = time_zones_agree,
   "every mixed-model cell has 2 or more observations" =
     length(thin_cells) == 0,
   "no singular mixed-model fits" = singular_fits == 0,

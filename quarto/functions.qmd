@@ -48,6 +48,15 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 #| eval: false
 ```
 
+## Calendar dates
+
+`as_calendar_date()` turns a date column into calendar dates, whatever form it was read in: text such as "2018-05-16", an Excel date (which readxl reads as a date-time in UTC), or a date. A date-time keeps the day recorded in the file and drops any time of day. Comparing a date-time with a date, or turning text into a date-time, depends on the time zone of the computer running the code, so a record near midnight could move to the next day and in or out of a window. Converting once, at import, makes every window give the same answer everywhere; a check in the synthetic tests runs scripts 1 to 3 in three time zones and requires identical results. Text in any other form stops with an error rather than silently becoming missing.
+
+```{r}
+#| label: as-calendar-date
+#| eval: false
+```
+
 ## Checks on the data
 
 `check_two_levels()` stops when the exposure does not have exactly two groups: with three, each visit would have two comparisons that the tables and figures could not tell apart. `check_time_levels()` stops when the time levels are not numbers in increasing order, because the first level is taken as baseline.

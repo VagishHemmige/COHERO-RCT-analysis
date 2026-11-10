@@ -53,6 +53,13 @@ timepoint_review_file <- file.path(
 # (app update glitch). See analysis-plan.md.
 glitch_date <- as.Date("2018-5-16")
 
+# The REDCap export's visit dates. 01_import_data.R converts them to calendar
+# dates, so that every date comparison is between dates, not times.
+redcap_date_variables <- c(
+  "consent_date", "follow_up_2_months", "follow_up_4_months",
+  "follow_up_6_months", "follow_up_9_months", "follow_up_12_month"
+)
+
 # Items averaged into each scale score
 aqlq_items <- c(
   "short_of_breath_2weeks",

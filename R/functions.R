@@ -146,6 +146,38 @@ tabulate_effects <- function(estimates, caption, time = "time_factor",
     gtsummary::modify_caption(caption)
 }
 
+## ---- as-calendar-date
+# A date column as calendar dates (class Date), whatever form it was read in:
+# Date is kept; a date-time (readxl reads Excel dates as date-times in UTC)
+# keeps its UTC calendar day, the day recorded in the file, with any time of
+# day dropped; text must be in year-month-day form. The result is the same in
+# every time zone, so date windows are too. Text in any other form stops
+# with an error rather than becoming NA.
+as_calendar_date <- function(x) {
+  if (inherits(x, "Date")) {
+    return(x)
+  }
+  if (inherits(x, "POSIXt")) {
+    return(as.Date(x, tz = "UTC"))
+  }
+  if (is.character(x)) {
+    converted <- as.Date(x, format = "%Y-%m-%d")
+    unreadable <- !is.na(x) & x != "" & is.na(converted)
+    if (any(unreadable)) {
+      stop(
+        "Dates not in year-month-day form, for example: ",
+        paste(utils::head(unique(x[unreadable]), 3), collapse = ", "),
+        call. = FALSE
+      )
+    }
+    return(converted)
+  }
+  if (all(is.na(x))) {
+    return(as.Date(x))
+  }
+  stop("Cannot read dates of class ", class(x)[1], call. = FALSE)
+}
+
 ## ---- check-two-levels
 # The effects, tables and figures compare two exposure groups. A third group
 # would give two comparisons per visit that the outputs cannot tell apart, so

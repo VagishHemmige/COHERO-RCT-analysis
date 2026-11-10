@@ -3,7 +3,7 @@ title: "1. Import data"
 format: html
 ---
 
-Read the four study files and tidy their column names.
+Read the four study files, tidy their column names, and turn the dates later scripts compare into calendar dates.
 
 ::: {.Rcode title="Source code"}
 The full R script is available at:
@@ -29,7 +29,7 @@ knitr::read_chunk("../R/01_import_data.R")
 
 The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A `left_join()` matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; repeated matches in the sex file could instead multiply rows unintentionally. An authorized analyst should check that the sex file has one row per identifier and that the join preserves the visit count.
 
-The illustrated joins in [R for Data Science](https://r4ds.hadley.nz/joins.html) explain keys and unmatched rows [@r4ds2]. The output here, `clean_asthma_data`, becomes the input to [Build visit data](02_build_visit_data.qmd).
+The illustrated joins in [R for Data Science](https://r4ds.hadley.nz/joins.html) explain keys and unmatched rows [@r4ds2]. The visit dates (`redcap_date_variables`, listed on [Setup](setup.qmd)) are then turned into calendar dates with [`as_calendar_date()`](functions.qmd#calendar-dates), whether the export stores them as text or as Excel dates. The output here, `clean_asthma_data`, becomes the input to [Build visit data](02_build_visit_data.qmd).
 
 ```{r}
 #| label: import-redcap
@@ -47,7 +47,7 @@ This reads the Notifications sheet into `raw_notifications`. `col_types` states 
 
 ## Import medications
 
-This reads individual app medication records into `raw_medications`; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. [Derive medication outcomes](03_derive_medication_outcomes.qmd) will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. readxl's [column-type guide](https://readxl.tidyverse.org/articles/cell-and-column-types.html) explains what happens when spreadsheet cells and requested types disagree [@readxltypes].
+This reads individual app medication records into `raw_medications`; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. [Derive medication outcomes](03_derive_medication_outcomes.qmd) will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. Each record's `PuffDate` is read as a date-time and then kept as its calendar day, so a record counts on the day it was recorded, and windows such as "on or before the glitch date" give the same answer on any computer. readxl's [column-type guide](https://readxl.tidyverse.org/articles/cell-and-column-types.html) explains what happens when spreadsheet cells and requested types disagree [@readxltypes].
 
 ```{r}
 #| label: import-medications
