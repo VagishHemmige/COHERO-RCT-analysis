@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -151,6 +140,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -469,15 +469,18 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">str_detect</span>(Medication, <span class="fu">paste</span>(rescue_medication_names, <span class="at">collapse =</span> <span class="st">"|"</span>)) <span class="sc">~</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Rescue"</span></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(study_dates, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"SUBJECTID"</span> <span class="ot">=</span> <span class="st">"study_id_screening"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Drop records after the 12-month visit. See issue #3 for the lower bound.</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PuffDate <span class="sc">&lt;=</span> follow_up_12_month)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    study_dates, <span class="fu">join_by</span>(SUBJECTID <span class="sc">==</span> study_id_screening),</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Drop records after the 12-month visit. See issue #3 for the lower bound.</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PuffDate <span class="sc">&lt;=</span> follow_up_12_month)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
 <section id="count-rescue-use" class="level2">
 <h2 class="anchored" data-anchor-id="count-rescue-use">Count rescue use</h2>
-<p><code>group_by(SUBJECTID)</code> followed by <code>summarize()</code> reduces many records to one row per participant. Here <code>n()</code> counts records (the code calls these rescue puffs), while <code>n_distinct(PuffDate)</code> counts distinct recorded date values. The latter represents days only if the field has been reduced to calendar dates; timestamps within the same day would remain distinct. The second calculation restricts records to the per-protocol cutoff before joining the summaries.</p>
+<p><code>group_by(SUBJECTID)</code> followed by <code>summarize()</code> reduces many records to one row per participant. Here <code>n()</code> counts records (the code calls these rescue puffs), while <code>n_distinct(PuffDate)</code> counts distinct recorded date values. <code>PuffDate</code> is a calendar date (<a href="../quarto/01_import_data.html">Import data</a>), so this counts days. The second calculation restricts records to the per-protocol cutoff before joining the summaries.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -505,7 +508,10 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
 <span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SUBJECTID, rescue_puffs_pp, rescue_days_pp) <span class="sc">%&gt;%</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(total_rescue_medication_uses)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    total_rescue_medication_uses, <span class="fu">join_by</span>(SUBJECTID),</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"one-to-one"</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -542,39 +548,45 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unique</span>(medication_data_clean<span class="sc">$</span>StudyPeriod)</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">SUBJECTID =</span> Var1, <span class="at">StudyPeriod =</span> Var2) <span class="sc">%&gt;%</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(study_dates, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"SUBJECTID"</span> <span class="ot">=</span> <span class="st">"study_id_screening"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SUBJECTID, StudyPeriod) <span class="sc">%&gt;%</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">consent_date =</span> <span class="fu">as.Date</span>(consent_date)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PuffDate =</span> consent_date <span class="sc">+</span> StudyPeriod) <span class="sc">%&gt;%</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">%&gt;%</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quarter =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> consent_date) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_2_months) <span class="sc">~</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">"0-2 months"</span>,</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_2_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_4_months) <span class="sc">~</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">"2-4 months"</span>,</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_4_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_6_months) <span class="sc">~</span></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>      <span class="st">"4-6 months"</span>,</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_6_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_9_months) <span class="sc">~</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">"6-9 months"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_9_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">~</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="st">"9-12 months"</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Interval controller PDC is attached to the visit that closes the interval</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">case_when</span>(</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> consent_date) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_2_months) <span class="sc">~</span> <span class="st">"2"</span>,</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_2_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_4_months) <span class="sc">~</span> <span class="st">"4"</span>,</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_4_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_6_months) <span class="sc">~</span> <span class="st">"6"</span>,</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_6_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_9_months) <span class="sc">~</span> <span class="st">"9"</span>,</span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_9_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">~</span> <span class="st">"12"</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">as.factor</span>(time_factor)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SUBJECTID, StudyPeriod, PuffDate, quarter, time_factor)</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Days with no controller record get zero puffs and uses</span></span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>control_medication <span class="ot">&lt;-</span> <span class="fu">right_join</span>(control_medication, full_date_grid) <span class="sc">%&gt;%</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">control_puffs =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(control_puffs), <span class="dv">0</span>, control_puffs)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">control_uses =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(control_uses), <span class="dv">0</span>, control_uses)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SUBJECTID, StudyPeriod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    study_dates, <span class="fu">join_by</span>(SUBJECTID <span class="sc">==</span> study_id_screening),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SUBJECTID, StudyPeriod) <span class="sc">%&gt;%</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">consent_date =</span> <span class="fu">as.Date</span>(consent_date)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PuffDate =</span> consent_date <span class="sc">+</span> StudyPeriod) <span class="sc">%&gt;%</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">%&gt;%</span></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quarter =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> consent_date) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_2_months) <span class="sc">~</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">"0-2 months"</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_2_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_4_months) <span class="sc">~</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">"2-4 months"</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_4_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_6_months) <span class="sc">~</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="st">"4-6 months"</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_6_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_9_months) <span class="sc">~</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">"6-9 months"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_9_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">~</span></span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">"9-12 months"</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Interval controller PDC is attached to the visit that closes the interval</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">case_when</span>(</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> consent_date) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_2_months) <span class="sc">~</span> <span class="st">"2"</span>,</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_2_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_4_months) <span class="sc">~</span> <span class="st">"4"</span>,</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_4_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_6_months) <span class="sc">~</span> <span class="st">"6"</span>,</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_6_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;</span> follow_up_9_months) <span class="sc">~</span> <span class="st">"9"</span>,</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>    (PuffDate <span class="sc">&gt;=</span> follow_up_9_months) <span class="sc">&amp;</span> (PuffDate <span class="sc">&lt;=</span> follow_up_12_month) <span class="sc">~</span> <span class="st">"12"</span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">as.factor</span>(time_factor)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(SUBJECTID, StudyPeriod, PuffDate, quarter, time_factor)</span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co"># Days with no controller record get zero puffs and uses</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>control_medication <span class="ot">&lt;-</span> <span class="fu">right_join</span>(</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  control_medication, full_date_grid,</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">join_by</span>(SUBJECTID, StudyPeriod, PuffDate), <span class="at">relationship =</span> <span class="st">"one-to-one"</span></span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">control_puffs =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(control_puffs), <span class="dv">0</span>, control_puffs)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">control_uses =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(control_uses), <span class="dv">0</span>, control_uses)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(SUBJECTID, StudyPeriod)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -598,7 +610,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SUBJECTID) <span class="sc">%&gt;%</span></span>
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">controller_pdc_pp =</span> <span class="fu">mean</span>(day_is_covered)) <span class="sc">%&gt;%</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(controller_pdc)</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(controller_pdc, <span class="fu">join_by</span>(SUBJECTID), <span class="at">relationship =</span> <span class="st">"one-to-one"</span>)</span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co"># The same, within each visit interval</span></span>
 <span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>controller_pdc_quarter <span class="ot">&lt;-</span> control_medication <span class="sc">%&gt;%</span></span>
@@ -615,7 +627,10 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">controller_pdc_quarter_pp =</span> <span class="fu">mean</span>(day_is_covered)) <span class="sc">%&gt;%</span></span>
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">study_id_screening =</span> SUBJECTID) <span class="sc">%&gt;%</span></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(controller_pdc_quarter)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">right_join</span>(</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    controller_pdc_quarter, <span class="fu">join_by</span>(study_id_screening, time_factor),</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"one-to-one"</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -652,7 +667,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="merge-medication-summaries" class="level2">
 <h2 class="anchored" data-anchor-id="merge-medication-summaries">Merge medication summaries</h2>
-<p>The participant-level rescue and controller summaries are attached to baseline data for <a href="../quarto/04_fit_count_models.html">count models</a>. Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. The <a href="https://r4ds.hadley.nz/joins.html">joins chapter</a> explains why key uniqueness matters <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
+<p>The participant-level rescue and controller summaries are attached to baseline data for <a href="../quarto/04_fit_count_models.html">count models</a>. Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. Every join in this script names its keys with <code>join_by()</code> and declares the relationship it expects (“one-to-one” or “many-to-one”), so a repeated key stops the run instead of silently multiplying rows. The <a href="https://r4ds.hadley.nz/joins.html">joins chapter</a> explains why key uniqueness matters <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -660,35 +675,45 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>rescue_medication_merged <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  baseline_clean_data,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  total_rescue_medication_uses,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"study_id_screening"</span> <span class="ot">=</span> <span class="st">"SUBJECTID"</span>)</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_puffs_itt =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_puffs_itt), <span class="dv">0</span>, rescue_puffs_itt</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_days_itt =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_days_itt), <span class="dv">0</span>, rescue_days_itt</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_puffs_pp =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_puffs_pp), <span class="dv">0</span>, rescue_puffs_pp</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_days_pp =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_days_pp), <span class="dv">0</span>, rescue_days_pp</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>controller_medication_merged <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  baseline_clean_data,</span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  controller_pdc,</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"study_id_screening"</span> <span class="ot">=</span> <span class="st">"SUBJECTID"</span>)</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Interval controller PDC joined to the visit data</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_itt <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(controller_pdc_quarter) <span class="sc">%&gt;%</span></span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>controller_pdc_quarter_pp)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_pp <span class="ot">&lt;-</span> clean_asthma_data_pp <span class="sc">%&gt;%</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(controller_pdc_quarter) <span class="sc">%&gt;%</span></span>
-<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>controller_pdc_quarter_itt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">join_by</span>(study_id_screening <span class="sc">==</span> SUBJECTID),</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">relationship =</span> <span class="st">"one-to-one"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_puffs_itt =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_puffs_itt), <span class="dv">0</span>, rescue_puffs_itt</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_days_itt =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_days_itt), <span class="dv">0</span>, rescue_days_itt</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_puffs_pp =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_puffs_pp), <span class="dv">0</span>, rescue_puffs_pp</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rescue_days_pp =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">is.na</span>(rescue_days_pp), <span class="dv">0</span>, rescue_days_pp</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>controller_medication_merged <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>  baseline_clean_data,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>  controller_pdc,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">join_by</span>(study_id_screening <span class="sc">==</span> SUBJECTID),</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  <span class="at">relationship =</span> <span class="st">"one-to-one"</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Interval controller PDC joined to the visit data. Every join in this script</span></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a><span class="co"># names its keys and the relationship it expects, so a repeated participant</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a><span class="co"># or day stops the run instead of multiplying rows (issue #48).</span></span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_itt <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    controller_pdc_quarter, <span class="fu">join_by</span>(study_id_screening, time_factor),</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>controller_pdc_quarter_pp)</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_pp <span class="ot">&lt;-</span> clean_asthma_data_pp <span class="sc">%&gt;%</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a>    controller_pdc_quarter, <span class="fu">join_by</span>(study_id_screening, time_factor),</span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>controller_pdc_quarter_itt)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1255,7 +1280,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count rescue use</span></span>
 <span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="in">`group_by(SUBJECTID)`</span> followed by <span class="in">`summarize()`</span> reduces many records to one row per participant. Here <span class="in">`n()`</span> counts records (the code calls these rescue puffs), while <span class="in">`n_distinct(PuffDate)`</span> counts distinct recorded date values. The latter represents days only if the field has been reduced to calendar dates; timestamps within the same day would remain distinct. The second calculation restricts records to the per-protocol cutoff before joining the summaries.</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a><span class="in">`group_by(SUBJECTID)`</span> followed by <span class="in">`summarize()`</span> reduces many records to one row per participant. Here <span class="in">`n()`</span> counts records (the code calls these rescue puffs), while <span class="in">`n_distinct(PuffDate)`</span> counts distinct recorded date values. <span class="in">`PuffDate`</span> is a calendar date (<span class="co">[</span><span class="ot">Import data</span><span class="co">](01_import_data.qmd)</span>), so this counts days. The second calculation restricts records to the per-protocol cutoff before joining the summaries.</span>
 <span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: count-rescue-use</span></span>
@@ -1308,7 +1333,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## Merge medication summaries</span></span>
 <span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>The participant-level rescue and controller summaries are attached to baseline data for <span class="co">[</span><span class="ot">count models</span><span class="co">](04_fit_count_models.qmd)</span>. Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. The <span class="co">[</span><span class="ot">joins chapter</span><span class="co">](https://r4ds.hadley.nz/joins.html)</span> explains why key uniqueness matters <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>The participant-level rescue and controller summaries are attached to baseline data for <span class="co">[</span><span class="ot">count models</span><span class="co">](04_fit_count_models.qmd)</span>. Participants without a matching rescue summary are assigned zero recorded rescue use. Controller PDC is joined separately, and interval PDC is added to the visit datasets. Each join needs a unique matching summary per intended key: participant for annual summaries, participant and visit for interval summaries. Every join in this script names its keys with <span class="in">`join_by()`</span> and declares the relationship it expects ("one-to-one" or "many-to-one"), so a repeated key stops the run instead of silently multiplying rows. The <span class="co">[</span><span class="ot">joins chapter</span><span class="co">](https://r4ds.hadley.nz/joins.html)</span> explains why key uniqueness matters <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
 <span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: merge-medication-summaries</span></span>

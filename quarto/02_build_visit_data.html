@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -162,6 +151,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -388,7 +388,9 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#build-visit-data" id="toc-build-visit-data" class="nav-link active" data-scroll-target="#build-visit-data">Build visit data</a></li>
+  <li><a href="#visit-times" id="toc-visit-times" class="nav-link active" data-scroll-target="#visit-times">Visit times</a></li>
+  <li><a href="#baseline-values" id="toc-baseline-values" class="nav-link" data-scroll-target="#baseline-values">Baseline values</a></li>
+  <li><a href="#build-visit-data" id="toc-build-visit-data" class="nav-link" data-scroll-target="#build-visit-data">Build visit data</a></li>
   <li><a href="#per-protocol-population" id="toc-per-protocol-population" class="nav-link" data-scroll-target="#per-protocol-population">Per protocol population</a></li>
   <li><a href="#study-dates" id="toc-study-dates" class="nav-link" data-scroll-target="#study-dates">Study dates</a></li>
   </ul>
@@ -445,108 +447,163 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <p>The code sections below are imported directly from that script when this page is rendered.</p>
 </div>
 </div>
-<section id="build-visit-data" class="level2">
-<h2 class="anchored" data-anchor-id="build-visit-data">Build visit data</h2>
-<p>The input is the imported REDCap table; the intended output still has one row per participant and recorded visit. <code>mutate()</code> creates or changes columns without summarizing the rows. <code>case_when()</code> maps each event name to its scheduled month. <code>time_linear</code> stores that number; <code>time_factor</code> stores the visit as a category for the models.</p>
-<p>The code groups by participant before <code>fill()</code> carries baseline information down later rows. This assumes the baseline row precedes the rows that need it. It carries assignment and baseline subgroup information, not a missed visit’s outcome score. See the <a href="https://tidyr.tidyverse.org/reference/fill.html">fill documentation</a> for direction and grouping <span class="citation" data-cites="tidyrfill">(<a href="#ref-tidyrfill" role="doc-biblioref"><span class="nocase">tidyr authors</span>, n.d.</a>)</span>.</p>
-<p>Selected 999 codes become <code>NA</code>, R’s missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16">#16</a>. Scores are then derived from the item columns: <code>rowMeans(..., na.rm = TRUE)</code> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</p>
-<p>The baseline adherence and asthma-control groups are carried to later visits, so a participant does not switch subgroup because a later score changes. The small horizontal time shift is only for separating points in plots. For the R verbs in this block, see <a href="https://r4ds.hadley.nz/data-transform.html">Data transformation</a> <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
+<section id="visit-times" class="level2">
+<h2 class="anchored" data-anchor-id="visit-times">Visit times</h2>
+<p>The input is the imported REDCap table; the output still has one row per participant and recorded visit. <code>mutate()</code> creates or changes columns without summarizing the rows. <code>case_when()</code> maps each event name to its scheduled month, stored in <code>time_linear</code>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_itt <span class="ot">&lt;-</span> clean_asthma_data <span class="sc">%&gt;%</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Months since baseline for each REDCap event</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_linear =</span> <span class="fu">case_when</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"baseline_arm_1"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"2month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"4month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"6month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"9month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"12month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">12</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># A preferred language of 999 is set to English. See issue #16.</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">ifelse</span>(</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    prefer_language <span class="sc">==</span> <span class="dv">999</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    prefer_language</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visit time as a factor, for models that treat time as categorical</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">as_factor</span>(time_linear)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">studyarm =</span> <span class="fu">as.factor</span>(studyarm)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">participant_sex =</span> <span class="fu">factor</span>(</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    participant_sex,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">child_adult =</span> <span class="fu">factor</span>(</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    child_adult,</span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Child"</span>, <span class="st">"Adult"</span>)</span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">factor</span>(</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    prefer_language,</span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"English"</span>, <span class="st">"Spanish"</span>)</span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  <span class="co"># These are recorded only at baseline; carry them to every visit</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(study_id_screening) <span class="sc">%&gt;%</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>    studyarm, child_adult, prefer_language, consent_date,</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>    follow_up_2_months, follow_up_4_months, follow_up_6_months,</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    follow_up_9_months, follow_up_12_month</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_of</span>(<span class="fu">c</span>(aqlq_items, pacqlq_items, afs_items, missing_999_variables)),</span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">ifelse</span>(.x <span class="sc">==</span> <span class="dv">999</span>, <span class="cn">NA</span>, .x)</span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Date of each visit, from the consent and follow-up dates</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_of_observation =</span> <span class="fu">case_when</span>(</span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"baseline_arm_1"</span> <span class="sc">~</span> consent_date,</span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"2month_followup_arm_1"</span> <span class="sc">~</span> follow_up_2_months,</span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"4month_followup_arm_1"</span> <span class="sc">~</span> follow_up_4_months,</span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"6month_followup_arm_1"</span> <span class="sc">~</span> follow_up_6_months,</span>
-<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"9month_followup_arm_1"</span> <span class="sc">~</span> follow_up_9_months,</span>
-<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"12month_followup_arm_1"</span> <span class="sc">~</span> follow_up_12_month</span>
-<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visits after the app update glitch</span></span>
-<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">post_glitch_date =</span> (date_of_observation <span class="sc">&gt;</span> glitch_date)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Self-reported controller adherence score. See analysis-plan.md.</span></span>
-<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">self_reported_adherence =</span> <span class="dv">32</span> <span class="sc">-</span></span>
-<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>    only_give_controller_medication_needed <span class="sc">-</span></span>
-<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    only_give_controller_medication_breathless <span class="sc">+</span></span>
-<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_regularly <span class="sc">-</span></span>
-<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    try_to_avoid_controller_medication <span class="sc">-</span></span>
-<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>    forget_give_controller_medication <span class="sc">-</span></span>
-<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    alter_change_dosage_controller_medication <span class="sc">-</span></span>
-<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    stop_giving_controller_medication <span class="sc">-</span></span>
-<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    reserve_controller_medication_if_treatment_not_work <span class="sc">-</span></span>
-<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_child_does_breathless <span class="sc">+</span></span>
-<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_as_label) <span class="sc">%&gt;%</span></span>
-<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Baseline adherence and asthma control groups, carried to every visit</span></span>
-<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">self_reported_adherence_binary =</span> <span class="fu">case_when</span>(</span>
-<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>    self_reported_adherence <span class="sc">&gt;=</span> adherence_cutoff <span class="sc">&amp;</span></span>
-<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>      time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Adherent"</span>,</span>
-<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>    self_reported_adherence <span class="sc">&lt;</span> adherence_cutoff <span class="sc">&amp;</span></span>
-<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>      time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Non-adherent"</span></span>
-<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>    <span class="at">self_reported_adherence_binary =</span> <span class="fu">as.factor</span>(self_reported_adherence_binary)</span>
-<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">act_binary =</span> <span class="fu">case_when</span>(</span>
-<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>    act_score <span class="sc">&gt;=</span> act_cutoff <span class="sc">&amp;</span> time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Controlled"</span>,</span>
-<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    act_score <span class="sc">&lt;</span> act_cutoff <span class="sc">&amp;</span> time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Uncontrolled"</span></span>
-<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
-<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">act_binary =</span> <span class="fu">as.factor</span>(act_binary)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(study_id_screening) <span class="sc">%&gt;%</span></span>
-<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fill</span>(self_reported_adherence_binary, act_binary) <span class="sc">%&gt;%</span></span>
-<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Each score is the mean of the items answered at that visit</span></span>
-<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">aqlq_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(aqlq_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>    <span class="at">pacqlq_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(pacqlq_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">afs_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(afs_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Months since baseline for each REDCap event, and the preferred-language</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># recode, before baseline values are copied to other visits</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>visits <span class="ot">&lt;-</span> clean_asthma_data <span class="sc">%&gt;%</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_linear =</span> <span class="fu">case_when</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"baseline_arm_1"</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"2month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"4month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">4</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"6month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">6</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"9month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">9</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"12month_followup_arm_1"</span> <span class="sc">~</span> <span class="dv">12</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># A preferred language of 999 is set to English. See issue #16.</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">ifelse</span>(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    prefer_language <span class="sc">==</span> <span class="dv">999</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    prefer_language</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="baseline-values" class="level2">
+<h2 class="anchored" data-anchor-id="baseline-values">Baseline values</h2>
+<p>Study arm, child or adult, preferred language and the consent and follow-up dates are recorded only on each participant’s baseline row (<code>baseline_variables</code>, on <a href="../quarto/setup.html">Setup</a>). This step takes them from the baseline rows, one row per participant, so that the next step can copy them to every visit. Because they come from the baseline row itself, the order of rows in the export does not matter. A participant with two baseline rows stops the run, since there would be no way to tell which is right; a participant with visits but no baseline row keeps missing values, with a warning.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The values recorded only at baseline, one row per participant, to copy to</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># their other visits (issue #48). Taken from the baseline row itself, so the</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># order of rows in the export does not matter. A participant with two</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># baseline rows stops the run; one with visits but no baseline row keeps</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># missing values, with a warning.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>baseline_values <span class="ot">&lt;-</span> visits <span class="sc">%&gt;%</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_linear <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(study_id_screening, <span class="fu">all_of</span>(baseline_variables))</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>repeated_baselines <span class="ot">&lt;-</span> baseline_values <span class="sc">%&gt;%</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(study_id_screening) <span class="sc">%&gt;%</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(repeated_baselines) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(repeated_baselines), <span class="st">" participant(s) have more than one baseline "</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"row; each needs exactly one."</span>, <span class="at">call. =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>no_baseline <span class="ot">&lt;-</span> <span class="fu">setdiff</span>(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  visits<span class="sc">$</span>study_id_screening, baseline_values<span class="sc">$</span>study_id_screening</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">length</span>(no_baseline) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">warning</span>(</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">length</span>(no_baseline), <span class="st">" participant(s) have visits but no baseline row; "</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"their baseline values stay missing."</span>, <span class="at">call. =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="build-visit-data" class="level2">
+<h2 class="anchored" data-anchor-id="build-visit-data">Build visit data</h2>
+<p><code>time_factor</code> stores the visit as a category for the models, with its levels in time order, baseline first, whatever order the rows arrive in. The baseline values are then joined to every visit by participant: a visit keeps its own value if it has one and otherwise takes the baseline value. The join is declared “many-to-one” (many visits, one baseline row per participant), so a repeated participant stops the run rather than multiplying visits. This carries assignment and baseline subgroup information, not a missed visit’s outcome score.</p>
+<p>Selected 999 codes become <code>NA</code>, R’s missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16">#16</a>. Scores are then derived from the item columns: <code>rowMeans(..., na.rm = TRUE)</code> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</p>
+<p>The baseline adherence and asthma-control groups are taken from each participant’s baseline visit and set on all their visits, so a participant does not switch subgroup because a later score changes. For the R verbs in this block, see <a href="https://r4ds.hadley.nz/data-transform.html">Data transformation</a> <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Click to show/hide R Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_itt <span class="ot">&lt;-</span> visits <span class="sc">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visit time as a factor, for models that treat time as categorical. The</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># levels are in time order, baseline first, whatever the row order.</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_factor =</span> <span class="fu">factor</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    time_linear, <span class="at">levels =</span> <span class="fu">sort</span>(<span class="fu">unique</span>(time_linear))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># These are recorded only at baseline: a visit keeps its own value if it</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># has one, and otherwise takes the participant's baseline value</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    baseline_values, <span class="fu">join_by</span>(study_id_screening),</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">suffix =</span> <span class="fu">c</span>(<span class="st">""</span>, <span class="st">"_at_baseline"</span>), <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_of</span>(baseline_variables),</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">coalesce</span>(.x, <span class="fu">pick</span>(<span class="fu">everything</span>())[[<span class="fu">paste0</span>(<span class="fu">cur_column</span>(), <span class="st">"_at_baseline"</span>)]])</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">"_at_baseline"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">studyarm =</span> <span class="fu">as.factor</span>(studyarm)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">participant_sex =</span> <span class="fu">factor</span>(</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    participant_sex,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Male"</span>, <span class="st">"Female"</span>)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">child_adult =</span> <span class="fu">factor</span>(</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    child_adult,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Child"</span>, <span class="st">"Adult"</span>)</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prefer_language =</span> <span class="fu">factor</span>(</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    prefer_language,</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"English"</span>, <span class="st">"Spanish"</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    <span class="fu">all_of</span>(<span class="fu">c</span>(aqlq_items, pacqlq_items, afs_items, missing_999_variables)),</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> <span class="fu">ifelse</span>(.x <span class="sc">==</span> <span class="dv">999</span>, <span class="cn">NA</span>, .x)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Date of each visit, from the consent and follow-up dates</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">date_of_observation =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"baseline_arm_1"</span> <span class="sc">~</span> consent_date,</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"2month_followup_arm_1"</span> <span class="sc">~</span> follow_up_2_months,</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"4month_followup_arm_1"</span> <span class="sc">~</span> follow_up_4_months,</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"6month_followup_arm_1"</span> <span class="sc">~</span> follow_up_6_months,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"9month_followup_arm_1"</span> <span class="sc">~</span> follow_up_9_months,</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    redcap_event_name <span class="sc">==</span> <span class="st">"12month_followup_arm_1"</span> <span class="sc">~</span> follow_up_12_month</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visits after the app update glitch</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">post_glitch_date =</span> (date_of_observation <span class="sc">&gt;</span> glitch_date)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Self-reported controller adherence score. See analysis-plan.md.</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">self_reported_adherence =</span> <span class="dv">32</span> <span class="sc">-</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>    only_give_controller_medication_needed <span class="sc">-</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>    only_give_controller_medication_breathless <span class="sc">+</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_regularly <span class="sc">-</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    try_to_avoid_controller_medication <span class="sc">-</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    forget_give_controller_medication <span class="sc">-</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    alter_change_dosage_controller_medication <span class="sc">-</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>    stop_giving_controller_medication <span class="sc">-</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>    reserve_controller_medication_if_treatment_not_work <span class="sc">-</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_child_does_breathless <span class="sc">+</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    give_controller_medication_as_label) <span class="sc">%&gt;%</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Baseline adherence and asthma control groups, carried to every visit</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">self_reported_adherence_binary =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    self_reported_adherence <span class="sc">&gt;=</span> adherence_cutoff <span class="sc">&amp;</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>      time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Adherent"</span>,</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    self_reported_adherence <span class="sc">&lt;</span> adherence_cutoff <span class="sc">&amp;</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>      time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Non-adherent"</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="at">self_reported_adherence_binary =</span> <span class="fu">as.factor</span>(self_reported_adherence_binary)</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">act_binary =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>    act_score <span class="sc">&gt;=</span> act_cutoff <span class="sc">&amp;</span> time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Controlled"</span>,</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    act_score <span class="sc">&lt;</span> act_cutoff <span class="sc">&amp;</span> time_factor <span class="sc">==</span> <span class="st">"0"</span> <span class="sc">~</span> <span class="st">"Uncontrolled"</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">act_binary =</span> <span class="fu">as.factor</span>(act_binary)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Each participant's baseline group, on every visit</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(study_id_screening) <span class="sc">%&gt;%</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(self_reported_adherence_binary, act_binary),</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> .x[<span class="fu">which</span>(time_linear <span class="sc">==</span> <span class="dv">0</span>)][<span class="dv">1</span>]</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">%&gt;%</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Each score is the mean of the items answered at that visit</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">aqlq_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(aqlq_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>    <span class="at">pacqlq_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(pacqlq_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">afs_score =</span> <span class="fu">rowMeans</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(afs_items)), <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -556,8 +613,8 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_pp <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(post_glitch_date <span class="sc">==</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>clean_asthma_data_pp <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(post_glitch_date <span class="sc">==</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -567,14 +624,14 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row per participant with consent and follow-up visit dates</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>study_dates <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_linear <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    study_id_screening, consent_date, follow_up_2_months,</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    follow_up_4_months, follow_up_6_months, follow_up_9_months,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    follow_up_12_month</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># One row per participant with consent and follow-up visit dates</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>study_dates <span class="ot">&lt;-</span> clean_asthma_data_itt <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time_linear <span class="sc">==</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    study_id_screening, consent_date, follow_up_2_months,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    follow_up_4_months, follow_up_6_months, follow_up_9_months,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    follow_up_12_month</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 
@@ -585,9 +642,6 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-tidyrfill" class="csl-entry" role="listitem">
-<span class="nocase">tidyr authors</span>. n.d. <em>Fill in Missing Values with Previous or Next Value</em>. Accessed November 8, 2026. <a href="https://tidyr.tidyverse.org/reference/fill.html">https://tidyr.tidyverse.org/reference/fill.html</a>.
-</div>
 <div id="ref-r4ds2" class="csl-entry" role="listitem">
 Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for Data Science</em>. 2nd ed. O’Reilly Media. <a href="https://r4ds.hadley.nz/">https://r4ds.hadley.nz/</a>.
 </div>
@@ -1055,65 +1109,81 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "2. Build visit data"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>Build the visit-level analysis data for the ITT and per-protocol populations, with recodes and scale scores.</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/02_build_visit_data.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/02_build_visit_data.R)</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/02_build_visit_data.R"</span>)</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Build visit data</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>The input is the imported REDCap table; the intended output still has one row per participant and recorded visit. <span class="in">`mutate()`</span> creates or changes columns without summarizing the rows. <span class="in">`case_when()`</span> maps each event name to its scheduled month. <span class="in">`time_linear`</span> stores that number; <span class="in">`time_factor`</span> stores the visit as a category for the models.</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>The code groups by participant before <span class="in">`fill()`</span> carries baseline information down later rows. This assumes the baseline row precedes the rows that need it. It carries assignment and baseline subgroup information, not a missed visit's outcome score. See the <span class="co">[</span><span class="ot">fill documentation</span><span class="co">](https://tidyr.tidyverse.org/reference/fill.html)</span> for direction and grouping <span class="co">[</span><span class="ot">@tidyrfill</span><span class="co">]</span>.</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>Selected 999 codes become <span class="in">`NA`</span>, R's missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <span class="co">[</span><span class="ot">#16</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16)</span>. Scores are then derived from the item columns: <span class="in">`rowMeans(..., na.rm = TRUE)`</span> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>The baseline adherence and asthma-control groups are carried to later visits, so a participant does not switch subgroup because a later score changes. The small horizontal time shift is only for separating points in plots. For the R verbs in this block, see <span class="co">[</span><span class="ot">Data transformation</span><span class="co">](https://r4ds.hadley.nz/data-transform.html)</span> <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-visit-data</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Per protocol population</span></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="in">`clean_asthma_data_itt`</span> retains the visit records for the intention-to-treat analysis, which compares participants by assigned arm. The project's per-protocol dataset is a filtered copy keeping observations on or before the app-glitch cutoff. Here, “per protocol” means this specific date restriction, not a general selection of participants who adhered to treatment. A missing visit date produces a missing comparison and is not retained by <span class="in">`filter(post_glitch_date == FALSE)`</span>. The two datasets feed the same model code later.</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: per-protocol-population</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Study dates</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>Filtering to baseline makes a participant-level lookup table of consent and scheduled follow-up dates. The medication script joins this lookup onto app records to place them within each participant's follow-up. Check that the lookup has one row per participant: otherwise each medication record could match several rows. A blank follow-up date also needs attention because later comparisons against that date cannot establish whether a record is in the window.</span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: study-dates</span></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "2. Build visit data"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span><span class="co"> html</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>Build the visit-level analysis data for the ITT and per-protocol populations, with recodes and scale scores.</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>::: {.Rcode title="Source code"}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>The full R script is available at:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/02_build_visit_data.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/02_build_visit_data.R)</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>This R script file is itself reliant on the following helper files:</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/setup.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/setup.R)</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span><span class="co">[</span><span class="ot">`R/functions.R`</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/R/functions.R)</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>The code sections below are imported directly from that script when this page is rendered.</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| cache: false</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">read_chunk</span>(<span class="st">"../R/02_build_visit_data.R"</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Visit times</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>The input is the imported REDCap table; the output still has one row per participant and recorded visit. <span class="in">`mutate()`</span> creates or changes columns without summarizing the rows. <span class="in">`case_when()`</span> maps each event name to its scheduled month, stored in <span class="in">`time_linear`</span>.</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: visit-times</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Baseline values</span></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>Study arm, child or adult, preferred language and the consent and follow-up dates are recorded only on each participant's baseline row (<span class="in">`baseline_variables`</span>, on <span class="co">[</span><span class="ot">Setup</span><span class="co">](setup.qmd)</span>). This step takes them from the baseline rows, one row per participant, so that the next step can copy them to every visit. Because they come from the baseline row itself, the order of rows in the export does not matter. A participant with two baseline rows stops the run, since there would be no way to tell which is right; a participant with visits but no baseline row keeps missing values, with a warning.</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: baseline-values</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Build visit data</span></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a><span class="in">`time_factor`</span> stores the visit as a category for the models, with its levels in time order, baseline first, whatever order the rows arrive in. The baseline values are then joined to every visit by participant: a visit keeps its own value if it has one and otherwise takes the baseline value. The join is declared "many-to-one" (many visits, one baseline row per participant), so a repeated participant stops the run rather than multiplying visits. This carries assignment and baseline subgroup information, not a missed visit's outcome score.</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>Selected 999 codes become <span class="in">`NA`</span>, R's missing-value marker. The separate language recode currently assigns 999 to English; that behavior is under review in <span class="co">[</span><span class="ot">#16</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/16)</span>. Scores are then derived from the item columns: <span class="in">`rowMeans(..., na.rm = TRUE)`</span> averages available items within a row. It does not establish that an instrument permits a score with that many unanswered items; scoring rules remain to be verified against the instruments.</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>The baseline adherence and asthma-control groups are taken from each participant's baseline visit and set on all their visits, so a participant does not switch subgroup because a later score changes. For the R verbs in this block, see <span class="co">[</span><span class="ot">Data transformation</span><span class="co">](https://r4ds.hadley.nz/data-transform.html)</span> <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>.</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: build-visit-data</span></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a><span class="fu">## Per protocol population</span></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a><span class="in">`clean_asthma_data_itt`</span> retains the visit records for the intention-to-treat analysis, which compares participants by assigned arm. The project's per-protocol dataset is a filtered copy keeping observations on or before the app-glitch cutoff. Here, “per protocol” means this specific date restriction, not a general selection of participants who adhered to treatment. A missing visit date produces a missing comparison and is not retained by <span class="in">`filter(post_glitch_date == FALSE)`</span>. The two datasets feed the same model code later.</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: per-protocol-population</span></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## Study dates</span></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a>Filtering to baseline makes a participant-level lookup table of consent and scheduled follow-up dates. The medication script joins this lookup onto app records to place them within each participant's follow-up. Check that the lookup has one row per participant: otherwise each medication record could match several rows. A blank follow-up date also needs attention because later comparisons against that date cannot establish whether a record is in the window.</span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: study-dates</span></span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

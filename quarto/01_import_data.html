@@ -448,7 +448,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </div>
 <section id="import-redcap" class="level2">
 <h2 class="anchored" data-anchor-id="import-redcap">Import REDCap</h2>
-<p>The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A <code>left_join()</code> matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; repeated matches in the sex file could instead multiply rows unintentionally. An authorized analyst should check that the sex file has one row per identifier and that the join preserves the visit count.</p>
+<p>The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A <code>left_join()</code> matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; a participant listed twice in the sex file would instead multiply that participant’s visits. The join is declared “many-to-one” with <code>join_by()</code>, so a repeated identifier in the sex file stops the run with a message rather than doubling rows; the synthetic tests check that it does.</p>
 <p>The illustrated joins in <a href="https://r4ds.hadley.nz/joins.html">R for Data Science</a> explain keys and unmatched rows <span class="citation" data-cites="r4ds2">(<a href="#ref-r4ds2" role="doc-biblioref">Wickham et al. 2023</a>)</span>. The visit dates (<code>redcap_date_variables</code>, listed on <a href="../quarto/setup.html">Setup</a>) are then turned into calendar dates with <a href="../quarto/functions.html#calendar-dates"><code>as_calendar_date()</code></a>, whether the export stores them as text or as Excel dates. The output here, <code>clean_asthma_data</code>, becomes the input to <a href="../quarto/02_build_visit_data.html">Build visit data</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -460,14 +460,17 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>baseline_sex <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(baseline_sex_file) <span class="sc">%&gt;%</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(study_id_screening, participant_sex)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge sex into the REDCap export</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>clean_asthma_data <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  raw_asthma_data,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  baseline_sex,</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"study_id_screening"</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visit dates as calendar dates, however the export stores them</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(redcap_date_variables), as_calendar_date))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge sex into the REDCap export. Each participant must appear at most once</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># in the sex file: a repeated ID stops here rather than doubling that</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># participant's visits (issue #48).</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>clean_asthma_data <span class="ot">&lt;-</span> <span class="fu">left_join</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  raw_asthma_data,</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  baseline_sex,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">join_by</span>(study_id_screening),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">relationship =</span> <span class="st">"many-to-one"</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Visit dates as calendar dates, however the export stores them</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">all_of</span>(redcap_date_variables), as_calendar_date))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </section>
@@ -1049,7 +1052,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Import REDCap</span></span>
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A <span class="in">`left_join()`</span> matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; repeated matches in the sex file could instead multiply rows unintentionally. An authorized analyst should check that the sex file has one row per identifier and that the join preserves the visit count.</span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A <span class="in">`left_join()`</span> matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; a participant listed twice in the sex file would instead multiply that participant's visits. The join is declared "many-to-one" with <span class="in">`join_by()`</span>, so a repeated identifier in the sex file stops the run with a message rather than doubling rows; the synthetic tests check that it does.</span>
 <span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>The illustrated joins in <span class="co">[</span><span class="ot">R for Data Science</span><span class="co">](https://r4ds.hadley.nz/joins.html)</span> explain keys and unmatched rows <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>. The visit dates (<span class="in">`redcap_date_variables`</span>, listed on <span class="co">[</span><span class="ot">Setup</span><span class="co">](setup.qmd)</span>) are then turned into calendar dates with <span class="co">[</span><span class="ot">`as_calendar_date()`</span><span class="co">](functions.qmd#calendar-dates)</span>, whether the export stores them as text or as Excel dates. The output here, <span class="in">`clean_asthma_data`</span>, becomes the input to <span class="co">[</span><span class="ot">Build visit data</span><span class="co">](02_build_visit_data.qmd)</span>.</span>
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
