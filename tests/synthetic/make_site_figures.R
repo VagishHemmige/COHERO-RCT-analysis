@@ -3,13 +3,36 @@
 #   data. The three-level group is invented for the example.
 # Run from the project root: Rscript tests/synthetic/make_site_figures.R
 # Produces: quarto/images/trajectory_example_effects.png and
-#   quarto/images/trajectory_example_three_levels.png.
+#   quarto/images/trajectory_example_three_levels.png, the only files it
+#   writes in the project. The synthetic data and the tables main.R saves go
+#   to temporary folders, and COHERO_DATA_DIR and COHERO_OUTPUT_DIR are put
+#   back when it ends.
 
 ## ---- synthetic-data
-Sys.setenv(COHERO_DATA_DIR = file.path(tempdir(), "cohero-synthetic-data"))
-source("R/setup.R")
-source("tests/synthetic/build_synthetic_data.R")
-source("R/main.R")
+saved_settings <- Sys.getenv(
+  c("COHERO_DATA_DIR", "COHERO_OUTPUT_DIR"), unset = NA
+)
+restore_settings <- function() {
+  for (name in names(saved_settings)) {
+    if (is.na(saved_settings[[name]])) {
+      Sys.unsetenv(name)
+    } else {
+      do.call(Sys.setenv, as.list(saved_settings[name]))
+    }
+  }
+}
+Sys.setenv(
+  COHERO_DATA_DIR = file.path(tempdir(), "cohero-synthetic-data"),
+  COHERO_OUTPUT_DIR = file.path(tempdir(), "cohero-synthetic-outputs")
+)
+tryCatch({
+  source("R/setup.R")
+  source("tests/synthetic/build_synthetic_data.R")
+  source("R/main.R")
+}, error = function(e) {
+  restore_settings()
+  stop(e)
+})
 
 ## ---- example-figures
 data <- mixed_model_data[["itt"]] %>%
@@ -45,3 +68,5 @@ save_figure(
   three_levels, "quarto/images/trajectory_example_three_levels",
   width = 190, height = 150, formats = "png", dpi = 200
 )
+
+restore_settings()

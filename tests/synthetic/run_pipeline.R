@@ -8,9 +8,12 @@
 #   it on main's code too, from main's project root).
 # Set COHERO_SNAPSHOT to a file path to save every output there, for
 #   tests/synthetic/compare_snapshots.R.
-# Produces: a pass or fail, counts of warnings and messages, and nothing
-#   written outside a temporary folder (and the snapshot, if asked for).
-#   Prints no data values, only check results and estimates on synthetic data.
+# Produces: a pass or fail, counts of warnings and messages, and the
+#   snapshot, if asked for. Synthetic data and outputs go to temporary
+#   folders: COHERO_DATA_DIR and COHERO_OUTPUT_DIR point there while it runs
+#   and are put back when it ends, and a check confirms that the project's
+#   own tables/ and figures/ are unchanged. Prints no data values, only check
+#   results and estimates on synthetic data.
 
 ## ---- harness-folder
 script_arg <- grep("^--file=", commandArgs(FALSE), value = TRUE)
@@ -20,9 +23,38 @@ harness_dir <- if (length(script_arg) == 1) {
   "tests/synthetic"
 }
 
-## ---- synthetic-data-folder
+## ---- synthetic-folders
+# Synthetic data and every output go to temporary folders. The two settings
+# are put back when the run ends (restore_settings(), below), so running this
+# with source() in a session cannot leave the session pointed at synthetic
+# data or a temporary output folder.
+saved_settings <- Sys.getenv(
+  c("COHERO_DATA_DIR", "COHERO_OUTPUT_DIR"), unset = NA
+)
+restore_settings <- function() {
+  for (name in names(saved_settings)) {
+    if (is.na(saved_settings[[name]])) {
+      Sys.unsetenv(name)
+    } else {
+      do.call(Sys.setenv, as.list(saved_settings[name]))
+    }
+  }
+}
 synthetic_dir <- file.path(tempdir(), "cohero-synthetic-data")
-Sys.setenv(COHERO_DATA_DIR = synthetic_dir)
+synthetic_output_dir <- file.path(tempdir(), "cohero-synthetic-outputs")
+Sys.setenv(
+  COHERO_DATA_DIR = synthetic_dir, COHERO_OUTPUT_DIR = synthetic_output_dir
+)
+
+# The project's own output folders, as they are before the run: every file's
+# size and modification time
+project_outputs <- function() {
+  files <- list.files(c("tables", "figures"), recursive = TRUE,
+                      full.names = TRUE)
+  info <- file.info(files)
+  paste(files, info$size, format(info$mtime, "%Y-%m-%d %H:%M:%OS3"))
+}
+project_outputs_before <- project_outputs()
 
 ## ---- build-synthetic-data
 source("R/setup.R")
@@ -36,7 +68,10 @@ cat("Synthetic files written:", length(list.files(synthetic_dir)), "\n")
 collected_warnings <- character()
 collected_messages <- character()
 withCallingHandlers(
-  source("R/main.R"),
+  tryCatch(source("R/main.R"), error = function(e) {
+    restore_settings()
+    stop(e)
+  }),
   warning = function(w) {
     collected_warnings <<- c(collected_warnings, conditionMessage(w))
     invokeRestart("muffleWarning")
@@ -287,8 +322,14 @@ expected <- list(
   ),
   "model-term tables match the fitted models" = model_terms_match,
   "effect tables match the estimates" = effect_tables_match,
+  "outputs saved only in the temporary folder" = tryCatch(
+    startsWith(normalizePath(tables_dir), normalizePath(tempdir())),
+    error = function(e) FALSE
+  ),
+  "the project's own tables/ and figures/ are unchanged" =
+    identical(project_outputs(), project_outputs_before),
   "every table saved as a Word file" = tryCatch(
-    length(list.files("tables", pattern = "\\.docx$")) ==
+    length(list.files(tables_dir, pattern = "\\.docx$")) ==
       6 + sum(lengths(count_interaction_tables)) + 2 * 56,
     error = function(e) FALSE
   ),
@@ -343,6 +384,8 @@ if (snapshot_file != "") {
   saveRDS(snapshot_outputs(), snapshot_file)
   cat("\nSnapshot saved.\n")
 }
+
+restore_settings()
 
 if (!all(vapply(expected, isTRUE, logical(1)))) {
   quit(status = 1)
