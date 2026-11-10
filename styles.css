@@ -57,3 +57,12 @@
 .quarto-title-tools-only h1:empty {
   display: none;
 }
+
+/* On narrow screens, a wide table scrolls within its own box instead of
+   making the whole page scroll sideways */
+@media (max-width: 575.98px) {
+  main table {
+    display: block;
+    overflow-x: auto;
+  }
+}
