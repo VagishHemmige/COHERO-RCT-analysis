@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
-  background-image: none;
-}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -162,6 +151,17 @@ div.callout-Results.callout-style-default > .callout-header {
 div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
   content: '📊';
+  background-image: none;
+}
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 </style>
@@ -453,7 +453,7 @@ window.Quarto = {
 
 <p>The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model’s printed coefficient table may not answer that directly. A <strong>contrast</strong> is a requested comparison of model estimates, such as intervention minus control within a subgroup.</p>
 <p>In the <a href="../quarto/methods_interactions.html">invented interaction example</a>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</p>
-<p>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</p>
+<p>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build. The analysis itself uses emmeans in <code>estimate_effects()</code> (see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</p>
 <section id="with-emmeans" class="level2">
 <h2 class="anchored" data-anchor-id="with-emmeans">With emmeans</h2>
 <p>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. For the count model:</p>
@@ -1035,7 +1035,7 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>In the <span class="co">[</span><span class="ot">invented interaction example</span><span class="co">](methods_interactions.qmd)</span>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build or add emmeans to the analysis pipeline. The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses emmeans in <span class="in">`estimate_effects()`</span> (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## With emmeans</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>

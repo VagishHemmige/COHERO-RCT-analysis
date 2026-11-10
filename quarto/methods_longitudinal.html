@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
-}
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
-}
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
-  background-image: none;
-}
 div.callout-Results.callout {
   border-left-color: #198754;
 }
@@ -162,6 +151,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
+}
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
+}
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 </style>
@@ -592,7 +592,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <tr class="even">
 <td>Correlation between visits</td>
 <td>Implied: the same for any two visits</td>
-<td>Estimated freely for every pair of visits (unstructured)</td>
+<td>Often estimated freely for every pair of visits (unstructured); simpler structures are also used</td>
 <td>Treated as a nuisance; the standard errors are robust to a wrong guess</td>
 </tr>
 <tr class="odd">
@@ -610,14 +610,14 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <tr class="odd">
 <td>Main cost</td>
 <td>The equal-correlation assumption</td>
-<td>Many correlation parameters: 21 for six visits</td>
+<td>With an unstructured covariance, many parameters: 21 for six visits (6 variances and 15 correlations), or 15 with baseline as a covariate and five follow-up visits</td>
 <td>Weaker missing-data protection; robust standard errors are too small in small samples</td>
 </tr>
 </tbody>
 </table>
-<p><strong>MMRM</strong> is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="citation" data-cites="mallinckrodt2008mmrm">(<a href="#ref-mallinckrodt2008mmrm" role="doc-biblioref">Mallinckrodt et al. 2008</a>)</span>. Its unstructured correlation avoids assuming that a person’s visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="citation" data-cites="coffman2016clda">(<a href="#ref-coffman2016clda" role="doc-biblioref">Coffman et al. 2016</a>)</span>. That is a different question, not just a different method.</p>
+<p><strong>MMRM</strong> was recommended by a cross-industry working group as a primary analysis for continuous outcomes in trials with fixed visits <span class="citation" data-cites="mallinckrodt2008mmrm">(<a href="#ref-mallinckrodt2008mmrm" role="doc-biblioref">Mallinckrodt et al. 2008</a>)</span>. With an unstructured covariance it avoids assuming that a person’s visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. An MMRM often treats the baseline score as a covariate rather than as one of the outcomes. In a randomized trial the arms have the same expected baseline, so a baseline-adjusted difference at a visit and a difference in change from baseline estimate the same treatment effect; the approaches differ in efficiency and in how they use participants with incomplete data <span class="citation" data-cites="coffman2016clda">(<a href="#ref-coffman2016clda" role="doc-biblioref">Coffman et al. 2016</a>)</span>.</p>
 <p><strong>GEE</strong> describe the average outcome in each group without modeling individuals <span class="citation" data-cites="liang1986gee">(<a href="#ref-liang1986gee" role="doc-biblioref">Liang and Zeger 1986</a>)</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="citation" data-cites="robins1995weighted">(<a href="#ref-robins1995weighted" role="doc-biblioref">Robins et al. 1995</a>)</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="citation" data-cites="mancl2001gee">(<a href="#ref-mancl2001gee" role="doc-biblioref">Mancl and DeRouen 2001</a>)</span>.</p>
-<p>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</p>
+<p>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model. Its trade-off is few parameters against the assumption that any two visits are equally correlated; a sensitivity analysis is an open decision (<a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/22">#22</a>).</p>
 </section>
 <section id="count-outcomes-are-different" class="level2">
 <h2 class="anchored" data-anchor-id="count-outcomes-are-different">Count outcomes are different</h2>
@@ -1218,16 +1218,16 @@ Vickers, Andrew J., and Douglas G. Altman. 2001. <span>“Analysing Controlled T
 <span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Linear mixed model (used here) <span class="pp">|</span> Mixed model for repeated measures (MMRM) <span class="pp">|</span> Generalized estimating equations (GEE) <span class="pp">|</span></span>
 <span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
 <span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> How it handles a person's repeated visits <span class="pp">|</span> A random intercept per participant <span class="pp">|</span> No random effects; models the correlation between visits directly <span class="pp">|</span> No random effects; a "working" guess at the correlation <span class="pp">|</span></span>
-<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correlation between visits <span class="pp">|</span> Implied: the same for any two visits <span class="pp">|</span> Estimated freely for every pair of visits (unstructured) <span class="pp">|</span> Treated as a nuisance; the standard errors are robust to a wrong guess <span class="pp">|</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Correlation between visits <span class="pp">|</span> Implied: the same for any two visits <span class="pp">|</span> Often estimated freely for every pair of visits (unstructured); simpler structures are also used <span class="pp">|</span> Treated as a nuisance; the standard errors are robust to a wrong guess <span class="pp">|</span></span>
 <span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> How it is fitted <span class="pp">|</span> Likelihood <span class="pp">|</span> Likelihood <span class="pp">|</span> Estimating equations, with no full distributional assumption <span class="pp">|</span></span>
 <span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Missed visits <span class="pp">|</span> Valid if missing at random (see above) <span class="pp">|</span> Valid if missing at random <span class="pp">|</span> Valid only if missing completely at random, unless weighted <span class="pp">|</span></span>
-<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Main cost <span class="pp">|</span> The equal-correlation assumption <span class="pp">|</span> Many correlation parameters: 21 for six visits <span class="pp">|</span> Weaker missing-data protection; robust standard errors are too small in small samples <span class="pp">|</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Main cost <span class="pp">|</span> The equal-correlation assumption <span class="pp">|</span> With an unstructured covariance, many parameters: 21 for six visits (6 variances and 15 correlations), or 15 with baseline as a covariate and five follow-up visits <span class="pp">|</span> Weaker missing-data protection; robust standard errors are too small in small samples <span class="pp">|</span></span>
 <span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>**MMRM** is the most common primary analysis for continuous outcomes in regulatory trials with fixed visits <span class="co">[</span><span class="ot">@mallinckrodt2008mmrm</span><span class="co">]</span>. Its unstructured correlation avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. In its usual form an MMRM also treats the baseline score as a covariate rather than as one of the outcomes, which changes the estimate from a difference in change from baseline to a baseline-adjusted difference at each visit <span class="co">[</span><span class="ot">@coffman2016clda</span><span class="co">]</span>. That is a different question, not just a different method.</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>**MMRM** was recommended by a cross-industry working group as a primary analysis for continuous outcomes in trials with fixed visits <span class="co">[</span><span class="ot">@mallinckrodt2008mmrm</span><span class="co">]</span>. With an unstructured covariance it avoids assuming that a person's visits two months apart are as alike as visits a year apart. The price is many parameters, which a small pilot may not support, especially within subgroups. An MMRM often treats the baseline score as a covariate rather than as one of the outcomes. In a randomized trial the arms have the same expected baseline, so a baseline-adjusted difference at a visit and a difference in change from baseline estimate the same treatment effect; the approaches differ in efficiency and in how they use participants with incomplete data <span class="co">[</span><span class="ot">@coffman2016clda</span><span class="co">]</span>.</span>
 <span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>**GEE** describe the average outcome in each group without modeling individuals <span class="co">[</span><span class="ot">@liang1986gee</span><span class="co">]</span>. Their robust standard errors stay valid even if the assumed correlation is wrong. But in their basic form they assume that missed visits are unrelated to anything measured, which is a stronger assumption than missing at random; weighting by the probability of attending each visit relaxes it <span class="co">[</span><span class="ot">@robins1995weighted</span><span class="co">]</span>. With few participants, robust standard errors are biased downwards and need a small-sample correction <span class="co">[</span><span class="ot">@mancl2001gee</span><span class="co">]</span>.</span>
 <span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model because it uses every observed visit under missing at random with few parameters.</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>For a continuous outcome, all three can estimate the same treatment effect, and the same tools turn the fit into estimates and figures. This pilot uses the random-intercept model. Its trade-off is few parameters against the assumption that any two visits are equally correlated; a sensitivity analysis is an open decision (<span class="co">[</span><span class="ot">#22</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/22)</span>).</span>
 <span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count outcomes are different</span></span>
 <span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>

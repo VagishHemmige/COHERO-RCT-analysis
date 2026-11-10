@@ -84,6 +84,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -409,7 +412,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <h2 class="anchored" data-anchor-id="one-outcome-two-arms">One outcome, two arms</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/trajectory_example_effects.png" class="img-fluid figure-img" alt="Synthetic example figure. Top panel: ACT score from month 0 to month 12 for the control arm (gray circles, dashed line) and the intervention arm (blue triangles, solid line), each point with a vertical 95% confidence interval; the arms start close together and the intervention arm is higher at every follow-up visit. Middle panel: intervention minus control in change from baseline at months 2 to 12, each with its interval, above a line at zero. Below: a row of p values for each follow-up visit marked with a dagger, then the number of participants observed in each arm at each visit."></p>
+<p><a href="images/trajectory_example_effects.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="A synthetic example with the effect panel: model-estimated means by arm over the visits, the difference between arms below them, then p values and the number of participants observed at each visit."><img src="images/trajectory_example_effects.png" class="img-fluid figure-img" alt="Synthetic example figure. Top panel: ACT score from month 0 to month 12 for the control arm (gray circles, dashed line) and the intervention arm (blue triangles, solid line), each point with a vertical 95% confidence interval; the arms start close together and the intervention arm is higher at every follow-up visit. Middle panel: intervention minus control in change from baseline at months 2 to 12, each with its interval, above a line at zero. Below: a row of p values for each follow-up visit marked with a dagger, then the number of participants observed in each arm at each visit."></a></p>
 <figcaption>A synthetic example with the effect panel: model-estimated means by arm over the visits, the difference between arms below them, then p values and the number of participants observed at each visit.</figcaption>
 </figure>
 </div>
@@ -429,7 +432,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <h2 class="anchored" data-anchor-id="figures-by-subgroup">Figures by subgroup</h2>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/trajectory_example_three_levels.png" class="img-fluid figure-img" alt="Synthetic example figure with three panels side by side, Group A, Group B and Group C, on the same ACT score scale from month 0 to month 12. Each panel shows faint individual trajectories and the two arms' estimated means with 95% confidence intervals. Below the panels: p values for intervention versus control within each group, then p values for the difference between levels under Groups B and C, then the number of participants observed in each arm at each visit in each group."></p>
+<p><a href="images/trajectory_example_three_levels.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="A synthetic example by a three-level subgroup: one panel per level with individual trajectories and means, then p values within each level, the difference between levels, and the numbers observed."><img src="images/trajectory_example_three_levels.png" class="img-fluid figure-img" alt="Synthetic example figure with three panels side by side, Group A, Group B and Group C, on the same ACT score scale from month 0 to month 12. Each panel shows faint individual trajectories and the two arms' estimated means with 95% confidence intervals. Below the panels: p values for intervention versus control within each group, then p values for the difference between levels under Groups B and C, then the number of participants observed in each arm at each visit in each group."></a></p>
 <figcaption>A synthetic example by a three-level subgroup: one panel per level with individual trajectories and means, then p values within each level, the difference between levels, and the numbers observed.</figcaption>
 </figure>
 </div>
@@ -964,8 +967,40 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 <span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span> says which code produces each element.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
+<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/edit/main/quarto/methods_reading_trajectory_figure.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer><script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
 
 
 
 
-<footer class="footer"><div class="nav-footer"><div class="nav-footer-center"><div class="toc-actions d-sm-block d-md-none"><ul><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/edit/main/quarto/methods_reading_trajectory_figure.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></div></div></footer></body></html>
+</body></html>

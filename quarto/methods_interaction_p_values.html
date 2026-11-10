@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -162,6 +151,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -429,7 +429,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <p>This page explains what the p-value of an interaction term tests, and what it doesn’t. It uses no results from this trial.</p>
 <section id="it-tests-a-difference-between-effects" class="level2">
 <h2 class="anchored" data-anchor-id="it-tests-a-difference-between-effects">It tests a difference between effects</h2>
-<p>The p-value of an arm × subgroup interaction tests one null hypothesis: <strong>the arm effect is the same in every level of the subgroup</strong>. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.</p>
+<p>With two subgroup levels, the p-value of an arm × subgroup interaction tests one null hypothesis: <strong>the arm effect is the same in both levels</strong>. With three or more levels there are two different tests. One compares each level with a reference level, giving one p-value per level; this is what the analysis here reports. The other is a joint test of whether the effect is the same in every level; the analysis here does not report it. In either case, a small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup. In the trajectory figures, the comparison at baseline is between the arms’ baseline differences, and at each follow-up visit between the arms’ differences in change from baseline.</p>
 <p>A p-value measures how incompatible the observed test statistic is with a specified null hypothesis and model assumptions. It is not the probability that the null hypothesis is true, nor the probability that a result happened “by chance.” Here the null is about equal effects on the scale being tested.</p>
 <p>Altman and Bland make the general point: to compare two estimates, test their difference directly; don’t compare their separate p-values <span class="citation" data-cites="altman2003interaction">(<a href="#ref-altman2003interaction" role="doc-biblioref">Altman and Bland 2003</a>)</span>.</p>
 </section>
@@ -951,7 +951,7 @@ Wang, Rui, Stephen W. Lagakos, James H. Ware, David J. Hunter, and Jeffrey M. Dr
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">## It tests a difference between effects</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>The p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in every level of the subgroup**. A small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>With two subgroup levels, the p-value of an arm × subgroup interaction tests one null hypothesis: **the arm effect is the same in both levels**. With three or more levels there are two different tests. One compares each level with a reference level, giving one p-value per level; this is what the analysis here reports. The other is a joint test of whether the effect is the same in every level; the analysis here does not report it. In either case, a small p-value is evidence that the effects differ. It is not a test of whether the intervention works in any one subgroup. In the trajectory figures, the comparison at baseline is between the arms' baseline differences, and at each follow-up visit between the arms' differences in change from baseline.</span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>A p-value measures how incompatible the observed test statistic is with a specified null hypothesis and model assumptions. It is not the probability that the null hypothesis is true, nor the probability that a result happened “by chance.” Here the null is about equal effects on the scale being tested.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
