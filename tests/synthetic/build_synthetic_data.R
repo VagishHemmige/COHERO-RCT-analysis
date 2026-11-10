@@ -13,14 +13,14 @@
 # available, check these first.
 #
 # Assumptions
-#   A1. REDCap visit dates (consent_date, follow_up_*) are stored as text
-#       (YYYY-MM-DD), not Excel dates. If they were Excel dates, read_excel()
-#       would return date-times and the comparison with glitch_date in
-#       02_build_visit_data.R would mark every visit post-glitch.
+#   A1. REDCap visit dates (consent_date, follow_up_*) are written here as
+#       text (YYYY-MM-DD). 01_import_data.R turns them into calendar dates
+#       with as_calendar_date(), which also accepts Excel dates, so either
+#       storage gives the same dates.
 #   A2. App PuffDate sits in one of the columns read with col_types "date",
-#       so it is read as a date-time. The join with the
-#       day grid (a Date) in 03_derive_medication_outcomes.R works for a
-#       date-time but would fail for text.
+#       so it is read as a date-time; 01_import_data.R keeps its calendar
+#       day. Records here fall at midnight; a time of day would not change
+#       the day counted.
 #   A3. StudyPeriod is the day number since consent, so that
 #       PuffDate = consent date + StudyPeriod, as the day grid assumes.
 #   A4. The ten controller-adherence items are scored 0-4. With 1-5, the
