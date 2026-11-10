@@ -15,11 +15,14 @@ raw_asthma_data <- read_excel(redcap_export_file)
 baseline_sex <- read_excel(baseline_sex_file) %>%
   select(study_id_screening, participant_sex)
 
-# Merge sex into the REDCap export
+# Merge sex into the REDCap export. Each participant must appear at most once
+# in the sex file: a repeated ID stops here rather than doubling that
+# participant's visits (issue #48).
 clean_asthma_data <- left_join(
   raw_asthma_data,
   baseline_sex,
-  by = "study_id_screening"
+  join_by(study_id_screening),
+  relationship = "many-to-one"
 ) %>%
   # Visit dates as calendar dates, however the export stores them
   mutate(across(all_of(redcap_date_variables), as_calendar_date))

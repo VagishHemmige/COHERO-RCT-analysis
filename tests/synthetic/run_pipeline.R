@@ -160,6 +160,50 @@ figures_pass <- !is.null(figure_results) &&
   all(figure_results$failed == 0) && !any(figure_results$error) &&
   !any(figure_results$skipped)
 
+## ---- check-row-order
+# Script 02 gives the same visit data whatever the order of rows in the
+# REDCap export, and stops on a participant with two baseline rows; the sex
+# merge in 01 stops on a participant listed twice (issue #48). Each is run in
+# its own environment, so the pipeline's objects are untouched.
+build_visits <- function(export) {
+  env <- new.env(parent = globalenv())
+  env$clean_asthma_data <- export
+  suppressWarnings(source("R/02_build_visit_data.R", local = env))
+  env$clean_asthma_data_itt %>% arrange(study_id_screening, time_linear)
+}
+row_order_pass <- tryCatch({
+  shuffled_export <- withr::with_seed(
+    48, clean_asthma_data[sample(nrow(clean_asthma_data)), ]
+  )
+  isTRUE(all.equal(
+    build_visits(clean_asthma_data), build_visits(shuffled_export)
+  ))
+}, error = function(e) FALSE)
+
+duplicate_baseline_stops <- tryCatch({
+  first_baseline <- clean_asthma_data %>%
+    filter(redcap_event_name == "baseline_arm_1") %>%
+    slice(1)
+  build_visits(bind_rows(clean_asthma_data, first_baseline))
+  FALSE
+}, error = function(e) {
+  grepl("more than one baseline", conditionMessage(e), fixed = TRUE)
+})
+
+duplicate_sex_stops <- tryCatch({
+  sex_file <- tempfile(fileext = ".xlsx")
+  sex_records <- readxl::read_excel(baseline_sex_file)
+  writexl::write_xlsx(bind_rows(sex_records, sex_records[1, ]), sex_file)
+  env <- new.env(parent = globalenv())
+  env$baseline_sex_file <- sex_file
+  suppressWarnings(suppressMessages(
+    source("R/01_import_data.R", local = env)
+  ))
+  FALSE
+}, error = function(e) {
+  grepl("at most 1 row", conditionMessage(e), fixed = TRUE)
+})
+
 ## ---- check-time-zones
 # Scripts 01-03 give the same date-dependent results in time zones behind,
 # at and far ahead of UTC (check_time_zone.R, each in its own R session).
@@ -342,6 +386,10 @@ expected <- list(
   "model, table and figure functions work outside this project" =
     portable_pass,
   "date windows are the same in every time zone" = time_zones_agree,
+  "visit data do not depend on row order" = row_order_pass,
+  "a second baseline row stops the run" = duplicate_baseline_stops,
+  "a participant listed twice in the sex file stops the run" =
+    duplicate_sex_stops,
   "every mixed-model cell has 2 or more observations" =
     length(thin_cells) == 0,
   "no singular mixed-model fits" = singular_fits == 0,

@@ -27,7 +27,7 @@ knitr::read_chunk("../R/01_import_data.R")
 
 ## Import REDCap
 
-The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A `left_join()` matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; repeated matches in the sex file could instead multiply rows unintentionally. An authorized analyst should check that the sex file has one row per identifier and that the join preserves the visit count.
+The REDCap export supplies participant-visit records. Sex comes from a separate participant file. A `left_join()` matches the participant identifier and adds sex to each matching visit, retaining rows from the visit file. Repeated visits for one participant are expected; a participant listed twice in the sex file would instead multiply that participant's visits. The join is declared "many-to-one" with `join_by()`, so a repeated identifier in the sex file stops the run with a message rather than doubling rows; the synthetic tests check that it does.
 
 The illustrated joins in [R for Data Science](https://r4ds.hadley.nz/joins.html) explain keys and unmatched rows [@r4ds2]. The visit dates (`redcap_date_variables`, listed on [Setup](setup.qmd)) are then turned into calendar dates with [`as_calendar_date()`](functions.qmd#calendar-dates), whether the export stores them as text or as Excel dates. The output here, `clean_asthma_data`, becomes the input to [Build visit data](02_build_visit_data.qmd).
 
