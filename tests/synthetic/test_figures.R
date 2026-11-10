@@ -51,6 +51,40 @@ testthat::test_that("the trajectory figure's options change it as recorded", {
   )
 })
 
+## ---- caption-matches-options
+# The caption describes only what the figure shows: the baseline p value only
+# when it is drawn, and the between-level comparison whenever between-level
+# effects or p values are drawn
+testthat::test_that("the caption follows the figure's options", {
+  caption <- function(estimates, ...) {
+    figure <- compose_trajectory_figure(
+      mixed_model_data[["itt"]], estimates, "act_score", ...,
+      arm_labels = arm_labels, labels = figure_labels
+    )
+    gsub("\n", " ", figure$patches$annotation$caption)
+  }
+  overall <- mixed_model_estimates[["itt"]][["act_score"]][["overall"]]
+  by_sex <- mixed_model_estimates[["itt"]][["act_score"]][["participant_sex"]]
+
+  with_baseline <- caption(overall)
+  testthat::expect_match(with_baseline, "at baseline, the difference", fixed = TRUE)
+
+  without_baseline <- caption(overall, show_baseline_p = FALSE)
+  testthat::expect_no_match(without_baseline, "baseline, the difference", fixed = TRUE)
+  testthat::expect_match(without_baseline, "at each follow-up visit", fixed = TRUE)
+
+  no_p <- caption(overall, show_p = FALSE)
+  testthat::expect_no_match(no_p, "p values", fixed = TRUE)
+  testthat::expect_no_match(no_p, "multiple comparisons", fixed = TRUE)
+
+  effects_only <- caption(
+    by_sex, modifier = "participant_sex", show_p = FALSE,
+    show_effect_panel = TRUE
+  )
+  testthat::expect_match(effects_only, "Between levels:", fixed = TRUE)
+  testthat::expect_no_match(effects_only, "p values", fixed = TRUE)
+})
+
 ## ---- display-options
 # Jitter changes only what is drawn (#11)
 testthat::test_that("jitter changes only the display", {

@@ -212,8 +212,8 @@
 </g>
 <g clip-path='url(#cpMC4wMHw3MjAuMDB8MC4wMHw1NzYuMDA=)'>
 <text x='8.97' y='554.47' style='font-size: 7.20px; fill: #595959; font-family: sans;' textLength='337.20px' lengthAdjust='spacingAndGlyphs'>Points and bars: each arm's model-estimated mean and its 95% confidence interval (the uncertainty in the</text>
-<text x='8.97' y='562.25' style='font-size: 7.20px; fill: #595959; font-family: sans;' textLength='338.63px' lengthAdjust='spacingAndGlyphs'>mean, not the spread of individual values). p values: at baseline, the difference between arms; at follow-up</text>
-<text x='8.97' y='570.02' style='font-size: 7.20px; fill: #595959; font-family: sans;' textLength='308.59px' lengthAdjust='spacingAndGlyphs'>(†), the difference between arms in change from baseline. Not adjusted for multiple comparisons.</text>
+<text x='8.97' y='562.25' style='font-size: 7.20px; fill: #595959; font-family: sans;' textLength='348.24px' lengthAdjust='spacingAndGlyphs'>mean, not the spread of individual values). p values (†): the difference between arms in change from baseline</text>
+<text x='8.97' y='570.02' style='font-size: 7.20px; fill: #595959; font-family: sans;' textLength='195.31px' lengthAdjust='spacingAndGlyphs'>at each follow-up visit. Not adjusted for multiple comparisons.</text>
 <text x='8.97' y='11.92' style='font-size: 10.80px; font-weight: bold; font-family: sans;' textLength='244.35px' lengthAdjust='spacingAndGlyphs'>ACT means and p values without baseline test, ITT</text>
 </g>
 </svg>

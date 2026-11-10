@@ -818,13 +818,20 @@ compose_trajectory_figure <- function(data, estimates, outcome,
         " in change from baseline (95% CI)."
       )
     },
-    if (show_p) {
+    # Each sentence describes only what the figure shows
+    if (show_p && show_baseline_p) {
       paste(
         "p values: at baseline, the difference between arms; at follow-up",
         "(†), the difference between arms in change from baseline."
       )
     },
-    if (show_p && length(comparisons) > 0) {
+    if (show_p && !show_baseline_p) {
+      paste(
+        "p values (†): the difference between arms in change from baseline",
+        "at each follow-up visit."
+      )
+    },
+    if (length(comparisons) > 0 && (show_p || show_effect_panel)) {
       paste(
         "Between levels: each level's effect minus the first level's",
         "(the reference), not a test across all levels."
