@@ -5,7 +5,7 @@ format: html
 
 Reusable helper functions. Each takes its inputs as arguments and reads nothing else from this project, so `R/functions.R` and `R/plot_style.R` can be copied into another project and used there. Column names, arm names, readable labels and colors are arguments; this project passes its own from [Setup](setup.qmd).
 
-The functions expect one row per participant and visit; an exposure with exactly two groups, the first being the reference; and time as a factor whose levels are visit numbers in increasing order, baseline first. A subgroup can have any number of levels. Data that do not fit stop with a message rather than giving output that cannot be read correctly. They need the tidyverse attached, and lme4, lmerTest, emmeans, gtsummary, patchwork, withr and flextable installed; functions from those packages are called by name, so attaching them is not required. A test runs every function in a fresh R session with only these two files loaded, on invented data with other column names (`tests/synthetic/test_portable.R`).
+The functions expect one row per participant and visit; an exposure with exactly two groups, the first being the reference; and time as a factor whose levels are visit numbers in increasing order, baseline first. A subgroup can have any number of levels. Data that do not fit stop with a message rather than giving output that cannot be read correctly. They need the [{tidyverse}](https://www.tidyverse.org/) attached, and [{lme4}](https://CRAN.R-project.org/package=lme4), [{lmerTest}](https://CRAN.R-project.org/package=lmerTest), [{emmeans}](https://CRAN.R-project.org/package=emmeans), [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/), [{patchwork}](https://patchwork.data-imaginist.com/), [{withr}](https://withr.r-lib.org/) and [{flextable}](https://davidgohel.github.io/flextable/) installed; functions from those packages are called by name, so attaching them is not required. A test runs every function in a fresh R session with only these two files loaded, on invented data with other column names (`tests/synthetic/test_portable.R`).
 
 ::: {.Rcode title="Source code"}
 The full R script is available at:
@@ -41,7 +41,7 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Tabulate model terms
 
-`tabulate_model_terms()` turns a fitted model into a table of its fixed-effect terms with gtsummary's `tbl_regression()`, which takes the estimates, 95% confidence intervals and p-values from the model itself. Variables are named from `figure_labels`, and p-values are written the same way as on the figures. gtsummary shows only the fixed effects of a mixed model, so a note under the table gives the participant and residual standard deviations from `VarCorr()`, and the intraclass correlation (the share of the variance that lies between participants): rarely published, but needed to check the model. [How this code does it](methods_in_this_code.qmd#fitting-and-tables) describes what this table shows and doesn't.
+`tabulate_model_terms()` turns a fitted model into a table of its fixed-effect terms with {gtsummary}'s `tbl_regression()`, which takes the estimates, 95% confidence intervals and p-values from the model itself. Variables are named from `figure_labels`, and p-values are written the same way as on the figures. {gtsummary} shows only the fixed effects of a mixed model, so a note under the table gives the participant and residual standard deviations from `VarCorr()`, and the intraclass correlation (the share of the variance that lies between participants): rarely published, but needed to check the model. [How this code does it](methods_in_this_code.qmd#fitting-and-tables) describes what this table shows and doesn't.
 
 ```{r}
 #| label: tabulate-model-terms
@@ -50,7 +50,7 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Calendar dates
 
-`as_calendar_date()` turns a date column into calendar dates, whatever form it was read in: text such as "2018-05-16", an Excel date (which readxl reads as a date-time in UTC), or a date. A date-time keeps the day recorded in the file and drops any time of day. Comparing a date-time with a date, or turning text into a date-time, depends on the time zone of the computer running the code, so a record near midnight could move to the next day and in or out of a window. Converting once, at import, makes every window give the same answer everywhere; a check in the synthetic tests runs scripts 1 to 3 in three time zones and requires identical results. Text in any other form stops with an error rather than silently becoming missing.
+`as_calendar_date()` turns a date column into calendar dates, whatever form it was read in: text such as "2018-05-16", an Excel date (which [{readxl}](https://readxl.tidyverse.org/) reads as a date-time in UTC), or a date. A date-time keeps the day recorded in the file and drops any time of day. Comparing a date-time with a date, or turning text into a date-time, depends on the time zone of the computer running the code, so a record near midnight could move to the next day and in or out of a window. Converting once, at import, makes every window give the same answer everywhere; a check in the synthetic tests runs scripts 1 to 3 in three time zones and requires identical results. Text in any other form stops with an error rather than silently becoming missing.
 
 ```{r}
 #| label: as-calendar-date
@@ -68,7 +68,7 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Estimate effects
 
-`estimate_effects()` asks emmeans for the numbers the plot needs, from the fitted model and without refitting: the mean in each visit × arm cell (and subgroup level), the arm effect at each visit within each level, and, with a subgroup, how that effect differs between levels. It returns them as tidy tables. [Effects behind an interaction](methods_stratified_effects.qmd) explains the method.
+`estimate_effects()` asks {emmeans} for the numbers the plot needs, from the fitted model and without refitting: the mean in each visit × arm cell (and subgroup level), the arm effect at each visit within each level, and, with a subgroup, how that effect differs between levels. It returns them as tidy tables. [Effects behind an interaction](methods_stratified_effects.qmd) explains the method.
 
 ```{r}
 #| label: estimate-effects
@@ -77,7 +77,7 @@ What the model's coefficients mean is explained in [Longitudinal data and mixed 
 
 ## Tabulate effects
 
-`tabulate_effects()` puts the effects from `estimate_effects()` in a table: the difference between arms at baseline, then the difference between arms in change from baseline at each later visit, each with its 95% confidence interval and p-value. These are the same numbers as the figure's effect panel and † p-values, so table and figure cannot disagree. With a subgroup, each level gets its own group of columns, followed by the difference between each level and the first. gtsummary's `as_gtsummary()` makes the table from those estimates, and `tbl_merge()` puts the levels side by side.
+`tabulate_effects()` puts the effects from `estimate_effects()` in a table: the difference between arms at baseline, then the difference between arms in change from baseline at each later visit, each with its 95% confidence interval and p-value. These are the same numbers as the figure's effect panel and † p-values, so table and figure cannot disagree. With a subgroup, each level gets its own group of columns, followed by the difference between each level and the first. {gtsummary}'s `as_gtsummary()` makes the table from those estimates, and `tbl_merge()` puts the levels side by side.
 
 ```{r}
 #| label: tabulate-effects
@@ -164,7 +164,7 @@ The result is a patchwork object. To change every panel, add to it with `&`, for
 
 ## Save a table
 
-`save_table()` saves one table as a Word file, converting a gtsummary table with `as_flex_table()` first, and creates the folder if needed. [Tables](tables.qmd#export-tables) uses it to save every table.
+`save_table()` saves one table as a Word file, converting a {gtsummary} table with `as_flex_table()` first, and creates the folder if needed. [Tables](tables.qmd#export-tables) uses it to save every table.
 
 ```{r}
 #| label: save-table

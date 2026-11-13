@@ -24,7 +24,7 @@ knitr::read_chunk("../R/setup.R")
 
 A few R symbols recur throughout the site: `<-` stores a result under a name; `%>%` passes the result on the left into the next operation; `$` selects a named column; and `[["name"]]` selects an item from a named list. Read a pipeline from top to bottom, asking how each step changes the rows or columns.
 
-A package supplies functions that R does not provide on its own. `library()` attaches an already installed package for this session; it does not install it. Here, readxl reads spreadsheets, dplyr/tidyr (within tidyverse) reshape data, MASS and lme4 fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.
+A package supplies functions that R does not provide on its own. `library()` attaches an already installed package for this session; it does not install it. Here, [{readxl}](https://readxl.tidyverse.org/) reads spreadsheets, dplyr/tidyr (within [{tidyverse}](https://www.tidyverse.org/)) reshape data, [{MASS}](https://CRAN.R-project.org/package=MASS) and [{lme4}](https://CRAN.R-project.org/package=lme4) fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.
 
 ```{r}
 #| label: load-packages

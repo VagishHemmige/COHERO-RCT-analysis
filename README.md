@@ -24,6 +24,6 @@ https://vagishhemmige.github.io/COHERO-RCT-analysis/
 
 ## Running the analysis
 
-Requires authorized access to the trial data, which are not in this repository. Run `R/main.R` from the project root. Needs the packages attached in `R/setup.R`, plus broom.helpers, which gtsummary's model tables require.
+Requires authorized access to the trial data, which are not in this repository. Run `R/main.R` from the project root. Needs the packages attached in `R/setup.R`, plus [{broom.helpers}](https://larmarange.github.io/broom.helpers/), which [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/)'s model tables require.
 
 <!-- Results: add only when the figures and tables are cleared for public release. -->

@@ -29,7 +29,7 @@ knitr::read_chunk("../R/tables.R")
 
 The baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. `select()` chooses the characteristics to describe and `tbl_summary(by = studyarm)` puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.
 
-`bold_labels()`, captions and `as_flex_table()` change presentation. The [gtsummary tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) shows how to read and customize the defaults [@gtsummarytutorial]. The script saves it with the other tables at the end.
+`bold_labels()`, captions and `as_flex_table()` change presentation. The [{gtsummary} tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) shows how to read and customize the defaults [@gtsummarytutorial]. The script saves it with the other tables at the end.
 
 ```{r}
 #| label: table-1
@@ -47,7 +47,7 @@ This describes the distribution of participant-level counts by arm and stores it
 
 ## Export tables
 
-Every table, from this script and the model scripts, is saved to `tables/` as a Word file, one file per table, with [`save_table()`](functions.qmd#save-a-table), which converts gtsummary tables with `as_flex_table()` and saves them with flextable's `save_as_docx()`. The file name says where the table came from, for example `mixed_model_effects_itt_act_score_overall.docx`. `tables/` is not committed: the tables are made from study data and stay private until they are cleared for release.
+Every table, from this script and the model scripts, is saved to `tables/` as a Word file, one file per table, with [`save_table()`](functions.qmd#save-a-table), which converts {gtsummary} tables with `as_flex_table()` and saves them with [{flextable}](https://davidgohel.github.io/flextable/)'s `save_as_docx()`. The file name says where the table came from, for example `mixed_model_effects_itt_act_score_overall.docx`. `tables/` is not committed: the tables are made from study data and stay private until they are cleared for release.
 
 ```{r}
 #| label: export-tables

@@ -11,11 +11,11 @@ Think of the workflow in three steps: prepare the observations, fit the model, t
 
 [`fit_mixed_model()`](functions.qmd#fit-mixed-model) fits `outcome ~ time_factor * studyarm + (1 | study_id_screening)`, or the three-way version with a subgroup. [5. Fit mixed models](05_fit_mixed_models.qmd) fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.
 
-[`tabulate_model_terms()`](functions.qmd#tabulate-model-terms) shows the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly; [`tabulate_effects()`](functions.qmd#tabulate-effects) does, from the estimates below. Both are gtsummary tables.
+[`tabulate_model_terms()`](functions.qmd#tabulate-model-terms) shows the raw coefficients described on [Longitudinal data and mixed models](methods_longitudinal.qmd) and [Interactions](methods_interactions.qmd): the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly; [`tabulate_effects()`](functions.qmd#tabulate-effects) does, from the estimates below. Both are [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/) tables.
 
 ## Estimates and plots
 
-[`estimate_effects()`](functions.qmd#estimate-effects) takes everything the plot shows from that one fitted model, with emmeans [@lenth2026emmeans]:
+[`estimate_effects()`](functions.qmd#estimate-effects) takes everything the plot shows from that one fitted model, with [{emmeans}](https://CRAN.R-project.org/package=emmeans) [@lenth2026emmeans]:
 
 | Estimate | What it's used for |
 |---|---|
@@ -23,7 +23,7 @@ Think of the workflow in three steps: prepare the observations, fit the model, t
 | Arm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level | The p-values printed above each visit, or in each level's panel |
 | Difference in that effect between each subgroup level and the first level | The row of p-values under each level after the first |
 
-Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)). Using one fit also means the means, the p-values and the table come from the same analysis rows.
+Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; {emmeans} gives the same numbers from the one fit (checked on synthetic data, [#10](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)). Using one fit also means the means, the p-values and the table come from the same analysis rows.
 
 [`compose_trajectory_figure()`](functions.qmd#the-whole-figure) draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with `show_effect_panel = TRUE` it also shows each contrast's estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.
 
