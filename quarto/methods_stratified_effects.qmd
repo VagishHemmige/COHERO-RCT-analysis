@@ -7,11 +7,11 @@ The clinical question is usually “How large is the intervention effect in each
 
 In the [invented interaction example](methods_interactions.qmd), the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.
 
-The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses emmeans in `estimate_effects()` (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.
+The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses [{emmeans}](https://CRAN.R-project.org/package=emmeans) in `estimate_effects()` (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.
 
 ## With emmeans
 
-emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand [@lenth2026emmeans]. For the count model:
+{emmeans} computes these combinations from the fitted model, without refitting and without writing out terms by hand [@lenth2026emmeans]. For the count model:
 
 ```{r}
 #| eval: false
@@ -42,7 +42,7 @@ emmeans(fit_lmer, ~ studyarm * time_factor | prefer_language) %>%
   confint()
 ```
 
-For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.
+For lmer models, {emmeans} chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones [{lmerTest}](https://CRAN.R-project.org/package=lmerTest) reports.
 
 
 Read `~ studyarm | prefer_language` as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an `lmer()` formula. `revpairwise` reverses the usual pairwise direction so the stated factor order gives intervention versus control. `confint()` explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.
@@ -67,7 +67,7 @@ fit_spanish_ref <- glm.nb(
 # exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers
 ```
 
-This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)).
+This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with {emmeans} (see [How this code does it](methods_in_this_code.qmd#estimates-and-plots)).
 
 
 ::: {.callout-note collapse="true" title="Optional: where the interval comes from"}

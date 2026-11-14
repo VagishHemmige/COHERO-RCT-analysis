@@ -91,13 +91,13 @@ Negative binomial regression of each count on arm, with the log of follow-up tim
 
 ### Repeated measures
 
-Linear mixed model for each of ACT, AQLQ, PACQLQ, AFS and self-reported adherence: outcome ~ visit (as a factor) × arm, with a random intercept for participant. Arm-by-visit terms estimate the difference between arms at each visit relative to the baseline difference. P values from lmerTest. Run in ITT and per-protocol populations.
+Linear mixed model for each of ACT, AQLQ, PACQLQ, AFS and self-reported adherence: outcome ~ visit (as a factor) × arm, with a random intercept for participant. Arm-by-visit terms estimate the difference between arms at each visit relative to the baseline difference. P values from [{lmerTest}](https://CRAN.R-project.org/package=lmerTest). Run in ITT and per-protocol populations.
 
 Each model is reported in two tables (decided in #8): its terms, and the arm effect at each visit. The effects table reports the difference between arms at baseline and, at each follow-up visit, the difference between arms in change from baseline (intervention change minus control change), each with its 95% confidence interval and p value; with a subgroup, within each level and as the difference between each level and the first. These are the effects the trajectory figures show.
 
 ### Controller PDC
 
-PDC for the year compared between arms descriptively, with gtsummary's default test, in ITT and per-protocol populations.
+PDC for the year compared between arms descriptively, with [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/)'s default test, in ITT and per-protocol populations.
 
 ### Subgroups (effect modification)
 
@@ -117,7 +117,7 @@ No adjustment for multiple comparisons. Mixed models use all available visits; o
 
 ### Software
 
-R with MASS (negative binomial), lme4 and lmerTest (mixed models), emmeans (effects from the fitted models), broom and broom.mixed, gtsummary and flextable (tables), ggplot2, ggbeeswarm, patchwork and gganimate (figures). Package citations to be added from the analysis machine's `citation()` output.
+R with MASS (negative binomial), [{lme4}](https://CRAN.R-project.org/package=lme4) and {lmerTest} (mixed models), [{emmeans}](https://CRAN.R-project.org/package=emmeans) (effects from the fitted models), [{broom}](https://broom.tidymodels.org/) and [{broom.mixed}](https://CRAN.R-project.org/package=broom.mixed), {gtsummary} and [{flextable}](https://davidgohel.github.io/flextable/) (tables), [{ggplot2}](https://ggplot2.tidyverse.org/), [{ggbeeswarm}](https://CRAN.R-project.org/package=ggbeeswarm), [{patchwork}](https://patchwork.data-imaginist.com/) and [{gganimate}](https://gganimate.com/) (figures). Package citations to be added from the analysis machine's `citation()` output.
 
 ## 8. Disclosure control
 

@@ -9,7 +9,7 @@ This page explains the model behind the repeated-measures outcomes (ACT, AQLQ, P
 
 In a trial with visits at baseline and at several follow-up times, each participant contributes several measurements. Measurements from the same person are more alike than measurements from different people: someone with well-controlled asthma at baseline tends to stay better controlled than average. Treating all rows as independent ignores that relationship and can give incorrect uncertainty estimates; the direction of the error depends on the comparison.
 
-A **linear mixed model** represents this with a participant-specific shift in the expected score, a **random intercept**. The fixed effects describe the average course of each arm over time, and the random intercept absorbs each person's persistent difference from that average. This is the model fitted with lme4 [@bates2015lme4]:
+A **linear mixed model** represents this with a participant-specific shift in the expected score, a **random intercept**. The fixed effects describe the average course of each arm over time, and the random intercept absorbs each person's persistent difference from that average. This is the model fitted with [{lme4}](https://CRAN.R-project.org/package=lme4) [@bates2015lme4]:
 
 ```{r}
 #| eval: false
@@ -111,4 +111,4 @@ In an invented example, 6 events over 60 days and 3 events over 30 days have the
 
 An IRR of 1 means equal modeled rates; an IRR below 1 means a lower rate in the intervention arm, with the direction reversed above 1. A 95% confidence interval crossing 1 includes equal rates among the values compatible with the data and model at that confidence level; it does not prove equivalence.
 
-For technical depth after the examples, [Bates and colleagues](https://www.jstatsoft.org/article/view/v067i01) explain the mixed-model implementation [@bates2015lme4]. The [MASS reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) documents the negative binomial function [@massglmnb].
+For technical depth after the examples, [Bates and colleagues](https://www.jstatsoft.org/article/view/v067i01) explain the mixed-model implementation [@bates2015lme4]. The [{MASS} reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) documents the negative binomial function [@massglmnb].

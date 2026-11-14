@@ -17,6 +17,8 @@ If you have some R and introductory statistics experience, start with [Longitudi
 
 The **Code** pages follow the order of `R/main.R`. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.
 
+[Braces](https://forum.posit.co/t/curly-braces-around-package-name-convention/122547) identify R packages throughout this site.
+
 ## Follow the rows
 
 | Stage | What a row represents | Why it matters |

@@ -29,7 +29,7 @@ knitr::read_chunk("../R/04_fit_count_models.R")
 
 Each input row represents one participant, with a count and a follow-up duration. A `for` loop repeats the same formula for each outcome named in `count_outcomes`. `glm.nb()` fits a negative binomial model, which allows more variation in counts than a Poisson model. `offset(log(followup_time_itt))` accounts for exposure time with its coefficient fixed at one. `tbl_regression(exp = TRUE)` converts log-scale coefficients to rate ratios, and `tbl_stack()` combines the outcome tables.
 
-An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the [MASS function reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) for fitting details [@massglmnb].
+An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the [{MASS} function reference](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html) for fitting details [@massglmnb].
 
 Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in [Longitudinal data and mixed models](methods_longitudinal.qmd#count-outcomes-are-different).
 
@@ -60,7 +60,7 @@ These additional fits were retained from the earlier analysis. Their formula use
 
 ## Controller PDC comparison
 
-PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. `add_p()` asks gtsummary to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The [gtsummary tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) explains summary statistics, missing rows and test annotations [@gtsummarytutorial].
+PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. `add_p()` asks [{gtsummary}](https://www.danieldsjoberg.com/gtsummary/) to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The [{gtsummary} tutorial](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html) explains summary statistics, missing rows and test annotations [@gtsummarytutorial].
 
 ```{r}
 #| label: controller-pdc-comparison

@@ -45,7 +45,7 @@ ACT denotes the asthma-control score used in the code. In the visit panels, each
 
 ## Count outcome plots
 
-The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. `aes()` maps variables to positions and colors, while `geom_*()` chooses marks. The [ggplot2 introduction](https://ggplot2.tidyverse.org/articles/ggplot2.html) explains this layering [@ggplotintro].
+The loop creates one plot per count outcome and saves it under that outcome's name. Each point is a participant-level count. The plot makes skewness, many zeros and unusually large counts visible; it neither adjusts for follow-up nor establishes that an unusual value is an error. `aes()` maps variables to positions and colors, while `geom_*()` chooses marks. The [{ggplot2} introduction](https://ggplot2.tidyverse.org/articles/ggplot2.html) explains this layering [@ggplotintro].
 
 ```{r}
 #| label: count-outcome-plots

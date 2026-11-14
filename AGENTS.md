@@ -19,7 +19,7 @@ Analysis of the EM-ASTHMA pilot randomized trial of the COHERO mobile app for as
 
 - **`analysis-plan.md` is the source of truth for design.** Code implements the plan; it does not redefine it. If code needs to depart from the plan, open a decision issue, or comment on the existing one, for the deciders. Once a decider has settled it (in the issue, or relayed there in their exact words), the plan change and the code can go in the same pull request, which closes the issue.
 - **Deciders.** Scientific decisions are made by: Vagish Hemmige (all areas, for now). Co-investigators and their areas are still to be added. Anyone may open or contribute to a decision issue; only a decider settles it (see "Working with agents").
-- **This is an analysis project, not an R package.** Do not add DESCRIPTION, NAMESPACE, roxygen, or pkgdown infrastructure, or apply CRAN conventions.
+- **This is an analysis project, not an R package.** Do not add DESCRIPTION, NAMESPACE, roxygen, or [{pkgdown}](https://pkgdown.r-lib.org/) infrastructure, or apply CRAN conventions.
 - **Default branch:** `main`, to be protected. Changes reach it only through pull requests.
 
 ## Data sources
@@ -37,7 +37,7 @@ To allow more for a source, a person changes its row through a pull request, nam
 
 **For a source with no package:** the one loading script records the file, its export or edit date (in the filename for now), and any processing. Verify variables, codes (including 999 for missing) and scale scoring against the REDCap data dictionary and the instruments' scoring manuals, not from variable names. Facts about a source that this project relies on go in `references/` with a citation, or in the plan when they shape a decision.
 
-**For external packages** (readxl, lme4, MASS and the rest): work around problems here. Wrap the function in `R/functions.R` with a comment explaining the problem and linking any upstream issue. Reporting a bug upstream is an external communication; the person directing the work decides whether to file it. Read a package's documentation for the installed version before writing code that uses it.
+**For external packages** ([{readxl}](https://readxl.tidyverse.org/), [{lme4}](https://CRAN.R-project.org/package=lme4), [{MASS}](https://CRAN.R-project.org/package=MASS) and the rest): work around problems here. Wrap the function in `R/functions.R` with a comment explaining the problem and linking any upstream issue. Reporting a bug upstream is an external communication; the person directing the work decides whether to file it. Read a package's documentation for the installed version before writing code that uses it.
 
 ## Exploration and definitive analysis
 
@@ -98,7 +98,7 @@ The **Access** column of "Data sources" says which sources are restricted. All f
 
 ## Coding conventions
 
-- **Participant flow.** When the cleaning code is rewritten after the port, the CONSORT flow diagram and the analysis populations come from the same code, using the `flowchart` package: every exclusion goes through `fc_filter()`, in the plan's order, and flowchart labels are built from constants in `setup.R`. Record-level processing (relabeling inhaler records, choosing among a participant's records) is fine outside the flowchart.
+- **Participant flow.** When the cleaning code is rewritten after the port, the CONSORT flow diagram and the analysis populations come from the same code, using the [{flowchart}](https://bruigtp.github.io/flowchart/) package: every exclusion goes through `fc_filter()`, in the plan's order, and flowchart labels are built from constants in `setup.R`. Record-level processing (relabeling inhaler records, choosing among a participant's records) is fine outside the flowchart.
 - **Code lists** (scale items, inhaler names) carry their source. Check each against the data dictionary or instrument. Never invent codes, variables, files, or definitions.
 - **Joins** use `join_by()` with an explicit `relationship` where possible. After every join of records to participants, assert that rows did not multiply, and decide deliberately what happens to unmatched rows.
 - **Dates and windows** are written as inclusive intervals matching the plan, and the edges are tested on synthetic data.
