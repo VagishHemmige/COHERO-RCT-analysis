@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -142,17 +142,6 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   content: '📊';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
-}
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
-}
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -162,6 +151,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
+}
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
+}
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 </style>
@@ -449,7 +449,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 <section id="count-models" class="level2">
 <h2 class="anchored" data-anchor-id="count-models">Count models</h2>
 <p>Each input row represents one participant, with a count and a follow-up duration. A <code>for</code> loop repeats the same formula for each outcome named in <code>count_outcomes</code>. <code>glm.nb()</code> fits a negative binomial model, which allows more variation in counts than a Poisson model. <code>offset(log(followup_time_itt))</code> accounts for exposure time with its coefficient fixed at one. <code>tbl_regression(exp = TRUE)</code> converts log-scale coefficients to rate ratios, and <code>tbl_stack()</code> combines the outcome tables.</p>
-<p>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html">MASS function reference</a> for fitting details <span class="citation" data-cites="massglmnb">(<a href="#ref-massglmnb" role="doc-biblioref">MASS authors, n.d.</a>)</span>.</p>
+<p>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <a href="https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html">{MASS} function reference</a> for fitting details <span class="citation" data-cites="massglmnb">(<a href="#ref-massglmnb" role="doc-biblioref">MASS authors, n.d.</a>)</span>.</p>
 <p>Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in <a href="../quarto/methods_longitudinal.html#count-outcomes-are-different">Longitudinal data and mixed models</a>.</p>
 <div class="cell">
 <details class="code-fold">
@@ -550,7 +550,7 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
 </section>
 <section id="controller-pdc-comparison" class="level2">
 <h2 class="anchored" data-anchor-id="controller-pdc-comparison">Controller PDC comparison</h2>
-<p>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <code>add_p()</code> asks gtsummary to choose its default comparison test. The resulting table’s footnote identifies the test; readers should not assume it is a t test. The <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">gtsummary tutorial</a> explains summary statistics, missing rows and test annotations <span class="citation" data-cites="gtsummarytutorial">(<a href="#ref-gtsummarytutorial" role="doc-biblioref"><span class="nocase">gtsummary authors</span>, n.d.</a>)</span>.</p>
+<p>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <code>add_p()</code> asks <a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a> to choose its default comparison test. The resulting table’s footnote identifies the test; readers should not assume it is a t test. The <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">{gtsummary} tutorial</a> explains summary statistics, missing rows and test annotations <span class="citation" data-cites="gtsummarytutorial">(<a href="#ref-gtsummarytutorial" role="doc-biblioref"><span class="nocase">gtsummary authors</span>, n.d.</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1070,7 +1070,7 @@ MASS authors. n.d. <em>Fit a Negative Binomial Generalized Linear Model</em>. Ac
 <span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>Each input row represents one participant, with a count and a follow-up duration. A <span class="in">`for`</span> loop repeats the same formula for each outcome named in <span class="in">`count_outcomes`</span>. <span class="in">`glm.nb()`</span> fits a negative binomial model, which allows more variation in counts than a Poisson model. <span class="in">`offset(log(followup_time_itt))`</span> accounts for exposure time with its coefficient fixed at one. <span class="in">`tbl_regression(exp = TRUE)`</span> converts log-scale coefficients to rate ratios, and <span class="in">`tbl_stack()`</span> combines the outcome tables.</span>
 <span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <span class="co">[</span><span class="ot">MASS function reference</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html)</span> for fitting details <span class="co">[</span><span class="ot">@massglmnb</span><span class="co">]</span>.</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>An invented rate ratio of 0.80 means a rate 20% lower in the intervention arm; it does not mean 20% fewer participants had an event. The confidence interval describes the precision of that estimated ratio. See the <span class="co">[</span><span class="ot">{MASS} function reference</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/glm.nb.html)</span> for fitting details <span class="co">[</span><span class="ot">@massglmnb</span><span class="co">]</span>.</span>
 <span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>Why the offset turns counts into rates, and why the exponentiated coefficients are incidence rate ratios, is in <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd#count-outcomes-are-different)</span>.</span>
 <span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
@@ -1101,7 +1101,7 @@ MASS authors. n.d. <em>Fit a Negative Binomial Generalized Linear Model</em>. Ac
 <span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Controller PDC comparison</span></span>
 <span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <span class="in">`add_p()`</span> asks gtsummary to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The <span class="co">[</span><span class="ot">gtsummary tutorial</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)</span> explains summary statistics, missing rows and test annotations <span class="co">[</span><span class="ot">@gtsummarytutorial</span><span class="co">]</span>.</span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>PDC is a proportion for each participant, so this block summarizes it by arm rather than fitting the count model above. <span class="in">`add_p()`</span> asks <span class="co">[</span><span class="ot">{gtsummary}</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span> to choose its default comparison test. The resulting table's footnote identifies the test; readers should not assume it is a t test. The <span class="co">[</span><span class="ot">{gtsummary} tutorial</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)</span> explains summary statistics, missing rows and test annotations <span class="co">[</span><span class="ot">@gtsummarytutorial</span><span class="co">]</span>.</span>
 <span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: controller-pdc-comparison</span></span>

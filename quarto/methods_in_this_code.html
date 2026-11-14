@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -131,15 +131,15 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Pending.callout {
-  border-left-color: #f0c400;
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
 }
-div.callout-Pending.callout-style-default > .callout-header {
-  background-color: rgba(240, 196, 0, 0.13);
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
 }
-div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
-  content: '⏳';
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Results.callout {
@@ -153,15 +153,15 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
   content: '📊';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
+div.callout-Pending.callout {
+  border-left-color: #f0c400;
 }
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
+div.callout-Pending.callout-style-default > .callout-header {
+  background-color: rgba(240, 196, 0, 0.13);
 }
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
+div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
+  content: '⏳';
   background-image: none;
 }
 </style>
@@ -428,11 +428,11 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <section id="fitting-and-tables" class="level2">
 <h2 class="anchored" data-anchor-id="fitting-and-tables">Fitting and tables</h2>
 <p><a href="../quarto/functions.html#fit-mixed-model"><code>fit_mixed_model()</code></a> fits <code>outcome ~ time_factor * studyarm + (1 | study_id_screening)</code>, or the three-way version with a subgroup. <a href="../quarto/05_fit_mixed_models.html">5. Fit mixed models</a> fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.</p>
-<p><a href="../quarto/functions.html#tabulate-model-terms"><code>tabulate_model_terms()</code></a> shows the raw coefficients described on <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a> and <a href="../quarto/methods_interactions.html">Interactions</a>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn’t show the arm effect in each subgroup level directly; <a href="../quarto/functions.html#tabulate-effects"><code>tabulate_effects()</code></a> does, from the estimates below. Both are gtsummary tables.</p>
+<p><a href="../quarto/functions.html#tabulate-model-terms"><code>tabulate_model_terms()</code></a> shows the raw coefficients described on <a href="../quarto/methods_longitudinal.html">Longitudinal data and mixed models</a> and <a href="../quarto/methods_interactions.html">Interactions</a>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn’t show the arm effect in each subgroup level directly; <a href="../quarto/functions.html#tabulate-effects"><code>tabulate_effects()</code></a> does, from the estimates below. Both are <a href="https://www.danieldsjoberg.com/gtsummary/">{gtsummary}</a> tables.</p>
 </section>
 <section id="estimates-and-plots" class="level2">
 <h2 class="anchored" data-anchor-id="estimates-and-plots">Estimates and plots</h2>
-<p><a href="../quarto/functions.html#estimate-effects"><code>estimate_effects()</code></a> takes everything the plot shows from that one fitted model, with emmeans <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>:</p>
+<p><a href="../quarto/functions.html#estimate-effects"><code>estimate_effects()</code></a> takes everything the plot shows from that one fitted model, with <a href="https://CRAN.R-project.org/package=emmeans">{emmeans}</a> <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>:</p>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -459,7 +459,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </tr>
 </tbody>
 </table>
-<p>Degrees of freedom are Satterthwaite’s, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10">#10</a>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</p>
+<p>Degrees of freedom are Satterthwaite’s, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; {emmeans} gives the same numbers from the one fit (checked on synthetic data, <a href="https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10">#10</a>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</p>
 <p><a href="../quarto/functions.html#the-whole-figure"><code>compose_trajectory_figure()</code></a> draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with <code>show_effect_panel = TRUE</code> it also shows each contrast’s estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</p>
 <p>To read a plot, first identify the outcome, population, visit and subgroup. Then distinguish the individual observations, the fitted mean and its interval, and the particular contrast tested by each p-value. A visually separated pair of mean intervals is not a substitute for the corresponding contrast calculation.</p>
 </section>
@@ -961,11 +961,11 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`fit_mixed_model()`</span><span class="co">](functions.qmd#fit-mixed-model)</span> fits <span class="in">`outcome ~ time_factor * studyarm + (1 | study_id_screening)`</span>, or the three-way version with a subgroup. <span class="co">[</span><span class="ot">5. Fit mixed models</span><span class="co">](05_fit_mixed_models.qmd)</span> fits each of the 56 analyses once: 5 outcomes overall, 5 outcomes × 4 subgroups, and 3 outcomes by child or adult, each in the intention-to-treat and per-protocol populations. Each fitted model then goes to the table, the estimates and, through the estimates, the plot.</span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`tabulate_model_terms()`</span><span class="co">](functions.qmd#tabulate-model-terms)</span> shows the raw coefficients described on <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly; <span class="co">[</span><span class="ot">`tabulate_effects()`</span><span class="co">](functions.qmd#tabulate-effects)</span> does, from the estimates below. Both are gtsummary tables.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`tabulate_model_terms()`</span><span class="co">](functions.qmd#tabulate-model-terms)</span> shows the raw coefficients described on <span class="co">[</span><span class="ot">Longitudinal data and mixed models</span><span class="co">](methods_longitudinal.qmd)</span> and <span class="co">[</span><span class="ot">Interactions</span><span class="co">](methods_interactions.qmd)</span>: the baseline arm difference, the change-from-baseline differences at each visit, and the interaction terms. It doesn't show the arm effect in each subgroup level directly; <span class="co">[</span><span class="ot">`tabulate_effects()`</span><span class="co">](functions.qmd#tabulate-effects)</span> does, from the estimates below. Both are <span class="co">[</span><span class="ot">{gtsummary}</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/)</span> tables.</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="fu">## Estimates and plots</span></span>
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`estimate_effects()`</span><span class="co">](functions.qmd#estimate-effects)</span> takes everything the plot shows from that one fitted model, with emmeans <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`estimate_effects()`</span><span class="co">](functions.qmd#estimate-effects)</span> takes everything the plot shows from that one fitted model, with <span class="co">[</span><span class="ot">{emmeans}</span><span class="co">](https://CRAN.R-project.org/package=emmeans)</span> <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>:</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Estimate <span class="pp">|</span> What it's used for <span class="pp">|</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
@@ -973,7 +973,7 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Arm difference at baseline, and the visit × arm interaction at each follow-up (marked †), within each subgroup level <span class="pp">|</span> The p-values printed above each visit, or in each level's panel <span class="pp">|</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Difference in that effect between each subgroup level and the first level <span class="pp">|</span> The row of p-values under each level after the first <span class="pp">|</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; emmeans gives the same numbers from the one fit (checked on synthetic data, <span class="co">[</span><span class="ot">#10</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)</span>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>Degrees of freedom are Satterthwaite's, the same method as the model table, and p-values are not adjusted for multiplicity. An earlier version of the code refitted the same model in up to three other codings to read these numbers off as coefficients; {emmeans} gives the same numbers from the one fit (checked on synthetic data, <span class="co">[</span><span class="ot">#10</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues/10)</span>). Using one fit also means the means, the p-values and the table come from the same analysis rows.</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">`compose_trajectory_figure()`</span><span class="co">](functions.qmd#the-whole-figure)</span> draws those estimates, optionally over the individual trajectories. It fits nothing. By default it shows the means and the p-values for the contrasts; with <span class="in">`show_effect_panel = TRUE`</span> it also shows each contrast's estimate and 95% confidence interval. At follow-up, the dagger-marked p-values concern change from baseline, not just the gap between the plotted means.</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>

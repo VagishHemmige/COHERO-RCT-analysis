@@ -101,7 +101,7 @@ div.csl-indent {
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -130,15 +130,15 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
+div.callout-Rcode.callout {
+  border-left-color: #d63384;
 }
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
+div.callout-Rcode.callout-style-default > .callout-header {
+  background-color: rgba(214, 51, 132, 0.13);
 }
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
+div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
+  content: '💻';
   background-image: none;
 }
 div.callout-Pending.callout {
@@ -152,15 +152,15 @@ div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pen
   content: '⏳';
   background-image: none;
 }
-div.callout-Rcode.callout {
-  border-left-color: #d63384;
+div.callout-Results.callout {
+  border-left-color: #198754;
 }
-div.callout-Rcode.callout-style-default > .callout-header {
-  background-color: rgba(214, 51, 132, 0.13);
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
 }
-div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
-  content: '💻';
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -433,6 +433,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <h2 class="anchored" data-anchor-id="how-to-read-this-site">How to read this site</h2>
 <p>If you have some R and introductory statistics experience, start with <a href="./quarto/methods_longitudinal.html">Longitudinal data and mixed models</a>. Then read <a href="./quarto/methods_interactions.html">Interactions</a> and <a href="./quarto/methods_interaction_p_values.html">What a p-value for interaction means</a>. You can skip the optional algebra in <a href="./quarto/methods_stratified_effects.html">Effects behind an interaction</a> on a first pass.</p>
 <p>The <strong>Code</strong> pages follow the order of <code>R/main.R</code>. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.</p>
+<p><a href="https://forum.posit.co/t/curly-braces-around-package-name-convention/122547">Braces</a> identify R packages throughout this site.</p>
 </section>
 <section id="follow-the-rows" class="level2">
 <h2 class="anchored" data-anchor-id="follow-the-rows">Follow the rows</h2>
@@ -1024,38 +1025,40 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>The **Code** pages follow the order of <span class="in">`R/main.R`</span>. Each explains the input, the operation and the output before showing code imported from the actual script. Code is folded so you can read the explanation first. Opening a code block does not run it. The Methods examples use illustrative object names and invented numbers; they are not copy-and-run analyses of this trial.</span>
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Follow the rows</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Braces</span><span class="co">](https://forum.posit.co/t/curly-braces-around-package-name-convention/122547)</span> identify R packages throughout this site.</span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Stage <span class="pp">|</span> What a row represents <span class="pp">|</span> Why it matters <span class="pp">|</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Imported visit data <span class="pp">|</span> A participant at a recorded visit <span class="pp">|</span> Several rows can belong to the same person <span class="pp">|</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> App medication records <span class="pp">|</span> A recorded medication event <span class="pp">|</span> Many records must be summarized before comparing participants <span class="pp">|</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Participant-day grid <span class="pp">|</span> A candidate day for a participant <span class="pp">|</span> Days without records affect the adherence denominator <span class="pp">|</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Count-model data <span class="pp">|</span> A participant with counts and follow-up time <span class="pp">|</span> Time at risk matters when comparing counts <span class="pp">|</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mixed-model data <span class="pp">|</span> A participant at a visit <span class="pp">|</span> The model accounts for repeated measurements within a person <span class="pp">|</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>The grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Follow the rows</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Stage <span class="pp">|</span> What a row represents <span class="pp">|</span> Why it matters <span class="pp">|</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Imported visit data <span class="pp">|</span> A participant at a recorded visit <span class="pp">|</span> Several rows can belong to the same person <span class="pp">|</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> App medication records <span class="pp">|</span> A recorded medication event <span class="pp">|</span> Many records must be summarized before comparing participants <span class="pp">|</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Participant-day grid <span class="pp">|</span> A candidate day for a participant <span class="pp">|</span> Days without records affect the adherence denominator <span class="pp">|</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Count-model data <span class="pp">|</span> A participant with counts and follow-up time <span class="pp">|</span> Time at risk matters when comparing counts <span class="pp">|</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mixed-model data <span class="pp">|</span> A participant at a visit <span class="pp">|</span> The model accounts for repeated measurements within a person <span class="pp">|</span></span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Terms used throughout</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>The grid and several other derivations still have issues under review. The pages describe the present code rather than assuming those issues are fixed.</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Term <span class="pp">|</span> Meaning here <span class="pp">|</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Arm <span class="pp">|</span> The assigned intervention or control group <span class="pp">|</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Baseline <span class="pp">|</span> The starting assessment <span class="pp">|</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Intention to treat (ITT) <span class="pp">|</span> Comparing participants by assigned arm, using available observations <span class="pp">|</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Per protocol (PP) <span class="pp">|</span> This project's restriction to observations on or before the app-glitch cutoff; not a general definition of adherence <span class="pp">|</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Subgroup <span class="pp">|</span> A participant characteristic used to ask whether the arm effect differs between groups <span class="pp">|</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ACT / AQLQ / PACQLQ / AFS <span class="pp">|</span> Code labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification <span class="pp">|</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PDC <span class="pp">|</span> Proportion of days covered; here calculated from recorded controller use, as explained on the medication page <span class="pp">|</span></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Confidence interval <span class="pp">|</span> An interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions <span class="pp">|</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>For R syntax, <span class="co">[</span><span class="ot">R for Data Science</span><span class="co">](https://r4ds.hadley.nz/)</span> is a free reference with worked examples <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>. You only need the linked topic when it helps with the section you are reading.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Terms used throughout</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Term <span class="pp">|</span> Meaning here <span class="pp">|</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Arm <span class="pp">|</span> The assigned intervention or control group <span class="pp">|</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Baseline <span class="pp">|</span> The starting assessment <span class="pp">|</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Intention to treat (ITT) <span class="pp">|</span> Comparing participants by assigned arm, using available observations <span class="pp">|</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Per protocol (PP) <span class="pp">|</span> This project's restriction to observations on or before the app-glitch cutoff; not a general definition of adherence <span class="pp">|</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Subgroup <span class="pp">|</span> A participant characteristic used to ask whether the arm effect differs between groups <span class="pp">|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ACT / AQLQ / PACQLQ / AFS <span class="pp">|</span> Code labels for asthma control, adult quality of life, caregiver quality of life, and activity limitation; exact instrument versions and scoring rules still need verification <span class="pp">|</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PDC <span class="pp">|</span> Proportion of days covered; here calculated from recorded controller use, as explained on the medication page <span class="pp">|</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Confidence interval <span class="pp">|</span> An interval describing uncertainty in an estimated effect; its meaning depends on the model and assumptions <span class="pp">|</span></span>
 <span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Status</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>For R syntax, <span class="co">[</span><span class="ot">R for Data Science</span><span class="co">](https://r4ds.hadley.nz/)</span> is a free reference with worked examples <span class="co">[</span><span class="ot">@r4ds2</span><span class="co">]</span>. You only need the linked topic when it helps with the section you are reading.</span>
 <span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>The project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in <span class="co">[</span><span class="ot">Issues</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues)</span>.</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Status</span></span>
 <span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span> records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>The project is being ported from an earlier R Markdown analysis into plain R scripts. The pipeline has completed a synthetic-data check; that checks execution on invented inputs, not agreement with the original analysis or validity on study data. Known defects and decisions are tracked in <span class="co">[</span><span class="ot">Issues</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/issues)</span>.</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">analysis plan</span><span class="co">](https://github.com/VagishHemmige/COHERO-RCT-analysis/blob/main/analysis-plan.md)</span> records the scientific specification retrospectively. The study files and participant-derived outputs are not provided on this site. Clinical background and study-design pages will follow when the necessary source information is available.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -142,17 +142,6 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
   content: '💻';
   background-image: none;
 }
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -162,6 +151,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -453,10 +453,10 @@ window.Quarto = {
 
 <p>The clinical question is usually “How large is the intervention effect in each subgroup, and how uncertain is it?” A model’s printed coefficient table may not answer that directly. A <strong>contrast</strong> is a requested comparison of model estimates, such as intervention minus control within a subgroup.</p>
 <p>In the <a href="../quarto/methods_interactions.html">invented interaction example</a>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</p>
-<p>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build. The analysis itself uses emmeans in <code>estimate_effects()</code> (see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</p>
+<p>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site’s build. The analysis itself uses <a href="https://CRAN.R-project.org/package=emmeans">{emmeans}</a> in <code>estimate_effects()</code> (see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</p>
 <section id="with-emmeans" class="level2">
 <h2 class="anchored" data-anchor-id="with-emmeans">With emmeans</h2>
-<p>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. For the count model:</p>
+<p>{emmeans} computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. For the count model:</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -486,7 +486,7 @@ window.Quarto = {
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<p>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</p>
+<p>For lmer models, {emmeans} chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones <a href="https://CRAN.R-project.org/package=lmerTest">{lmerTest}</a> reports.</p>
 <p>Read <code>~ studyarm | prefer_language</code> as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an <code>lmer()</code> formula. <code>revpairwise</code> reverses the usual pairwise direction so the stated factor order gives intervention versus control. <code>confint()</code> explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.</p>
 <p>For a count outcome, a wholly invented output of ratio 0.80 with interval 0.60–1.07 would indicate an estimated 20% lower rate, with uncertainty extending from a lower rate to a slightly higher rate. For a score outcome, a difference of 2 points is measured in that score’s units. An interval for a mean or contrast is not the range of scores expected for individual participants.</p>
 <p>Start with the package’s <a href="https://rvlenth.github.io/emmeans/articles/AQuickStart.html">quick-start guide</a>. The <a href="https://rvlenth.github.io/emmeans/reference/summary.emmGrid.html">interval and summary reference</a> explains <code>confint()</code>, scales and inference options <span class="citation" data-cites="lenth2026emmeans">(<a href="#ref-lenth2026emmeans" role="doc-biblioref">Lenth and Piaskowski 2026</a>)</span>. These examples were checked against the published 2.0.5 documentation; they still need execution on synthetic data in this project.</p>
@@ -507,7 +507,7 @@ window.Quarto = {
 <span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<p>This is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a>).</p>
+<p>This is the same model, coded differently: it fits identically, and the interaction p-value doesn’t change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with {emmeans} (see <a href="../quarto/methods_in_this_code.html#estimates-and-plots">How this code does it</a>).</p>
 <div class="callout callout-style-default callout-note callout-titled" title="Optional: where the interval comes from">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -1035,11 +1035,11 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>In the <span class="co">[</span><span class="ot">invented interaction example</span><span class="co">](methods_interactions.qmd)</span>, the subgroup IRRs were 0.80 and 1.00. Those are the effects to report, with intervals, alongside the test comparing them. You do not need to calculate a covariance matrix by hand to extract them.</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses emmeans in <span class="in">`estimate_effects()`</span> (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>The code below is illustrative, displayed without execution, and assumes models have already been fitted with the variables shown. It does not run in this site's build. The analysis itself uses <span class="co">[</span><span class="ot">{emmeans}</span><span class="co">](https://CRAN.R-project.org/package=emmeans)</span> in <span class="in">`estimate_effects()`</span> (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span>). The intended ordering is control then intervention, and baseline then follow-up visits; changing the factor order can reverse a comparison.</span>
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## With emmeans</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>emmeans computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>. For the count model:</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>{emmeans} computes these combinations from the fitted model, without refitting and without writing out terms by hand <span class="co">[</span><span class="ot">@lenth2026emmeans</span><span class="co">]</span>. For the count model:</span>
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
@@ -1070,7 +1070,7 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">confint</span>()</span>
 <span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>For lmer models, emmeans chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones lmerTest reports.</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>For lmer models, {emmeans} chooses its own degrees-of-freedom method (Kenward–Roger or Satterthwaite; see its documentation), so p-values can differ slightly from the ones <span class="co">[</span><span class="ot">{lmerTest}</span><span class="co">](https://CRAN.R-project.org/package=lmerTest)</span> reports.</span>
 <span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>Read <span class="in">`~ studyarm | prefer_language`</span> as “compare arms separately within each language.” Here the vertical bar groups requested comparisons; it is not the random-intercept notation in an <span class="in">`lmer()`</span> formula. <span class="in">`revpairwise`</span> reverses the usual pairwise direction so the stated factor order gives intervention versus control. <span class="in">`confint()`</span> explicitly requests confidence intervals. Check the printed contrast labels before interpreting the signs or ratios.</span>
@@ -1095,7 +1095,7 @@ Lenth, Russell V., and Julia Piaskowski. 2026. <em>Emmeans: Estimated Marginal M
 <span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a><span class="co"># exp(coef(fit_spanish_ref)["studyarm1"]) is now the IRR in Spanish speakers</span></span>
 <span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with emmeans (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span>).</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a>This is the same model, coded differently: it fits identically, and the interaction p-value doesn't change. An earlier version of the plotting function used a related idea, rewriting the formula to expose subgroup-specific terms directly; the code now takes those effects from the fitted model with {emmeans} (see <span class="co">[</span><span class="ot">How this code does it</span><span class="co">](methods_in_this_code.qmd#estimates-and-plots)</span>).</span>
 <span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="Optional: where the interval comes from"}</span>

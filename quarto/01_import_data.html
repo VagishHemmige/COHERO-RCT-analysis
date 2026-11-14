@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -131,6 +131,17 @@ div.csl-indent {
   }
 }</script>
 <style>
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
+  background-image: none;
+}
 div.callout-Rcode.callout {
   border-left-color: #d63384;
 }
@@ -151,17 +162,6 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
-  background-image: none;
-}
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
   background-image: none;
 }
 </style>
@@ -497,7 +497,7 @@ div.callout-Results.callout-style-default .callout-icon::before, div.callout-Res
 </section>
 <section id="import-medications" class="level2">
 <h2 class="anchored" data-anchor-id="import-medications">Import medications</h2>
-<p>This reads individual app medication records into <code>raw_medications</code>; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. <a href="../quarto/03_derive_medication_outcomes.html">Derive medication outcomes</a> will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. Each record’s <code>PuffDate</code> is read as a date-time and then kept as its calendar day, so a record counts on the day it was recorded, and windows such as “on or before the glitch date” give the same answer on any computer. readxl’s <a href="https://readxl.tidyverse.org/articles/cell-and-column-types.html">column-type guide</a> explains what happens when spreadsheet cells and requested types disagree <span class="citation" data-cites="readxltypes">(<a href="#ref-readxltypes" role="doc-biblioref"><span class="nocase">readxl authors</span>, n.d.</a>)</span>.</p>
+<p>This reads individual app medication records into <code>raw_medications</code>; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. <a href="../quarto/03_derive_medication_outcomes.html">Derive medication outcomes</a> will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. Each record’s <code>PuffDate</code> is read as a date-time and then kept as its calendar day, so a record counts on the day it was recorded, and windows such as “on or before the glitch date” give the same answer on any computer. <a href="https://readxl.tidyverse.org/">{readxl}</a>’s <a href="https://readxl.tidyverse.org/articles/cell-and-column-types.html">column-type guide</a> explains what happens when spreadsheet cells and requested types disagree <span class="citation" data-cites="readxltypes">(<a href="#ref-readxltypes" role="doc-biblioref"><span class="nocase">readxl authors</span>, n.d.</a>)</span>.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1072,7 +1072,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## Import medications</span></span>
 <span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>This reads individual app medication records into <span class="in">`raw_medications`</span>; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. <span class="co">[</span><span class="ot">Derive medication outcomes</span><span class="co">](03_derive_medication_outcomes.qmd)</span> will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. Each record's <span class="in">`PuffDate`</span> is read as a date-time and then kept as its calendar day, so a record counts on the day it was recorded, and windows such as "on or before the glitch date" give the same answer on any computer. readxl's <span class="co">[</span><span class="ot">column-type guide</span><span class="co">](https://readxl.tidyverse.org/articles/cell-and-column-types.html)</span> explains what happens when spreadsheet cells and requested types disagree <span class="co">[</span><span class="ot">@readxltypes</span><span class="co">]</span>.</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>This reads individual app medication records into <span class="in">`raw_medications`</span>; a participant can contribute many rows. This is a different unit of observation from a visit or a participant. <span class="co">[</span><span class="ot">Derive medication outcomes</span><span class="co">](03_derive_medication_outcomes.qmd)</span> will aggregate these records. The current import suppresses warnings, so absence of a displayed warning does not verify that every cell was parsed correctly. Each record's <span class="in">`PuffDate`</span> is read as a date-time and then kept as its calendar day, so a record counts on the day it was recorded, and windows such as "on or before the glitch date" give the same answer on any computer. <span class="co">[</span><span class="ot">{readxl}</span><span class="co">](https://readxl.tidyverse.org/)</span>'s <span class="co">[</span><span class="ot">column-type guide</span><span class="co">](https://readxl.tidyverse.org/articles/cell-and-column-types.html)</span> explains what happens when spreadsheet cells and requested types disagree <span class="co">[</span><span class="ot">@readxltypes</span><span class="co">]</span>.</span>
 <span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: import-medications</span></span>

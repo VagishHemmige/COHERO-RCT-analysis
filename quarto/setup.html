@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -151,6 +140,17 @@ div.callout-Pending.callout-style-default > .callout-header {
 div.callout-Pending .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Pending.callout-style-default .callout-icon::before, div.callout-Pending.callout-titled .callout-icon::before {
   content: '⏳';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 div.callout-Rcode.callout {
@@ -445,7 +445,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <section id="load-packages" class="level2">
 <h2 class="anchored" data-anchor-id="load-packages">Load packages</h2>
 <p>A few R symbols recur throughout the site: <code>&lt;-</code> stores a result under a name; <code>%&gt;%</code> passes the result on the left into the next operation; <code>$</code> selects a named column; and <code>[["name"]]</code> selects an item from a named list. Read a pipeline from top to bottom, asking how each step changes the rows or columns.</p>
-<p>A package supplies functions that R does not provide on its own. <code>library()</code> attaches an already installed package for this session; it does not install it. Here, readxl reads spreadsheets, dplyr/tidyr (within tidyverse) reshape data, MASS and lme4 fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.</p>
+<p>A package supplies functions that R does not provide on its own. <code>library()</code> attaches an already installed package for this session; it does not install it. Here, <a href="https://readxl.tidyverse.org/">{readxl}</a> reads spreadsheets, dplyr/tidyr (within <a href="https://www.tidyverse.org/">{tidyverse}</a>) reshape data, <a href="https://CRAN.R-project.org/package=MASS">{MASS}</a> and <a href="https://CRAN.R-project.org/package=lme4">{lme4}</a> fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1233,7 +1233,7 @@ Wickham, Hadley, Mine Çetinkaya-Rundel, and Garrett Grolemund. 2023. <em>R for 
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>A few R symbols recur throughout the site: <span class="in">`&lt;-`</span> stores a result under a name; <span class="in">`%&gt;%`</span> passes the result on the left into the next operation; <span class="in">`$`</span> selects a named column; and <span class="in">`[["name"]]`</span> selects an item from a named list. Read a pipeline from top to bottom, asking how each step changes the rows or columns.</span>
 <span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>A package supplies functions that R does not provide on its own. <span class="in">`library()`</span> attaches an already installed package for this session; it does not install it. Here, readxl reads spreadsheets, dplyr/tidyr (within tidyverse) reshape data, MASS and lme4 fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>A package supplies functions that R does not provide on its own. <span class="in">`library()`</span> attaches an already installed package for this session; it does not install it. Here, <span class="co">[</span><span class="ot">{readxl}</span><span class="co">](https://readxl.tidyverse.org/)</span> reads spreadsheets, dplyr/tidyr (within <span class="co">[</span><span class="ot">{tidyverse}</span><span class="co">](https://www.tidyverse.org/)</span>) reshape data, <span class="co">[</span><span class="ot">{MASS}</span><span class="co">](https://CRAN.R-project.org/package=MASS)</span> and <span class="co">[</span><span class="ot">{lme4}</span><span class="co">](https://CRAN.R-project.org/package=lme4)</span> fit models, and the table and plotting packages format the output. If R reports that a package is missing, the setup has not finished.</span>
 <span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-packages</span></span>

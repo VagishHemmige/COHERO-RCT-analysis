@@ -102,7 +102,7 @@ div.csl-indent {
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-66ae90e4418e9d0ac3caa4b8c3bef75c.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9c6fd4a99ff4209dd1149a1765198857.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -131,17 +131,6 @@ div.csl-indent {
   }
 }</script>
 <style>
-div.callout-Results.callout {
-  border-left-color: #198754;
-}
-div.callout-Results.callout-style-default > .callout-header {
-  background-color: rgba(25, 135, 84, 0.13);
-}
-div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
-div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
-  content: '📊';
-  background-image: none;
-}
 div.callout-Pending.callout {
   border-left-color: #f0c400;
 }
@@ -162,6 +151,17 @@ div.callout-Rcode.callout-style-default > .callout-header {
 div.callout-Rcode .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
 div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode.callout-titled .callout-icon::before {
   content: '💻';
+  background-image: none;
+}
+div.callout-Results.callout {
+  border-left-color: #198754;
+}
+div.callout-Results.callout-style-default > .callout-header {
+  background-color: rgba(25, 135, 84, 0.13);
+}
+div.callout-Results .callout-toggle::before {  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="rgb(33, 37, 41)" class="bi bi-chevron-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');}
+div.callout-Results.callout-style-default .callout-icon::before, div.callout-Results.callout-titled .callout-icon::before {
+  content: '📊';
   background-image: none;
 }
 </style>
@@ -448,7 +448,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <section id="table-1" class="level2">
 <h2 class="anchored" data-anchor-id="table-1">Table 1</h2>
 <p>The baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. <code>select()</code> chooses the characteristics to describe and <code>tbl_summary(by = studyarm)</code> puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.</p>
-<p><code>bold_labels()</code>, captions and <code>as_flex_table()</code> change presentation. The <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">gtsummary tutorial</a> shows how to read and customize the defaults <span class="citation" data-cites="gtsummarytutorial">(<a href="#ref-gtsummarytutorial" role="doc-biblioref"><span class="nocase">gtsummary authors</span>, n.d.</a>)</span>. The script saves it with the other tables at the end.</p>
+<p><code>bold_labels()</code>, captions and <code>as_flex_table()</code> change presentation. The <a href="https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html">{gtsummary} tutorial</a> shows how to read and customize the defaults <span class="citation" data-cites="gtsummarytutorial">(<a href="#ref-gtsummarytutorial" role="doc-biblioref"><span class="nocase">gtsummary authors</span>, n.d.</a>)</span>. The script saves it with the other tables at the end.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -499,7 +499,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 </section>
 <section id="export-tables" class="level2">
 <h2 class="anchored" data-anchor-id="export-tables">Export tables</h2>
-<p>Every table, from this script and the model scripts, is saved to <code>tables/</code> as a Word file, one file per table, with <a href="../quarto/functions.html#save-a-table"><code>save_table()</code></a>, which converts gtsummary tables with <code>as_flex_table()</code> and saves them with flextable’s <code>save_as_docx()</code>. The file name says where the table came from, for example <code>mixed_model_effects_itt_act_score_overall.docx</code>. <code>tables/</code> is not committed: the tables are made from study data and stay private until they are cleared for release.</p>
+<p>Every table, from this script and the model scripts, is saved to <code>tables/</code> as a Word file, one file per table, with <a href="../quarto/functions.html#save-a-table"><code>save_table()</code></a>, which converts {gtsummary} tables with <code>as_flex_table()</code> and saves them with <a href="https://davidgohel.github.io/flextable/">{flextable}</a>’s <code>save_as_docx()</code>. The file name says where the table came from, for example <code>mixed_model_effects_itt_act_score_overall.docx</code>. <code>tables/</code> is not committed: the tables are made from study data and stay private until they are cleared for release.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Click to show/hide R Code</summary>
@@ -1053,7 +1053,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>The baseline filter selects one intended row per participant, so repeated visits do not make a participant count several times. <span class="in">`select()`</span> chooses the characteristics to describe and <span class="in">`tbl_summary(by = studyarm)`</span> puts the randomized arms in separate columns. This table describes who entered the comparison; it is not an estimate of treatment benefit. A missing or inapplicable questionnaire score is not a zero score.</span>
 <span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="in">`bold_labels()`</span>, captions and <span class="in">`as_flex_table()`</span> change presentation. The <span class="co">[</span><span class="ot">gtsummary tutorial</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)</span> shows how to read and customize the defaults <span class="co">[</span><span class="ot">@gtsummarytutorial</span><span class="co">]</span>. The script saves it with the other tables at the end.</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="in">`bold_labels()`</span>, captions and <span class="in">`as_flex_table()`</span> change presentation. The <span class="co">[</span><span class="ot">{gtsummary} tutorial</span><span class="co">](https://www.danieldsjoberg.com/gtsummary/articles/tbl_summary.html)</span> shows how to read and customize the defaults <span class="co">[</span><span class="ot">@gtsummarytutorial</span><span class="co">]</span>. The script saves it with the other tables at the end.</span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: table-1</span></span>
@@ -1071,7 +1071,7 @@ div.callout-Rcode.callout-style-default .callout-icon::before, div.callout-Rcode
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## Export tables</span></span>
 <span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>Every table, from this script and the model scripts, is saved to <span class="in">`tables/`</span> as a Word file, one file per table, with <span class="co">[</span><span class="ot">`save_table()`</span><span class="co">](functions.qmd#save-a-table)</span>, which converts gtsummary tables with <span class="in">`as_flex_table()`</span> and saves them with flextable's <span class="in">`save_as_docx()`</span>. The file name says where the table came from, for example <span class="in">`mixed_model_effects_itt_act_score_overall.docx`</span>. <span class="in">`tables/`</span> is not committed: the tables are made from study data and stay private until they are cleared for release.</span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>Every table, from this script and the model scripts, is saved to <span class="in">`tables/`</span> as a Word file, one file per table, with <span class="co">[</span><span class="ot">`save_table()`</span><span class="co">](functions.qmd#save-a-table)</span>, which converts {gtsummary} tables with <span class="in">`as_flex_table()`</span> and saves them with <span class="co">[</span><span class="ot">{flextable}</span><span class="co">](https://davidgohel.github.io/flextable/)</span>'s <span class="in">`save_as_docx()`</span>. The file name says where the table came from, for example <span class="in">`mixed_model_effects_itt_act_score_overall.docx`</span>. <span class="in">`tables/`</span> is not committed: the tables are made from study data and stay private until they are cleared for release.</span>
 <span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
 <span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: export-tables</span></span>
